@@ -9,8 +9,8 @@ Evolução do *CineMatch JS* (motor de recomendação que rodava no terminal Nod
 | **Projeto** | CineMatch Web: Recomendação de Séries em Tempo Real |
 | **Disciplina / módulo** | Desenvolvimento Mobile — Módulo 01 — Semana 13 (Projeto Avaliativo Final) |
 | **Prazo de entrega** | 05/10/2026 até 22h (vale a última atualização no repositório do GitHub) |
-| **Branch de trabalho** | `feature/cinematch-web` (individual — em squad: `feature/interface` e `feature/logica`) |
-| **Branch alvo** | `develop` → `main` (todo o código deve chegar à `main` no final; em squad o fluxo é o mesmo, com as duas branches de feature) |
+| **Branch de trabalho** | `feature/cinematch-web` (lógica) e `feature/cinematch-web-interface` (interface/UI) — squad de 2 pessoas, integração em `develop` |
+| **Branch alvo** | `develop` → `main` (todo o código deve chegar à `main` no final do projeto) |
 | **API utilizada** | TVMaze API — `https://api.tvmaze.com/shows?page=0` (API pública, sem chave) |
 | **Stack** | HTML5 + CSS3 (Flexbox, mobile-first) + JavaScript com módulos ES nativos — sem frameworks, sem build |
 | **Pacote de apoio** | `live-server` via npm (apenas servidor local de desenvolvimento) |
@@ -30,8 +30,29 @@ Evolução do *CineMatch JS* (motor de recomendação que rodava no terminal Nod
 ### Mecanismo de rastreio (checkboxes)
 
 - `- [ ]` = tarefa **pendente**.
-- `- [x]` = tarefa **concluída**, sempre acompanhada de `– Concluído em DD/MM/AAAA:HH:MM` para registrar a data real da conclusão.
-- O checkbox é a única fonte de verdade do andamento: a tarefa só sai de *A Fazer* quando o código estiver funcionando e testado, não quando estiver escrito — exceto quando for a única tarefa em execução, que fica na coluna *Em Andamento*.
+- `- [x]` = tarefa **concluída**, sempre acompanhada do bloco de proveniência `– Concluído em DD/MM/AAAA:HH:MM por Nome` 🟡, no formato exato da tabela de *Marcação de estado e bloco de proveniência*.
+- O checkbox é a única fonte de verdade do andamento: a tarefa só sai de *A Fazer* quando o código estiver funcionando e testado, não quando estiver escrito — exceto quando a tarefa entra em execução, que é quando passa a ocupar a coluna *Em Andamento*.
+
+### Marcação de estado e bloco de proveniência
+
+O bloco de proveniência é o trecho no final da linha que registra **estado, timestamp e responsável**. Ele segue uma única gramática nos dois estados:
+
+| Estado | Checkbox | Formato |
+| --- | --- | --- |
+| Em andamento | `- [ ]` na coluna *Em Andamento* | `– Em andamento desde DD/MM/AAAA:HH:MM por Nome` 🟡 |
+| Concluído | `- [x]` na coluna *Concluído* | `– Concluído em DD/MM/AAAA:HH:MM por Nome` 🟡 |
+
+Regras do bloco:
+
+- **Simetria:** `Concluído em` ↔ `Em andamento desde`, com o mesmo separador `– ` e o mesmo `DD/MM/AAAA:HH:MM por Nome`. Não invente um terceiro formato.
+- **O amarelo marca a proveniência, não o estado.** Quem codifica o estado é o checkbox. O 🟡 vai **apenas** no bloco de proveniência — nunca na linha inteira, nem na descrição da tarefa.
+- **Não use tag HTML para tentar o destaque.** O GitHub removeu o `<mark>` da allowlist do seu sanitizador, e `<span style="…">` nunca teve `style` como atributo permitido — ambos vazariam como texto literal no quadro publicado. O 🟡 é o único mecanismo de amarelo que sobrevive em todas as plataformas: GitHub, Trello, Notion e GitHub Projects, que a seção 5.5 do briefing aceita para publicar o quadro.
+- **Timestamp por comando**, nunca digitado à mão: `Get-Date -Format 'dd/MM/yyyy:HH:mm'` (PowerShell) ou `date '+%d/%m/%Y:%H:%M'` (POSIX).
+- **Responsável obrigatório** no squad: sem `por Nome` não há rastreabilidade de autoria.
+- **Placeholder:** a linha `_Nenhuma tarefa em andamento no momento._` só existe quando a coluna *Em Andamento* está vazia. Havendo task na coluna, ela é removida.
+- **Coluna "Coluna atual" da Rastreabilidade:** quando um mesmo RF ou critério é entregue por tasks em colunas diferentes, a célula lista as colunas separadas por ` / `, na ordem em que as tasks aparecem na célula de tarefas — por exemplo `Concluído / A Fazer`.
+- **WIP por pessoa:** o limite escala com o tamanho do time, porque o WIP existe para limitar a mudança de contexto de **cada pessoa**, não do time. É **1 no trabalho solo** e **3 no squad de 2 pessoas**. O 3 vem de tasks **acopladas** — o HTML e o CSS da mesma tela são uma unidade de trabalho e compartilham um slot, enquanto a task de lógica ocupa o outro. Subir além disso anula a proteção contra dispersão.
+- **Nota `_Bloqueio:_`:** quando a dependência declarada ainda não foi resolvida, registre o bloqueio no fim da linha, depois da nota de dependência e **antes** do bloco de proveniência. A nota descreve a dependência e pode citar a coluna em que ela está; o estado da **própria** task é definido só pelo checkbox. É por isso que o checkbox continua sendo a única fonte de verdade do estado.
 
 ### Colunas do quadro
 
@@ -39,7 +60,7 @@ Evolução do *CineMatch JS* (motor de recomendação que rodava no terminal Nod
 | --- | --- |
 | **Backlog** | Ideias de bônus e melhorias **sem nota**. Não têm `M1-T##` e não entram na rastreabilidade de RF. |
 | **A Fazer** | Cadeia principal de desenvolvimento, na ordem do passo a passo sugerido (seção 5.1 do briefing). |
-| **Em Andamento** | Tarefa em execução agora — no máximo uma por vez, para manter o foco. |
+| **Em Andamento** | Tarefas em execução agora — uma por pessoa, mais as tasks acopladas da mesma tela que compartilham o slot dela. |
 | **Concluído** | Tarefas finalizadas, com data registrada. |
 
 ### Convenções técnicas
@@ -69,9 +90,6 @@ Ideias de bônus da seção 8 do briefing e melhorias possíveis. **Não contam 
 ## A Fazer
 
 - [ ] `M1-T02` **RF01 — HTML semântico da página.** Montar a estrutura de `index.html` com `header`, `main`, `section`, `article` (um por série recomendada) e `footer`, um único `h1`, `<title>`, `<meta name="description">`, og tags (`og:title`, `og:description`, `og:type`, `og:url`, `og:image`) e `lang="pt-BR"` no `<html>`. _Depende de: M1-T01._
-- [ ] `M1-T03` **RF02 — Formulário de perfil.** Montar `<form id="form-perfil">` dentro da `<main>`: `<label for="nome">` com `<input type="text" id="nome" required>`, `<label for="idade">` com `<input type="number" id="idade" min="1" required>`, `<fieldset>` + `<legend>Gêneros favoritos</legend>` com checkboxes `name="genero"` (Drama, Comédia, Ação e outros) e `<button type="submit">Ver recomendações</button>`. _Depende de: M1-T02._
-- [ ] `M1-T04` **RF09 — Estilo da tela do formulário (1ª metade).** Criar `style.css` externo, mobile-first, aplicando box model, cores, espaçamento e Flexbox no formulário, usando o wireframe da seção 3 do briefing como referência. _Depende de: M1-T03._
-- [ ] `M1-T05` **RF02 — Captura e validação do formulário.** Em `script.js`, registrar `addEventListener('submit', ...)` com `preventDefault()`, montar o objeto `usuario` com `{ nome, idade, generosFavoritos }` (lendo os checkboxes por `name="genero"`), confirmar com `console.log` e exibir feedback de erro acessível quando a validação falhar (nome vazio, idade fora de faixa, nenhum gênero marcado). _Depende de: M1-T03, M1-T04._
 - [ ] `M1-T06` **RF03 — Persistir perfil no `localStorage`.** Salvar com `localStorage.setItem('cinematchPerfil', JSON.stringify(usuario))` e recuperar com `getItem` + `JSON.parse`, tratando o `null` da primeira visita; com perfil salvo, pular o formulário e ir direto ao catálogo; adicionar botão "Trocar perfil" que limpa o registro e reabre o formulário. _Depende de: M1-T05._
 - [ ] `M1-T07` **RF04 — Buscar catálogo real via `fetch`.** Implementar `async function buscarCatalogo()` com `await fetch('https://api.tvmaze.com/shows?page=0')` dentro de `try/catch`, validar `response.ok` e registrar o resultado bruto no `console` antes de tratar; em caso de falha, acionar `exibirMensagemDeErro` para que a página nunca fique travada. _Depende de: M1-T01, M1-T06._
 - [ ] `M1-T08` **RF05 — Tratar o catálogo com métodos de array.** Encadear ao menos 3 métodos: `filter` (só séries com `genres.length > 0` e `rating.average`), `sort` por `rating.average` decrescente, `slice` para limitar a 8 itens e `map` para normalizar em `{ id, titulo, tipo, generos, duracaoMinutos }`; tratar catálogo vazio com a mensagem "Não encontramos recomendações agora". _Depende de: M1-T07._
@@ -87,7 +105,7 @@ Ideias de bônus da seção 8 do briefing e melhorias possíveis. **Não contam 
 - [ ] `M1-T18` **RF15 — Servir o projeto com `live-server`.** Criar `package.json` com o script `"start": "live-server"` e `live-server` em `devDependencies` (instalação local, não global), rodar `npm install` e validar que os módulos ES carregam pelo servidor. _Depende de: M1-T01, M1-T17._
 - [ ] `M1-T19` **Entrega — Teste integrado do zero.** Limpar `cinematchPerfil` do `localStorage`, recarregar, refazer o formulário e conferir se os cards aparecem corretamente; repetir o teste com a internet desligada para validar a mensagem de erro; testar em desktop e celular. _Depende de: M1-T18._
 - [ ] `M1-T20` **Entrega — Escrever o `README.md`.** Documentar o nome do software, o problema que ele resolve, as técnicas e linguagens utilizadas, como executar e quais melhorias são possíveis; explicar em poucas linhas a diferença entre CommonJS (`require`/`module.exports`, do CineMatch JS original) e ESM (`import`/`export`, usado aqui), as escolhas de `const`/`let` e onde o escopo de bloco importou, além de justificar o uso sem `!important`; incluir alguma imagem ou diagrama para melhorar o entendimento, como sugere a seção 5.7. _Depende de: M1-T19._
-- [ ] `M1-T21` **Entrega — Commits descritivos e fluxo de branches.** Fazer pelo menos 5 commits padronizados por funcionalidade (prefixos `feat:`, `style:`, `docs:`) seguindo o fluxo `feature/cinematch-web` → `develop` → `main`, garantindo que todo o código esteja na `main` ao final; em squad: 8 commits e as duas branches de feature da seção 5.6. Não é preciso criar uma branch para cada RF — o objetivo é mostrar que sabe separar trabalho numa branch de feature e trazer de volta para a `develop`, não multiplicar branches. _Depende de: M1-T20._
+- [ ] `M1-T21` **Entrega — Commits descritivos e fluxo de branches.** Fazer pelo menos 5 commits padronizados por funcionalidade (prefixos `feat:`, `style:`, `docs:`) seguindo o fluxo `feature/cinematch-web` (lógica), `feature/cinematch-web-interface` (interface/UI) → `develop` → `main`, garantindo que todo o código esteja na `main` ao final; em squad: 8 commits e as duas branches de feature da seção 5.6. Não é preciso criar uma branch para cada RF — o objetivo é mostrar que sabe separar trabalho numa branch de feature e trazer de volta para a `develop`, não multiplicar branches. _Depende de: M1-T20._
 - [ ] `M1-T22` **Entrega — Gravar o vídeo de até 7 minutos.** Abordar os 5 tópicos do item 5.8: objetivo do sistema e demonstração de funcionamento; o que deve ser feito para executar o sistema; como as tarefas foram organizadas antes de começar; quais branches foram criadas e o objetivo de cada uma; e o que falta no código que poderia ser melhorado. Pode gravar na vertical ou na horizontal, mas é importante que o rosto apareça e que a gravação seja feita em um local com boa iluminação; deixar o vídeo no Google Drive em modo leitor ou no YouTube como "não listado". _Depende de: M1-T21._
 - [ ] `M1-T23` **Entrega — Publicar e enviar os links.** Publicar o repositório no GitHub como repositório público, publicar este quadro Kanban com link público de acesso (a seção 5.5 aceita Trello, GitHub Projects, Notion, um quadro simples no README, planilha ou imagem) e enviar os links no AVA (repositório público, quadro Kanban e vídeo de apresentação), respeitando o prazo de 05/10/2026 até 22h. _Depende de: M1-T22._
 
@@ -95,32 +113,36 @@ Ideias de bônus da seção 8 do briefing e melhorias possíveis. **Não contam 
 
 ## Em Andamento
 
-- _Nenhuma tarefa em andamento no momento._
+- [ ] `M1-T03` **RF02 — Formulário de perfil.** Montar `<form id="form-perfil">` dentro da `<main>`: `<label for="nome">` com `<input type="text" id="nome" required>`, `<label for="idade">` com `<input type="number" id="idade" min="1" required>`, `<fieldset>` + `<legend>Gêneros favoritos</legend>` com checkboxes `name="genero"` (Drama, Comédia, Ação e outros) e `<button type="submit">Ver recomendações</button>`. _Depende de: M1-T02._ _Bloqueio: a dependência declarada é a M1-T02, que segue em A Fazer; o formulário entra em construção em paralelo._ – Em andamento desde 26/09/2026:13:37 por Lucas 🟡
+
+- [ ] `M1-T04` **RF09 — Estilo da tela do formulário (1ª metade).** Criar `style.css` externo, mobile-first, aplicando box model, cores, espaçamento e Flexbox no formulário, usando o wireframe da seção 3 do briefing como referência. _Depende de: M1-T03._ _Bloqueio: a dependência declarada é a M1-T03, que está em Em Andamento; a folha de estilo entra em construção em paralelo._ – Em andamento desde 26/09/2026:13:37 por Lucas 🟡
+
+- [ ] `M1-T05` **RF02 — Captura e validação do formulário.** Em `script.js`, registrar `addEventListener('submit', ...)` com `preventDefault()`, montar o objeto `usuario` com `{ nome, idade, generosFavoritos }` (lendo os checkboxes por `name="genero"`), confirmar com `console.log` e exibir feedback de erro acessível quando a validação falhar (nome vazio, idade fora de faixa, nenhum gênero marcado). _Depende de: M1-T03, M1-T04._ _Bloqueio: as dependências declaradas são a M1-T03 e a M1-T04, ambas em Em Andamento; a captura do `submit` e a leitura dos checkboxes `name="genero"` só fecham quando o formulário existir._ – Em andamento desde 26/09/2026:13:05 por Tiago 🟡
 
 ---
 
 ## Concluído
 
-- [x] `M1-T00` **Planejar o quadro — Ler o briefing e mapear os 15 RFs e o passo a passo sugerido em tarefas.** Levantamento dos requisitos funcionais RF01–RF15 (seção 5.3), do passo a passo sugerido (seção 5.1), da organização de projeto (5.2), dos requisitos técnicos (5.4), do versionamento Git/GitHub (5.6), dos critérios de avaliação (seção 6), do checklist final de entrega (seção 7) e das ideias de bônus (seção 8), convertendo cada passo em uma tarefa rastreável deste quadro. – Concluído em 25/09/2026:20:28
-- [x] `M1-T01` **RF15 (parcial) — Bootstrap do projeto.** Criar a estrutura de arquivos do projeto dentro da pasta versionada no Git (`index.html`, `style.css`, `script.js`, `ui.js`, `modelo.js`) e o `package.json` com o script de `live-server`, deixando o repositório pronto para receber o código; aqui só são criados os arquivos em branco e o `package.json` — a instalação e a validação do `live-server` ficam em `M1-T18`. _Sem dependências._ – Concluído em 25/09/2026:22:51
+- [x] `M1-T00` **Planejar o quadro — Ler o briefing e mapear os 15 RFs e o passo a passo sugerido em tarefas.** Levantamento dos requisitos funcionais RF01–RF15 (seção 5.3), do passo a passo sugerido (seção 5.1), da organização de projeto (5.2), dos requisitos técnicos (5.4), do versionamento Git/GitHub (5.6), dos critérios de avaliação (seção 6), do checklist final de entrega (seção 7) e das ideias de bônus (seção 8), convertendo cada passo em uma tarefa rastreável deste quadro. – Concluído em 25/09/2026:20:28 por Lucas 🟡
+- [x] `M1-T01` **RF15 (parcial) — Bootstrap do projeto.** Criar a estrutura de arquivos do projeto dentro da pasta versionada no Git (`index.html`, `style.css`, `script.js`, `ui.js`, `modelo.js`) e o `package.json` com o script de `live-server`, deixando o repositório pronto para receber o código; aqui só são criados os arquivos em branco e o `package.json` — a instalação e a validação do `live-server` ficam em `M1-T18`. _Sem dependências._ – Concluído em 25/09/2026:22:51 por Lucas 🟡
 
 ---
 
 ## Rastreabilidade
 
-Cada linha da tabela abaixo mapeia um requisito funcional do briefing (seção 5.3) à tarefa que o entrega, à coluna em que ele está e ao peso correspondente na nota de 0 a 10.
+Cada linha da tabela abaixo mapeia um requisito funcional do briefing (seção 5.3) à tarefa que o entrega, à(s) coluna(s) em que ele está e ao peso correspondente na nota de 0 a 10.
 
 | RF | Requisito funcional (seção 5.3) | Tarefa(s) | Coluna atual | Peso na avaliação |
 | --- | --- | --- | --- | --- |
 | **RF01** | Estruturar a página com HTML semântico | `M1-T02`, `M1-T16` | A Fazer | Critério 9 — Estrutura da página HTML — **0,50**, compartilhado com a RF13 |
-| **RF02** | Criar o formulário de perfil com tratamento de erro | `M1-T03`, `M1-T05` | A Fazer | Critério 11 — Formulário e validação — **0,50** |
+| **RF02** | Criar o formulário de perfil com tratamento de erro | `M1-T03`, `M1-T05` | Em Andamento | Critério 11 — Formulário e validação — **0,50** |
 | **RF03** | Persistir o perfil com `localStorage` | `M1-T06` | A Fazer | Critério 14 — LocalStorage — **0,50** |
 | **RF04** | Buscar o catálogo real via `fetch` | `M1-T07` | A Fazer | Critério 13 — Consumo de dados — **0,50**, compartilhado com a RF12 |
 | **RF05** | Tratar o catálogo com métodos de array | `M1-T08` | A Fazer | Critério 6 — Utilização de métodos — **0,50** |
 | **RF06** | Reaproveitar e adaptar as classes do projeto anterior | `M1-T09` | A Fazer | Critério 7 — Utilização de métodos de classe — **0,50** |
 | **RF07** | Calcular e classificar a compatibilidade | `M1-T10` | A Fazer | Critério 5 — Compatibilidade entre perfil e catálogo — **1,00** |
 | **RF08** | Renderizar os resultados no DOM | `M1-T11` | A Fazer | Critério 12 — Conteúdo dinâmico — **0,50** |
-| **RF09** | Estilizar com Flexbox e responsividade | `M1-T04`, `M1-T12` | A Fazer | Critério 10 — Responsividade — **0,50** |
+| **RF09** | Estilizar com Flexbox e responsividade | `M1-T04`, `M1-T12` | Em Andamento / A Fazer | Critério 10 — Responsividade — **0,50** |
 | **RF10** | Usar callback | `M1-T13` | A Fazer | Critério 8 — Emprego de callback e closure — **0,50**, compartilhado com a RF11 (callback) |
 | **RF11** | Usar closure | `M1-T14` | A Fazer | Critério 8 — Emprego de callback e closure — **0,50**, compartilhado com a RF10 (closure) |
 | **RF12** | Usar uma Browser API de tempo | `M1-T15` | A Fazer | Critério 13 — Consumo de dados — **0,50**, compartilhado com a RF04 (estado "carregando") |
@@ -135,7 +157,7 @@ Cada linha da tabela abaixo mapeia um requisito funcional do briefing (seção 5
 | 1 — Realizou a gravação de um vídeo? | **1,50** | `M1-T22` | A Fazer |
 | 2 — Versionamento com branches e commits | **1,00** | `M1-T21` | A Fazer |
 | 3 — Organização dos arquivos no repositório | **1,00** | `M1-T01`, `M1-T18`, `M1-T20` | Concluído / A Fazer |
-| 4 — Modelagem do perfil da pessoa usuária e catálogo de séries | **0,50** | `M1-T05` (objeto `usuario`), `M1-T08` (array de séries tratado) | A Fazer |
+| 4 — Modelagem do perfil da pessoa usuária e catálogo de séries | **0,50** | `M1-T05` (objeto `usuario`), `M1-T08` (array de séries tratado) | Em Andamento / A Fazer |
 | Teste integrado do zero (item 18 do checklist) | **Sem peso** — não é critério notado, é boa prática | `M1-T19` | A Fazer |
 | Links no AVA e prazo de 05/10/2026 22h (itens 2 e 4 da seção 4) | **Sem peso** — é penalidade, não critério | `M1-T23` | A Fazer |
 
@@ -158,6 +180,7 @@ Cada linha da tabela abaixo mapeia um requisito funcional do briefing (seção 5
 | 7 | **Vídeo acima de 7 minutos** ou com permissão de visualização errada | Médio — penalidade no Critério 1 (peso 1,50) | Cronometrar a gravação, cortar takes excedentes e revisar a permissão "qualquer pessoa com o link" antes de enviar |
 | 8 | **Nota zero por plágio** — o briefing penaliza cópia da internet ou de colegas com nota 0 | Alto — zera a avaliação | Escrever todas as linhas do zero, comentar o raciocínio e saber explicar cada trecho; usar o briefing e a documentação apenas como referência. A seção 4 do briefing autoriza pedir ajuda à IA, desde que o resultado seja adaptado ao desafio e cada linha seja explicada com segurança — a penalidade é pela cópia, não pelo uso da ferramenta |
 | 9 | **Links não submetidos no AVA** geram penalidade na nota | Alto — perda direta de pontos | Submeter os links do item 4 do briefing assim que o repositório, o quadro e o vídeo estiverem públicos |
+| 10 | **Dependência técnica declarada mas não satisfeita** — a `M1-T05` registra o `submit` e lê os checkboxes `name="genero"`, que só existem quando o formulário da `M1-T03` estiver montado; as três estão em Em Andamento, com o bloqueio declarado na linha de cada uma | Médio — se a captura do `submit` for fechada antes do formulário, o código fica órfão e o rastreio das tasks não sustenta a afirmação de que o trabalho foi organizado antes de começar | Tratar a `M1-T05` e a `M1-T03` como um bloco de trabalho acoplado, com o bloqueio declarado na própria linha de cada tarefa; fechar a `M1-T05` só depois que a `M1-T03` estiver funcional e testada |
 
 ---
 
