@@ -78,11 +78,17 @@ O detalhamento de cada RF, com critérios de aceitação e pesos, está em `docs
 
 Os agentes deste ambiente vêm configurados de outro projeto e esperam um backlog em `docs/PROJECT_BACKLOG_*.md`. **Neste projeto esse arquivo não existe. O backlog é `docs/KANBAN.md`.** Qualquer agente que procurar pelo caminho padrão vai concluir que não há backlog e perder o rastreamento.
 
-**O que o arquivo contém (190 linhas):** cabeçalho com metadados, legenda e convenções, as 4 colunas obrigatórias (Backlog, A Fazer, Em Andamento, Concluído), tabela de Rastreabilidade (RF, tarefa, coluna, peso), riscos com mitigação e o checklist final de entrega com 24 itens, reprodução literal da seção 7 do briefing.
+**O que o arquivo contém:** cabeçalho com metadados, legenda e convenções, as 4 colunas obrigatórias (Backlog, A Fazer, Em Andamento, Concluído), tabela de Rastreabilidade (RF, tarefa, coluna, peso), riscos com mitigação e o checklist final de entrega com 24 itens, reprodução literal da seção 7 do briefing.
 
-**IDs de tarefa:** `M1-T00` a `M1-T23`. Hoje `M1-T00` (planejar o quadro) está em *Concluído*, `M1-T01` (bootstrap) está em *Em Andamento* e `M1-T02` a `M1-T23` estão em *A Fazer*. Os itens da coluna *Backlog* são bônus sem nota e **não** têm ID `M1-T##`.
+**IDs de tarefa:** `M1-T00` a `M1-T23`. A numeração é fixa e não muda; os IDs nunca são reaproveitados. Os itens da coluna *Backlog* são bônus sem nota e **não** têm ID `M1-T##`.
 
-**Como marcar uma tarefa como concluída:** troque `- [ ]` por `- [x]` **e** acrescente ao final da linha ` – Concluído em DD/MM/AAAA:HH:MM`. O timestamp tem de vir de um comando executado no momento, nunca digitado à mão: `Get-Date -Format 'dd/MM/yyyy:HH:mm'` (PowerShell, o shell deste ambiente) ou `date '+%d/%m/%Y:%H:%M'` (Git Bash ou outro shell POSIX) — ambos produzem exatamente o mesmo formato. Atenção: no PowerShell, `date` é alias de `Get-Date` e não entende `strftime`, então falha.
+**Qual tarefa está em qual coluna não é registrado aqui.** O estado do quadro vive só no `docs/KANBAN.md`, que é a fonte de verdade — e o checkbox da linha é a única fonte de verdade do estado. O `AGENTS.md` registra apenas as regras: como marcar, como mover, com que formato. Antes de mover qualquer tarefa, **leia o `docs/KANBAN.md`**; se este arquivo e o quadro divergirem sobre o estado, o quadro vence.
+
+**Como marcar uma tarefa como concluída:** troque `- [ ]` por `- [x]` **e** acrescente ao final da linha `– Concluído em DD/MM/AAAA:HH:MM por Nome` 🟡. O campo `por Nome` é **obrigatório no squad**: é ele que dá rastreabilidade de autoria, e o Critério 2 da avaliação (peso 1,00) pesa justamente em versionamento e na capacidade de mostrar quem fez o quê, quando. O timestamp tem de vir de um comando executado no momento, nunca digitado à mão: `Get-Date -Format 'dd/MM/yyyy:HH:mm'` (PowerShell, o shell deste ambiente) ou `date '+%d/%m/%Y:%H:%M'` (Git Bash ou outro shell POSIX) — ambos produzem exatamente o mesmo formato. Atenção: no PowerShell, `date` é alias de `Get-Date` e não entende `strftime`, então falha.
+
+**Como marcar uma tarefa como em andamento:** mova a tarefa para a coluna *Em Andamento* **e** acrescente ao final da linha `– Em andamento desde DD/MM/AAAA:HH:MM por Nome` 🟡. É a mesma gramática da conclusão, com o rótulo trocado: `Concluído em` ↔ `Em andamento desde`. **Nunca** escreva só o nome da pessoa no fim da linha — sem estado, sem timestamp e sem marcador, a linha não é parseável e o quadro perde o registro de há quanto tempo a tarefa está na coluna. O limite de WIP é **1 por pessoa** — 1 no trabalho solo, 3 no squad de 2 pessoas, porque o HTML e o CSS da mesma tela são tasks acopladas e compartilham um slot, enquanto a task de lógica ocupa o outro. Dependência declarada **não** precisa estar resolvida para entrar na coluna, mas o bloqueio tem que ficar **visível na própria linha**, com a marca `_Bloqueio:_`, depois da nota de dependência e antes do bloco de proveniência. A nota descreve a dependência e pode citar a coluna em que ela está; o estado da **própria** task é definido só pelo checkbox, que continua sendo a única fonte de verdade. Havendo task na coluna, remova o placeholder `_Nenhuma tarefa em andamento no momento._`, que só existe enquanto a coluna está vazia.
+
+**Bloco de proveniência (estado, timestamp e responsável):** o trecho final da linha é sempre `– <estado> DD/MM/AAAA:HH:MM por Nome` seguido de 🟡 — por exemplo `– Concluído em 25/09/2026:20:28 por Lucas 🟡`. O 🟡 é o único mecanismo de amarelo que funciona em todas as plataformas: GitHub, Trello, Notion e GitHub Projects, que a seção 5.5 do briefing aceita para publicar o quadro. **Não** tente o destaque com tag HTML: o GitHub removeu o `<mark>` da allowlist do sanitizador, e `<span style="…">` nunca teve `style` como atributo permitido, então as duas vazariam como texto literal no quadro publicado. O 🟡 marca **a proveniência, não o estado** — quem codifica o estado é o checkbox `- [ ]` / `- [x]`. O destaque vai **apenas** no bloco, nunca na linha inteira nem na descrição da tarefa.
 
 **Regras de movimentação:**
 
@@ -99,12 +105,17 @@ Os agentes deste ambiente vêm com regras padrão que **não se aplicam** aqui. 
 
 | Regra padrão do ambiente | Neste projeto |
 | --- | --- |
-| Branch por tarefa, no formato `feature/{slug}` ou `feature/{CAT}-{NUM}` | Branch **fixa** `feature/cinematch-web` |
+| Branch por tarefa, no formato `feature/{slug}` ou `feature/{CAT}-{NUM}` | Duas branches **fixas** de feature, uma por pessoa: `feature/cinematch-web` (lógica) e `feature/cinematch-web-interface` (interface/UI) |
 | `main` e `develop` proibidos | **`main` e `develop` são obrigatórios**, por exigência do professor |
+| Commit direto na branch de feature | Não. A integração acontece em `develop`: commit na branch de feature, merge em `develop`, e `develop` para `main` só no fim do projeto |
 
-**Branches:** `main`, `develop` e `feature/cinematch-web`. Em squad (até 3 pessoas), usam-se também `feature/interface` (formulário e estilos) e `feature/logica` (API, classes e compatibilidade) — a criar caso o trabalho seja dividido entre pessoas.
+**Branches:** `main`, `develop` e as duas branches de feature do squad — `feature/cinematch-web` (lógica: API, classes, compatibilidade) e `feature/cinematch-web-interface` (interface: formulário, estilos, cards). A divisão é por pessoa: quem faz lógica commita na branch de lógica, quem faz interface commita na branch de interface. As duas convergem em `develop`.
 
-**Fluxo:** `feature/cinematch-web` para `develop`, e `develop` para `main`. Todo o código deve chegar na `main` no fim do projeto — não faça merge na `main` antes disso.
+**Desvio do briefing, e por quê.** A seção 5.6 do briefing sugere, para squad, `feature/interface` e `feature/logica`. Usamos `feature/cinematch-web` e `feature/cinematch-web-interface` porque `feature/cinematch-web` é o nome que o próprio briefing dá à branch individual, e o ambiente exige `feature/{slug}` fixo. Os papéis são os mesmos — um branch por pessoa, uma de interface e uma de lógica — então o Critério 2 é atendido. Vale a pena citar essa razão no vídeo, porque o item 5.8 pede para explicar quais branches foram criadas e para quê.
+
+**Antes de commitar, atualizar a branch de integração.** O `develop` local pode ficar atrás do remoto depois de um merge via PR. Commitar em cima de um `develop` desatualizado gera push rejeitado por non-fast-forward, e a saída errada — um force push — apaga trabalho já mergeado. Confira com `git log --oneline develop..origin/develop`; se houver commits, faça fast-forward com `git merge --ff-only origin/develop` **antes** de commitar. Nunca force push neste repositório, nem com `--force` nem com `--force-with-lease`.
+
+**Fluxo:** `feature/cinematch-web` e `feature/cinematch-web-interface` para `develop`, e `develop` para `main`. Todo o código deve chegar na `main` no fim do projeto — não faça merge na `main` antes disso. Mudança de convenção do próprio quadro e do `AGENTS.md` vai direto em `develop`, porque vale para as duas branches.
 
 **Não é preciso criar uma branch por RF.** O objetivo é mostrar que se sabe separar trabalho numa branch de feature e trazê-la de volta. Não multiplicar branches.
 
@@ -139,7 +150,7 @@ O diretório externo para trabalho temporário, como scripts e extrações, é `
 ### Gotchas do ambiente Windows e PowerShell
 
 - **O modelo não lê PDF.** Para extrair texto de PDF use `pypdf`, já instalado na versão 6.15.0 com Python 3.12. Grave um script em vez de usar `python -c`.
-- **`Measure-Object -Line` conta só linhas não-vazias.** Um arquivo de 190 linhas com 42 em branco reporta 148. Use `$a = Get-Content <arquivo>` seguido de `$a.Count` para a contagem real. Já causou um falso alarme nesta sessão.
+- **`Measure-Object -Line` conta só linhas não-vazias.** Um arquivo com 42 linhas em branco reporta menos que o total real. Use `$a = Get-Content <arquivo>` seguido de `$a.Count` para a contagem real. Já causou um falso alarme nesta sessão.
 - **O console do PowerShell corrompe acentuação na saída**, e `Módulo` vira `M�dulo`. O arquivo em si está correto em UTF-8. **Não "conserte" acentuação que só está errada na tela do terminal** — isso corromperia o arquivo.
 - `Get-ChildItem`, `Get-Content` e `Set-Content` devem ser evitados em favor das ferramentas dedicadas de leitura, busca e escrita.
 
@@ -164,7 +175,7 @@ Existem cinco agentes globais já configurados, **fora deste repositório**, em 
 | `task-planner` | Planeja. **Deve ler `docs/KANBAN.md`, não procurar `docs/PROJECT_BACKLOG_*.md`** |
 | `dev` | Implementa. Marca a task no `docs/KANBAN.md` com `Get-Date -Format 'dd/MM/yyyy:HH:mm'`, conforme a seção 5 |
 | `code-review` | Revisa o código contra os RFs e a convenção do quadro |
-| `git-commit` | Commits e branches. Branch fixa `feature/cinematch-web`, com `main` e `develop` permitidos aqui |
+| `git-commit` | Commits e branches. As duas branches fixas de feature (`feature/cinematch-web` e `feature/cinematch-web-interface`), com `main` e `develop` permitidos aqui |
 
 Regras de orquestração que valem para este projeto:
 
@@ -228,10 +239,10 @@ Prazo: **05/10/2026 até 22h**, contado pela última atualização no repositór
 
 | Caminho | O que é |
 | --- | --- |
-| `docs/KANBAN.md` | **O backlog.** 190 linhas, 24 tarefas, 15 RFs rastreados e 24 itens de checklist |
+| `docs/KANBAN.md` | **O backlog e a fonte de verdade do estado do quadro.** 24 tarefas, 15 RFs rastreados e 24 itens de checklist |
 | `docs/Projeto Avaliativo Final - Módulo 01 - Mobile React Native T1 - M1S13 (1).pdf` | O briefing original, 16 páginas. Fonte de verdade quando algo divergir |
 | `.gitattributes` | Força LF em `md`, `js`, `css` e `html`. Não remover |
-| `index.html`, `style.css`, `script.js`, `ui.js`, `modelo.js`, `package.json` | A aplicação e o `package.json` do `live-server`. Ainda não criados, porque `M1-T01` está em *Em Andamento* |
+| `index.html`, `style.css`, `script.js`, `ui.js`, `modelo.js`, `package.json` | A aplicação e o `package.json` do `live-server`. O estado da implementação vive no `docs/KANBAN.md`, não aqui |
 | `.opencode/plans/` | Planos de implementação, quando houver |
 
 > **Regra de precedência:** quando este arquivo, o `docs/KANBAN.md` e o PDF divergirem, o **PDF vence** — é o briefing do professor. Corrija os outros dois.
