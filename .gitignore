@@ -1,0 +1,19 @@
+# Dependências do npm (entram na M1-T18, com `npm install`)
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editores e IDE (o projeto não usa build; nada disso faz parte do repositório)
+.vscode/
+.idea/
+
+# NÃO ignorar: package-lock.json — ele registra a versão exata do live-server
+# NÃO ignorar: .opencode/ — os planos de implementação entram no histórico

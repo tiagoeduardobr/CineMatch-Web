@@ -1,0 +1,11 @@
+/*
+ * CineMatch Web — estilos da aplicação.
+ *
+ * Esqueleto da tarefa M1-T01 (RF15 parcial). Este arquivo existe para que o
+ * <link rel="stylesheet"> do index.html já resolva e para deixar registrada a
+ * separação de responsabilidade entre marcação e estilo.
+ *
+ * As regras entram na M1-T04 (tela do formulário) e na M1-T12 (grade de cards),
+ * sempre com Flexbox e mobile-first. CSS Grid, Sass e CSS-in-JS estão fora do
+ * escopo do Módulo 01 e não podem aparecer aqui (AGENTS.md, seção 2).
+ */

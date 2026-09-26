@@ -95,13 +95,14 @@ Ideias de bônus da seção 8 do briefing e melhorias possíveis. **Não contam 
 
 ## Em Andamento
 
-- [ ] `M1-T01` **RF15 (parcial) — Bootstrap do projeto.** Criar a estrutura de arquivos do projeto dentro da pasta versionada no Git (`index.html`, `style.css`, `script.js`, `ui.js`, `modelo.js`) e o `package.json` com o script de `live-server`, deixando o repositório pronto para receber o código; aqui só são criados os arquivos em branco e o `package.json` — a instalação e a validação do `live-server` ficam em `M1-T18`. _Sem dependências._
+- _Nenhuma tarefa em andamento no momento._
 
 ---
 
 ## Concluído
 
 - [x] `M1-T00` **Planejar o quadro — Ler o briefing e mapear os 15 RFs e o passo a passo sugerido em tarefas.** Levantamento dos requisitos funcionais RF01–RF15 (seção 5.3), do passo a passo sugerido (seção 5.1), da organização de projeto (5.2), dos requisitos técnicos (5.4), do versionamento Git/GitHub (5.6), dos critérios de avaliação (seção 6), do checklist final de entrega (seção 7) e das ideias de bônus (seção 8), convertendo cada passo em uma tarefa rastreável deste quadro. – Concluído em 25/09/2026:20:28
+- [x] `M1-T01` **RF15 (parcial) — Bootstrap do projeto.** Criar a estrutura de arquivos do projeto dentro da pasta versionada no Git (`index.html`, `style.css`, `script.js`, `ui.js`, `modelo.js`) e o `package.json` com o script de `live-server`, deixando o repositório pronto para receber o código; aqui só são criados os arquivos em branco e o `package.json` — a instalação e a validação do `live-server` ficam em `M1-T18`. _Sem dependências._ – Concluído em 25/09/2026:22:51
 
 ---
 
@@ -125,7 +126,7 @@ Cada linha da tabela abaixo mapeia um requisito funcional do briefing (seção 5
 | **RF12** | Usar uma Browser API de tempo | `M1-T15` | A Fazer | Critério 13 — Consumo de dados — **0,50**, compartilhado com a RF04 (estado "carregando") |
 | **RF13** | SEO básico e acessibilidade | `M1-T16` | A Fazer | Critério 9 — Estrutura da página HTML — **0,50**, compartilhado com a RF01 (SEO e acessibilidade) |
 | **RF14** | Organizar o código em módulos ES (`import`/`export`) | `M1-T17` | A Fazer | Critério 15 — Módulos ES — **0,50** |
-| **RF15** | Servir o projeto com um pacote via npm | `M1-T01`, `M1-T18` | Em Andamento / A Fazer | Sem critério próprio na seção 6 — registrado no Critério 3 (organização do repositório), que já aparece abaixo; ver nota sobre o compartilhamento de pontos |
+| **RF15** | Servir o projeto com um pacote via npm | `M1-T01`, `M1-T18` | Concluído / A Fazer | Sem critério próprio na seção 6 — registrado no Critério 3 (organização do repositório), que já aparece abaixo; ver nota sobre o compartilhamento de pontos |
 
 ### Critérios e obrigações cobertos por tarefas sem RF exclusivo
 
@@ -133,7 +134,7 @@ Cada linha da tabela abaixo mapeia um requisito funcional do briefing (seção 5
 | --- | --- | --- | --- |
 | 1 — Realizou a gravação de um vídeo? | **1,50** | `M1-T22` | A Fazer |
 | 2 — Versionamento com branches e commits | **1,00** | `M1-T21` | A Fazer |
-| 3 — Organização dos arquivos no repositório | **1,00** | `M1-T01`, `M1-T18`, `M1-T20` | Em Andamento / A Fazer |
+| 3 — Organização dos arquivos no repositório | **1,00** | `M1-T01`, `M1-T18`, `M1-T20` | Concluído / A Fazer |
 | 4 — Modelagem do perfil da pessoa usuária e catálogo de séries | **0,50** | `M1-T05` (objeto `usuario`), `M1-T08` (array de séries tratado) | A Fazer |
 | Teste integrado do zero (item 18 do checklist) | **Sem peso** — não é critério notado, é boa prática | `M1-T19` | A Fazer |
 | Links no AVA e prazo de 05/10/2026 22h (itens 2 e 4 da seção 4) | **Sem peso** — é penalidade, não critério | `M1-T23` | A Fazer |
