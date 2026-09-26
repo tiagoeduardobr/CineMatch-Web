@@ -1,0 +1,237 @@
+# CineMatch Web — Instruções para Agentes
+
+Este arquivo é carregado automaticamente no contexto de todos os agentes que trabalham neste repositório. Ele define a stack permitida, aponta o backlog canônico, fixa o fluxo de Git e registra as convenções que evitam retrabalho. O detalhamento de cada requisito funcional e o checklist de entrega vivem em `docs/KANBAN.md` e no briefing em PDF — aqui fica o essencial para não perder o rastreamento.
+
+---
+
+## 1. Contexto do Projeto
+
+**CineMatch Web — Recomendação de Séries em Tempo Real.** Projeto avaliativo final da disciplina *Desenvolvimento Mobile — React Native*, **Módulo 01, Semana 13**, professor Matheus de Nadai. É a evolução do "CineMatch JS", que rodava no terminal Node.js com catálogo fictício: agora a mesma lógica de recomendação ganha interface web, persistência e catálogo real de uma API pública.
+
+| Dado | Valor |
+| --- | --- |
+| Repositório | https://github.com/tiagoeduardobr/CineMatch-Web |
+| Módulo | Desenvolvimento Mobile — Módulo 01 — Semana 13 (Projeto Avaliativo Final) |
+| Prazo de entrega | 05/10/2026 até 22h, contado pela última atualização no GitHub |
+| Peso na nota | 60% da nota do módulo — 15 critérios somando 10,00 pontos |
+| API de catálogo | TVMaze — `https://api.tvmaze.com/shows?page=0` (pública, sem chave) |
+
+A aplicação coleta perfil (nome, idade, gêneros) por formulário, persiste em `localStorage`, busca o catálogo na TVMaze via `fetch` e renderiza cards de recomendação calculados por compatibilidade.
+
+**Plágio é nota 0.** O briefing autoriza usar IA, desde que o resultado seja adaptado e o aluno saiba explicar cada linha. Isso muda como o código deve ser escrito aqui: comentado, com o raciocínio explícito, não só o resultado.
+
+---
+
+## 2. Restrição de Stack
+
+Esta é a regra mais importante do arquivo. Usar qualquer item proibido zera o mérito do módulo.
+
+**Permitido:** HTML5 semântico, CSS3 (Flexbox, box model, mobile-first, media queries), JavaScript com **módulos ES nativos** (`import`/`export`), `fetch`, `localStorage`, npm apenas como ferramenta de apoio (`live-server`).
+
+**Proibido (fora do escopo do Módulo 01):** React, Next.js, React Native, Vue, Angular, qualquer outro framework JS, TypeScript, bundlers e build (Webpack, Vite, Babel), CSS Grid, Sass, CSS-in-JS, back-end, servidor ou banco de dados, `fetch` com POST/PUT/DELETE gravando em servidor, jQuery, axios, e qualquer biblioteca não vista em aula.
+
+**Não se deixe enganar pelo nome da disciplina.** O projeto se chama "Mobile React Native" e o PDF está na pasta `docs/`, mas o Módulo 01 é explicitamente **HTML + CSS + JS puros**. React Native chega no Módulo 02. O briefing só mencionou Flexbox, então **não use CSS Grid**.
+
+---
+
+## 3. Estrutura de Arquivos (RF14)
+
+Três módulos JavaScript, cada um com uma responsabilidade. O briefing diz que três já cumprem o requisito com folga, e fatiar mais é **opcional, não exigência**.
+
+| Arquivo | Responsabilidade |
+| --- | --- |
+| `script.js` | O **fluxo**: formulário, `localStorage`, busca na API e cálculo |
+| `ui.js` | Tudo que toca a **tela**: renderizar cards, mensagens de carregando, vazio e erro |
+| `modelo.js` | As **classes**: `Conteudo` e `Serie`, com herança e `this` |
+
+Mais `index.html` e `style.css`, todos na raiz do repositório. O carregamento é feito por `<script type="module" src="script.js"></script>`.
+
+> A pasta `Frontend` aparece vazia na árvore de trabalho e **não é versionada** (o Git não versiona diretórios vazios). Não constróa o projeto dentro dela: os arquivos do RF14 vão na raiz.
+
+---
+
+## 4. Requisitos Funcionais (RF01 a RF15)
+
+| RF | Título curto | Tarefa |
+| --- | --- | --- |
+| RF01 | HTML semântico: landmarks, `title`, `meta description`, og tags | `M1-T02`, `M1-T16` |
+| RF02 | Formulário de perfil e captura no `submit` com validação | `M1-T03`, `M1-T05` |
+| RF03 | Persistir perfil com `localStorage` | `M1-T06` |
+| RF04 | Buscar catálogo real via `fetch` na TVMaze com `try/catch` | `M1-T07` |
+| RF05 | Tratar catálogo com três ou mais métodos de array | `M1-T08` |
+| RF06 | Classes `Conteudo` e `Serie` com herança e `this` | `M1-T09` |
+| RF07 | Calcular e classificar a compatibilidade | `M1-T10` |
+| RF08 | Renderizar os resultados no DOM | `M1-T11` |
+| RF09 | Flexbox e responsividade | `M1-T04`, `M1-T12` |
+| RF10 | Callback | `M1-T13` |
+| RF11 | Closure | `M1-T14` |
+| RF12 | Browser API de tempo com `setTimeout` | `M1-T15` |
+| RF13 | SEO básico e acessibilidade | `M1-T16` |
+| RF14 | Módulos ES com `import` e `export` | `M1-T17` |
+| RF15 | Servir com pacote via npm | `M1-T01`, `M1-T18` |
+
+O detalhamento de cada RF, com critérios de aceitação e pesos, está em `docs/KANBAN.md`.
+
+---
+
+## 5. Backlog — docs/KANBAN.md (Seção Crítica)
+
+Os agentes deste ambiente vêm configurados de outro projeto e esperam um backlog em `docs/PROJECT_BACKLOG_*.md`. **Neste projeto esse arquivo não existe. O backlog é `docs/KANBAN.md`.** Qualquer agente que procurar pelo caminho padrão vai concluir que não há backlog e perder o rastreamento.
+
+**O que o arquivo contém (190 linhas):** cabeçalho com metadados, legenda e convenções, as 4 colunas obrigatórias (Backlog, A Fazer, Em Andamento, Concluído), tabela de Rastreabilidade (RF, tarefa, coluna, peso), riscos com mitigação e o checklist final de entrega com 24 itens, reprodução literal da seção 7 do briefing.
+
+**IDs de tarefa:** `M1-T00` a `M1-T23`. Hoje `M1-T00` (planejar o quadro) está em *Concluído*, `M1-T01` (bootstrap) está em *Em Andamento* e `M1-T02` a `M1-T23` estão em *A Fazer*. Os itens da coluna *Backlog* são bônus sem nota e **não** têm ID `M1-T##`.
+
+**Como marcar uma tarefa como concluída:** troque `- [ ]` por `- [x]` **e** acrescente ao final da linha ` – Concluído em DD/MM/AAAA:HH:MM`. O timestamp tem de vir de um comando executado no momento, nunca digitado à mão: `Get-Date -Format 'dd/MM/yyyy:HH:mm'` (PowerShell, o shell deste ambiente) ou `date '+%d/%m/%Y:%H:%M'` (Git Bash ou outro shell POSIX) — ambos produzem exatamente o mesmo formato. Atenção: no PowerShell, `date` é alias de `Get-Date` e não entende `strftime`, então falha.
+
+**Regras de movimentação:**
+
+- Ao concluir, mova a tarefa para a coluna *Concluído* e, se couber, atualize a coluna "Coluna atual" da linha correspondente na tabela de Rastreabilidade.
+- Uma tarefa só sai de *A Fazer* quando o código **funciona e foi testado**, não quando foi apenas escrito. A única exceção é a coluna *Em Andamento*.
+- **Não invente IDs novos** sem antes acrescentar a tarefa ao quadro.
+- A coluna *Backlog* é a **lista canônica** dos bônus. Não duplique esses itens em outra seção.
+
+---
+
+## 6. Git — Fluxo e Override de Padrões
+
+Os agentes deste ambiente vêm com regras padrão que **não se aplicam** aqui. Trate o quadro abaixo como override explícito.
+
+| Regra padrão do ambiente | Neste projeto |
+| --- | --- |
+| Branch por tarefa, no formato `feature/{slug}` ou `feature/{CAT}-{NUM}` | Branch **fixa** `feature/cinematch-web` |
+| `main` e `develop` proibidos | **`main` e `develop` são obrigatórios**, por exigência do professor |
+
+**Branches:** `main`, `develop` e `feature/cinematch-web`. Em squad (até 3 pessoas), usam-se também `feature/interface` (formulário e estilos) e `feature/logica` (API, classes e compatibilidade) — a criar caso o trabalho seja dividido entre pessoas.
+
+**Fluxo:** `feature/cinematch-web` para `develop`, e `develop` para `main`. Todo o código deve chegar na `main` no fim do projeto — não faça merge na `main` antes disso.
+
+**Não é preciso criar uma branch por RF.** O objetivo é mostrar que se sabe separar trabalho numa branch de feature e trazê-la de volta. Não multiplicar branches.
+
+**Commits:** mínimo de 5 no trabalho individual e 8 em squad. Use **Conventional Commits**, que é o estilo exemplificado no próprio briefing: `feat:`, `style:`, `docs:`. Uma linha, minúscula, sem ponto final. Exemplos que o briefing usa: `feat: busca catálogo real via fetch na TVMaze API`, `style: estiliza cards com flexbox e responsividade`, `docs: atualiza readme com instruções de execução`.
+
+**NÃO faça `push` sem pedido explícito do usuário.** Publicar é decisão dele, não do agente. O mesmo vale para force push, com `--force` ou `--force-with-lease`: só mediante pedido explícito.
+
+**Versione arquivos por nome explícito** (`git add <arquivo>`). Nunca `git add .` nem `git add -A`.
+
+**`.gitattributes` força LF** em `*.md`, `*.js`, `*.css` e `*.html`. Não remova: sem ele o Windows converte tudo para CRLF e o `docs/KANBAN.md` passa a aparecer sujo em todo diff.
+
+Os arquivos de identidade do Git já estão configurados no repositório. Não rode `git config`.
+
+---
+
+## 7. Convenções e Gotchas
+
+### Restrições do ambiente (bloqueiam comandos)
+
+O ambiente tem regras de permissão que **negam** comandos cujo uso seria atalho. Se um comando falhar por permissão, **não tente contornar** — escreva um arquivo de script e execute-o.
+
+| Negado | Faça em vez disso |
+| --- | --- |
+| `python -c` e `python3 -c` | Grave um `script.py` e rode `python script.py` |
+| `node -e` | Grave um arquivo `.js` e rode `node script.js` |
+| `sed`, `sed -i`, `awk` | Use a ferramenta de edição dedicada |
+| `tee`, `cat >`, `echo >` | Use a ferramenta de escrita dedicada |
+| `cp`, `mv` | Delegue a um subagente com permissão de escrita |
+
+O diretório externo para trabalho temporário, como scripts e extrações, é `C:\Users\Tiago\AppData\Local\Temp\opencode`. É o único lugar fora do repositório onde escrita é permitida.
+
+### Gotchas do ambiente Windows e PowerShell
+
+- **O modelo não lê PDF.** Para extrair texto de PDF use `pypdf`, já instalado na versão 6.15.0 com Python 3.12. Grave um script em vez de usar `python -c`.
+- **`Measure-Object -Line` conta só linhas não-vazias.** Um arquivo de 190 linhas com 42 em branco reporta 148. Use `$a = Get-Content <arquivo>` seguido de `$a.Count` para a contagem real. Já causou um falso alarme nesta sessão.
+- **O console do PowerShell corrompe acentuação na saída**, e `Módulo` vira `M�dulo`. O arquivo em si está correto em UTF-8. **Não "conserte" acentuação que só está errada na tela do terminal** — isso corromperia o arquivo.
+- `Get-ChildItem`, `Get-Content` e `Set-Content` devem ser evitados em favor das ferramentas dedicadas de leitura, busca e escrita.
+
+### Gotchas técnicas do projeto
+
+- **Módulos ES não funcionam via `file://`.** Abrir o `index.html` por duplo clique dispara erro de CORS nos `import` e a página fica sem JavaScript. Sirva sempre com `npm start`, que roda o `live-server` na porta 8080. O botão "Trocar perfil" nunca deve recarregar via `file://`.
+- **TVMaze API:** `https://api.tvmaze.com/shows?page=0` responde com `Access-Control-Allow-Origin: *`, então o CORS não bloqueia — mas confirme na aba Network do DevTools. **Nunca** desabilite a segurança do navegador para "fazer funcionar".
+- **Nem toda série tem gênero ou nota preenchidos.** Sempre filtre antes de usar, verificando `genres.length > 0` e `rating.average`.
+- **`localStorage`:** a chave é `cinematchPerfil`. Trate o `null` da primeira visita. Envolva leitura e escrita em `try/catch`, porque o modo de falha real é **cota excedida ou storage limpo pelo navegador**, não exceção em `setItem`. Se a persistência falhar, siga sem ela e avise na tela.
+- **Trate os três estados da chamada:** carregando, vazio e erro. O `setTimeout` do RF12 vai na **exibição**, nunca dentro do `fetch`, onde mascararia o estado de erro.
+- **Escaping em template literals:** os cards são gerados com `innerHTML`. Se algum dado da API entrar interpolado, isso é XSS. Sanitize ou construa com `createElement` e `textContent`.
+
+---
+
+## 8. Agent Workflow — Orquestração
+
+Existem cinco agentes globais já configurados, **fora deste repositório**, em `C:\Users\Tiago\.config\opencode\agents\`.
+
+| Agente | Papel neste projeto |
+| --- | --- |
+| `task-build` | Orquestrador. Delega tudo aos demais e não edita código |
+| `task-planner` | Planeja. **Deve ler `docs/KANBAN.md`, não procurar `docs/PROJECT_BACKLOG_*.md`** |
+| `dev` | Implementa. Marca a task no `docs/KANBAN.md` com `Get-Date -Format 'dd/MM/yyyy:HH:mm'`, conforme a seção 5 |
+| `code-review` | Revisa o código contra os RFs e a convenção do quadro |
+| `git-commit` | Commits e branches. Branch fixa `feature/cinematch-web`, com `main` e `develop` permitidos aqui |
+
+Regras de orquestração que valem para este projeto:
+
+1. **Nenhum agente edita código diretamente.** O `task-build` delega tudo ao `dev`, e o Git vai sempre para o `git-commit`. Nenhum agente fora do `git-commit` executa `git add`, `git commit`, `git push`, `git checkout -b` ou `git rm` por conta própria.
+2. **Nenhum agente faz push** sem pedido explícito do usuário nesta conversa.
+3. **Após cada task implementada, code review é obrigatório** antes da próxima task.
+4. **Planos** vão para `.opencode/plans/`. Checkboxes de plano **não** levam timestamp, porque timestamp é exclusividade do `docs/KANBAN.md`.
+5. **Tentativas:** máximo de 3 por task, com orçamento global de 20 tentativas por sessão.
+
+---
+
+## 9. Leitura Recomendada por Tarefa
+
+Orçamento: **no máximo 200 linhas de `AGENTS.md` por prompt de subagente**. Filtre pela seção aplicável, não envie o arquivo inteiro.
+
+| Tipo de tarefa | Ler do AGENTS.md | Fonte complementar |
+| --- | --- | --- |
+| Implementar RF de HTML e CSS: RF01, RF09, RF13 | Seções 2, 3 e 7 | `docs/KANBAN.md` → Rastreabilidade |
+| Implementar RF de JS e POO: RF06, RF07, RF10, RF11 | Seções 2 e 3 | `docs/KANBAN.md` → tarefa correspondente |
+| Implementar RF de rede e persistência: RF03, RF04, RF05, RF12 | Seções 2, 3 e 7, gotchas técnicas | `docs/KANBAN.md` → riscos 1 a 5 |
+| Renderizar no DOM: RF08 | Seções 3 e 7 | `docs/KANBAN.md` → `M1-T11` |
+| Mover, marcar ou criar task no quadro | Seção 5 | `docs/KANBAN.md` |
+| Criar branch, commitar ou mergear | Seção 6 | Nenhuma |
+| Push e publicação | Seção 6 | Nenhuma |
+| Escrever o `README.md` | Seções 2 e 3 | `docs/KANBAN.md` → `M1-T20` |
+| Revisar código | Seções 2, 3 e 7 | `docs/KANBAN.md` → Rastreabilidade |
+| Orquestração e multi-agente | Seções 5, 8 e 9 | Nenhuma |
+
+**Se um subagente não tem certeza de qual seção aplicar, mande-o ler o `AGENTS.md` completo antes de começar.**
+
+---
+
+## 10. Critérios de Avaliação
+
+O briefing avalia 15 critérios somando **10,00 pontos**. A tabela completa com o mapeamento de RF para critério e peso está em `docs/KANBAN.md` → "Rastreabilidade". Destaque apenas o que mais pesa, porque é onde a nota se concentra:
+
+- **Critério 1 — vídeo de até 7 minutos: 1,50**, o maior peso isolado. Precisa cobrir os 5 tópicos do item 5.8, com o rosto visível e boa iluminação. Inserir o vídeo no `README.md` é dica do próprio briefing.
+- **Critério 2 — versionamento: 1,00.** Branches e commits padronizados.
+- **Critério 3 — organização do repositório: 1,00.** Estrutura de pastas e `README.md`.
+- **Critério 5 — compatibilidade e classificação: 1,00.** Gêneros em comum, gêneros não explorados e faixa Alta, Média ou Baixa.
+- Os outros 11 critérios valem 0,50 cada.
+
+Três critérios não têm RF exclusivo: o **Critério 8**, que exige callback **e** closure — os dois, não um deles —; o **Critério 9** (estrutura da página HTML), compartilhado entre a RF01 e a RF13; e o **Critério 13**, que exige `fetch` com `try/catch` + `response.ok` tratando os três estados. Some cada um **uma única vez**: é por isso que a soma literal das tabelas do `docs/KANBAN.md` dá 11,50 em vez de 10,00.
+
+---
+
+## 11. Entregáveis Finais
+
+Além do código, o projeto exige:
+
+- `README.md` com o nome do software, o problema resolvido, as técnicas, como executar, a **diferença entre CommonJS (`require` e `module.exports`) e ESM (`import` e `export`)**, as escolhas de `const` e `let` e o escopo de bloco, e por que não usa `!important`. Registre também quais melhorias podem ser aplicadas e insira alguma imagem ou diagrama para melhorar o entendimento.
+- Quadro Kanban publicado com link acessível.
+- Vídeo de até 7 minutos, no Google Drive em modo leitor ou no YouTube como "não listado".
+- **Três links no AVA:** repositório público, quadro Kanban e vídeo. Link não submetido gera penalidade.
+
+Prazo: **05/10/2026 até 22h**, contado pela última atualização no repositório.
+
+---
+
+## 12. Referências — Mapa de Arquivos
+
+| Caminho | O que é |
+| --- | --- |
+| `docs/KANBAN.md` | **O backlog.** 190 linhas, 24 tarefas, 15 RFs rastreados e 24 itens de checklist |
+| `docs/Projeto Avaliativo Final - Módulo 01 - Mobile React Native T1 - M1S13 (1).pdf` | O briefing original, 16 páginas. Fonte de verdade quando algo divergir |
+| `.gitattributes` | Força LF em `md`, `js`, `css` e `html`. Não remover |
+| `index.html`, `style.css`, `script.js`, `ui.js`, `modelo.js`, `package.json` | A aplicação e o `package.json` do `live-server`. Ainda não criados, porque `M1-T01` está em *Em Andamento* |
+| `.opencode/plans/` | Planos de implementação, quando houver |
+
+> **Regra de precedência:** quando este arquivo, o `docs/KANBAN.md` e o PDF divergirem, o **PDF vence** — é o briefing do professor. Corrija os outros dois.
