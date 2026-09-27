@@ -2,3 +2,5 @@
 *.js text eol=lf
 *.css text eol=lf
 *.html text eol=lf
+# Arquivo batch precisa de CRLF no Windows; o restante do texto do projeto segue LF.
+*.bat text eol=crlf
