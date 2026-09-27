@@ -32,6 +32,62 @@ Esta é a regra mais importante do arquivo. Usar qualquer item proibido zera o m
 
 **Não se deixe enganar pelo nome da disciplina.** O projeto se chama "Mobile React Native" e o PDF está na pasta `docs/`, mas o Módulo 01 é explicitamente **HTML + CSS + JS puros**. React Native chega no Módulo 02. O briefing só mencionou Flexbox, então **não use CSS Grid**.
 
+### 2.1 Fonte de verdade do código
+
+Nenhum agente escreve código novo aqui por analogia com "boas práticas" genéricas. Toda linha nova precisa ter origem em um destes dois repositórios, que são o material já ensinado na disciplina.
+
+| Fonte | Endereço | O que vem de lá |
+| --- | --- | --- |
+| Mini-projeto da semana 6 | <https://github.com/tiagoeduardobr/Mini-Projeto-Cinematch-SCTEC>, cópia local em `cinematch_antigo/` | A **lógica**: classes, compatibilidade, closure, callback e `setTimeout` |
+| Exercícios das semanas 1 a 5 e 7 a 12 | <https://github.com/tiagoeduardobr/codigo-tecnico-semanas> | O **web**: HTML semântico, CSS com Flexbox, DOM, `fetch`, `localStorage` e módulos ES |
+
+A semana 6 é o mini-projeto da linha de cima e a semana 13 é este projeto. Nenhum dos dois repositórios tem pasta para elas.
+
+`cinematch_antigo/` existe no repositório para ser lido offline. **Não edite os três arquivos** (`class.js`, `cinematch.js`, `catalogo.js`): é o registro da entrega da semana 6, com `require` e `module.exports` de propósito. O que este projeto consome é a *lógica* portada e reescrita em módulos ES dentro de `js/`. Porte a lógica, não o estilo: o `cinematch.js` é código de terminal e usa globais sem declarar, como `opcao = prompt(...)` e `for (i = 0; ...)`, que quebram com `ReferenceError` em módulo ES. Declare com `let` ou `const` ao portar.
+
+**Precedência.** O PDF define o que o professor exige. Os dois repositórios acima definem *como* escrever isso. O `docs/KANBAN.md` define o estado das tasks. Este arquivo define como os agentes trabalham. Entre "o que foi ensinado" e "o que é permitido aqui", o PDF vence.
+
+#### Onde cada RF já tem exemplo
+
+| RF | Referência |
+| --- | --- |
+| RF02 Formulário e validação | `semana-09/exercicio-form/script.js` — `FormData`, `preventDefault()`, `getAll()`, array `erros` |
+| RF03 `localStorage` | `semana-11/ceu-aberto/script.js` — `setItem(chave, valor)` e `getItem(...) \|\| padrão`. É a referência da **forma** da API; o `try/catch` exigido pela Seção 7 não aparece nesse arquivo |
+| RF04 `fetch` | `semana-11/ceu-aberto-api/script.js` — `try`/`catch`, `response.ok === false`, `throw new Error` |
+| RF05 Métodos de array | `cinematch_antigo/cinematch.js` — `map`, `filter`, `find` e `sort` com `localeCompare("pt-BR")` |
+| RF06 Herança e `this` | `cinematch_antigo/class.js` — `Serie extends Conteudo`, `super()`, `instanceof` |
+| RF07 Compatibilidade | `cinematch_antigo/cinematch.js` — `compatibilidade()` e `obterConteudosPorGenero()`, limiares 80 e 50 |
+| RF08 Render no DOM | `semana-08/cinematch-createElement/script.js` — `createElement`, `textContent`, `appendChild`, `remove` |
+| RF09 Flexbox e responsividade | `semana-10/` — media queries, `gap`, `clamp()` |
+| RF10 Callback | `cinematch_antigo/cinematch.js` — `saudacaoDespedida(usuario, callback)` |
+| RF11 Closure | `cinematch_antigo/cinematch.js` — `criarContadorDeRecomendacoes()` |
+| RF12 `setTimeout` | `cinematch_antigo/cinematch.js` — `buscarCatalogoSimulado()` |
+| RF13 SEO e acessibilidade | `semana-11/ceu-aberto/index.html` — `og:title`, `meta description`, `aria-label` |
+| RF14 Módulos ES | `semana-12/modulos/` — a instrução do "antes" está no `README.md`: `require` vira `import`, `module.exports` vira `export`, `"type": "module"`. Os `.js` da pasta já são o "depois" (commit `a413b0c`, 18/09/2026): `index.js` faz `import` e `slug.js` faz `export` |
+
+RF01 e RF15 não têm linha própria. O RF01 tem exemplo em `semana-11/ceu-aberto/index.html` — `og:title`, `og:description`, `og:image`, `meta description`, skip link e landmarks — e, para landmarks mais `lang` e `<title>`, nos `index.html` das semanas 09 e 10. O RF15 não tem exemplo ensinado: nenhum dos dois repositórios usa `live-server`, e a referência é o `package.json` deste projeto.
+
+#### Não ensinado — não use sem perguntar
+
+Nenhum item abaixo aparece em nenhum dos dois repositórios. Se um deliverable exigir algum deles, pergunte antes de escrever: encadeamento opcional `?.`, `Object.assign`, `structuredClone`, `AbortController`, `IntersectionObserver` e `ResizeObserver`, *debounce*, *throttle*, `<template>`, `localStorage.removeItem`, `padStart` e `Intl.`.
+
+Um caso fora da lista, para não confundir: `??` aparece **uma vez** em `cinematch_antigo/cinematch.js:211`, no cálculo do próximo id. Não foi ensinado e não deve ser replicado.
+
+Dois contrapontos, porque a lista é curta e pode ser lida ao contrário. `localeCompare` com `"pt-BR"` **não** é o namespace `Intl.` e está liberado — é o que o RF05 exige. E o `removeItem` é o caso prático: o botão "Trocar perfil" precisa apagar o perfil salvo e o método não foi ensinado. Resolva reapresentando o formulário, no padrão da semana 09, em vez de inventar a API.
+
+#### Conflitos entre o que foi ensinado e o que é permitido aqui
+
+| O curso ensina | O que fazer neste projeto |
+| --- | --- |
+| CSS Grid, em `semana-11/ceu-aberto*/`, `semana-12/ceu-aberto/` e `semana-12/pokedex/` | **Não usar.** O briefing só autorizou Flexbox. Resolva com `flex-wrap` e `gap` |
+| `require` e `module.exports`, em `cinematch_antigo/` | Reescrever em `import`/`export`, conforme `semana-12/modulos/` |
+| `prompt-sync` e menu de terminal, em `cinematch_antigo/cinematch.js` | Substituir por formulário com `FormData` e `localStorage` |
+| Catálogo fictício de 30 itens, em `cinematch_antigo/catalogo.js` | Substituir pela TVMaze com `fetch`, mantendo `normalizarTexto()`, que hoje vive em `cinematch_antigo/cinematch.js:284` |
+| `setTimeout` embrulhado em `Promise` para simular latência, em `cinematch_antigo/cinematch.js` | O RF12 aqui é de **exibição**: o atraso proposital vai na renderização, nunca dentro do `fetch`, onde mascararia o estado de erro |
+| `!important` | Reforço, não divergência: o curso já proíbe. `semana-10/exercicio-especificidade/` diz para ajustar o seletor ou apagar a regra, e o README do projeto exige explicar por que não usamos |
+
+A regra geral: o repositório das aulas diz o que **se sabe fazer**; o briefing diz o que **se pode entregar**. Conflando, o briefing vence — e o conflito vai registrado no `docs/KANBAN.md`, nunca silenciado.
+
 ---
 
 ## 3. Estrutura de Arquivos (RF14)
@@ -193,15 +249,15 @@ Orçamento: **no máximo 200 linhas de `AGENTS.md` por prompt de subagente**. Fi
 
 | Tipo de tarefa | Ler do AGENTS.md | Fonte complementar |
 | --- | --- | --- |
-| Implementar RF de HTML e CSS: RF01, RF09, RF13 | Seções 2, 3 e 7 | `docs/KANBAN.md` → Rastreabilidade |
-| Implementar RF de JS e POO: RF06, RF07, RF10, RF11 | Seções 2 e 3 | `docs/KANBAN.md` → tarefa correspondente |
-| Implementar RF de rede e persistência: RF03, RF04, RF05, RF12 | Seções 2, 3 e 7, gotchas técnicas | `docs/KANBAN.md` → riscos 1 a 5 |
-| Renderizar no DOM: RF08 | Seções 3 e 7 | `docs/KANBAN.md` → `M1-T11` |
+| Implementar RF de HTML e CSS: RF01, RF09, RF13 | Seções 2, 2.1 e 3 | `docs/KANBAN.md` → Rastreabilidade |
+| Implementar RF de JS e POO: RF06, RF07, RF10, RF11 | Seções 2 e 2.1 | `docs/KANBAN.md` → tarefa correspondente |
+| Implementar RF de rede e persistência: RF03, RF04, RF05, RF12 | Seções 2, 2.1, 3 e 7, gotchas técnicas | `docs/KANBAN.md` → riscos 1 a 5 |
+| Renderizar no DOM: RF08 | Seções 2.1, 3 e 7 | `docs/KANBAN.md` → `M1-T11` |
 | Mover, marcar ou criar task no quadro | Seção 5 | `docs/KANBAN.md` |
 | Criar branch, commitar ou mergear | Seção 6 | Nenhuma |
 | Push e publicação | Seção 6 | Nenhuma |
-| Escrever o `README.md` | Seções 2 e 3 | `docs/KANBAN.md` → `M1-T20` |
-| Revisar código | Seções 2, 3 e 7 | `docs/KANBAN.md` → Rastreabilidade |
+| Escrever o `README.md` | Seções 2, 2.1 e 3 | `docs/KANBAN.md` → `M1-T20` |
+| Revisar código | Seções 2, 2.1, 3 e 7 | `docs/KANBAN.md` → Rastreabilidade |
 | Orquestração e multi-agente | Seções 5, 8 e 9 | Nenhuma |
 
 **Se um subagente não tem certeza de qual seção aplicar, mande-o ler o `AGENTS.md` completo antes de começar.**
@@ -244,6 +300,8 @@ Prazo: **05/10/2026 até 22h**, contado pela última atualização no repositór
 | `.gitattributes` | Força LF em `md`, `js`, `css` e `html`, e CRLF em `bat`. Não remover |
 | `index.html`, `css/style.css`, `js/script.js`, `js/ui.js`, `js/modelo.js`, `assets/main.png`, `package.json` | A aplicação e o `package.json` do `live-server`. O estado da implementação vive no `docs/KANBAN.md`, não aqui |
 | `run_opencode_web.bat` | Sobe o `opencode web` em `127.0.0.1:4096`, sem senha e sem `.env`. Conveniência local |
+| cinematch_antigo/class.js, cinematch_antigo/cinematch.js, cinematch_antigo/catalogo.js | Entrega da semana 6 e base da lógica: classes, compatibilidade, closure, callback e setTimeout. Não editar; consultar conforme a seção 2.1 |
+| cspell.json | Dicionário de termos em pt-BR para o Code Spell Checker. Configuração de editor, não entra na aplicação |
 | `.opencode/plans/` | Planos de implementação, quando houver |
 
-> **Regra de precedência:** quando este arquivo, o `docs/KANBAN.md` e o PDF divergirem, o **PDF vence** — é o briefing do professor. Corrija os outros dois.
+> **Regra de precedência:** quando este arquivo, o `docs/KANBAN.md` e o PDF divergirem, o **PDF vence** — é o briefing do professor. Corrija os outros dois. Para o *como* escrever o código, a fonte de verdade é a seção 2.1.
