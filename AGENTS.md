@@ -296,7 +296,8 @@ Prazo: **05/10/2026 até 22h**, contado pela última atualização no repositór
 | Caminho | O que é |
 | --- | --- |
 | `docs/KANBAN.md` | **O backlog e a fonte de verdade do estado do quadro.** 24 tarefas, 15 RFs rastreados e 24 itens de checklist |
-| `docs/Projeto Avaliativo Final - Módulo 01 - Mobile React Native T1 - M1S13 (1).pdf` | O briefing original, 16 páginas. Fonte de verdade quando algo divergir |
+| `docs/BRIEFING.md` | Transcrição pesquisável do briefing, extraída do PDF. Útil porque agentes não leem PDF. Substituída pelo PDF em qualquer divergência |
+| `docs/Projeto Avaliativo Final - Módulo 01 - Mobile React Native T1 - M1S13 (1).pdf` | O briefing original, 16 páginas. Fonte de verdade; `docs/BRIEFING.md` é a cópia pesquisável |
 | `.gitattributes` | Força LF em `md`, `js`, `css` e `html`, e CRLF em `bat`. Não remover |
 | `index.html`, `css/style.css`, `js/script.js`, `js/ui.js`, `js/modelo.js`, `assets/main.png`, `package.json` | A aplicação e o `package.json` do `live-server`. O estado da implementação vive no `docs/KANBAN.md`, não aqui |
 | `run_opencode_web.bat` | Sobe o `opencode web` em `127.0.0.1:4096`, sem senha e sem `.env`. Conveniência local |
