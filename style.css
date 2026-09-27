@@ -1,11 +1,132 @@
 /*
- * CineMatch Web — estilos da aplicação.
- *
- * Esqueleto da tarefa M1-T01 (RF15 parcial). Este arquivo existe para que o
- * <link rel="stylesheet"> do index.html já resolva e para deixar registrada a
- * separação de responsabilidade entre marcação e estilo.
- *
- * As regras entram na M1-T04 (tela do formulário) e na M1-T12 (grade de cards),
- * sempre com Flexbox e mobile-first. CSS Grid, Sass e CSS-in-JS estão fora do
- * escopo do Módulo 01 e não podem aparecer aqui (AGENTS.md, seção 2).
- */
+	CineMatch Web — estilos da aplicação.
+
+	M1-T01 (RF15 parcial) criou este arquivo em branco; a folha de estilo
+		externa é a M1-T04. Regras atuais: navbar translúcida sobre a capa e
+		recorte da imagem com object-fit.
+	M1-T04 reescreve para mobile-first e a tela do formulário; M1-T12 adiciona a
+		grade de cards com flex-wrap.
+	Sem !important: a especificidade dos seletores de classe já resolve, e o
+		KANBAN exige nome de classe bem escolhido em vez de !important.
+	CSS Grid, Sass e CSS-in-JS estão fora do escopo do Módulo 01 (AGENTS.md §2).
+*/
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	min-height: 100vh;
+	min-height: 100svh;
+	background: #050505;
+	color: #f5eee5;
+	font-family: Georgia, "Times New Roman", serif;
+}
+
+.navbar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 10;
+	height: 72px;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	padding: 0 5%;
+	background: rgba(5, 5, 5, 0.68);
+	border-bottom: 1px solid rgba(190, 150, 85, 0.28);
+}
+
+.logo {
+	font-weight: 400;
+	font-size: 28px;
+	letter-spacing: 2px;
+	color: #eee3d5;
+	margin-right: 70px;
+	white-space: nowrap;
+}
+
+.nav-links {
+	display: flex;
+	gap: 42px;
+	list-style: none;
+}
+
+.nav-links a {
+	color: #eee3d5;
+	text-decoration: none;
+	font-size: 17px;
+	transition: color 0.2s ease;
+}
+
+.nav-links a:focus-visible {
+	outline: 2px solid #d9ae6d;
+	outline-offset: 3px;
+	border-radius: 2px;
+}
+
+.nav-links a:hover {
+	color: #e8c88f;
+}
+
+.hero {
+	position: relative;
+	width: 100%;
+	/* Fallback de viewport: a primeira declaração (100vh) cobre navegadores sem
+		suporte a svh; a segunda (100svh) é o valor preferido. O mesmo par se
+		repite na media query do fim do arquivo. */
+	min-height: 100vh;
+	min-height: 100svh;
+	display: flex;
+	overflow: hidden;
+}
+
+.hero-content {
+	width: 100%;
+	height: 100vh;
+	height: 100svh;
+}
+
+.main-image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+}
+
+@media (max-width: 768px) {
+	.navbar {
+		height: auto;
+		min-height: 64px;
+		padding: 16px 5%;
+		flex-wrap: wrap;
+		gap: 14px;
+	}
+
+	.logo {
+		margin-right: 20px;
+		font-size: 22px;
+	}
+
+	.nav-links {
+		gap: 18px;
+		flex-wrap: wrap;
+	}
+
+	.nav-links a {
+		font-size: 14px;
+	}
+
+	.hero {
+		min-height: 100vh;
+		min-height: 100svh;
+	}
+
+	.hero-content {
+		height: 100vh;
+		height: 100svh;
+	}
+}

@@ -1,15 +1,54 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CineMatch Web</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <!-- Bootstrap da tarefa M1-T01 (RF15 parcial).
-         A estrutura semântica completa, o h1, a meta description e as og tags
-         são da tarefa M1-T02; a acessibilidade e o SEO são da M1-T16. -->
-    <script type="module" src="script.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineMatch</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <!--
+   * CineMatch Web — página da aplicação.
+   *
+   * M1-T01 (RF15 parcial) criou os arquivos do projeto em branco. O <link>
+   * desta folha de estilo é da M1-T04 e a tag <script type="module"> é da
+   * M1-T17; script.js por sua vez importa ui.js e modelo.js.
+   * Estado atual: <nav> com a marca e os links, e a capa .hero com a <img>
+   * principal. Ainda não há header, section, article, footer nem formulário.
+   * M1-T02 (RF01) traz header, section, article, footer, a meta description e
+   * as og tags, mantendo um único h1. M1-T16 (RF13) consolida SEO e
+   * acessibilidade, entre elas o foco visível e o contraste de cor.
+   * A marca é o <h1> da página; quando os landmarks chegarem, ele migra para
+   * dentro do <header>.
+   * AGENTS.md, seção 2: HTML, CSS e JS de módulos ES nativos, sem frameworks.
+   -->
+
+  <nav class="navbar">
+    <h1 class="logo">CineMatch</h1>
+
+    <ul class="nav-links">
+      <li><a href="#">Início</a></li>
+      <li><a href="#">Explorar</a></li>
+      <li><a href="#">Minha Lista</a></li>
+      <li><a href="#">Meu Perfil</a></li>
+    </ul>
+  </nav>
+
+  <!-- Imagem de capa que abre a página; o recorte responsivo é feito por object-fit no .main-image -->
+  <main class="hero">
+    <div class="hero-content">
+      <img
+        class="main-image"
+        src="./main.png"
+        alt="CineMatch em uma paisagem de montanhas, castelo e vulcão"
+        width="2048"
+        height="768"
+      >
+    </div>
+  </main>
+
+  <script type="module" src="./script.js"></script>
+
+</body>
 </html>
