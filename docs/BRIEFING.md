@@ -205,7 +205,7 @@ if (perfilSalvo) {
 
 Em vez do array fictício do mini-projeto anterior, o catálogo agora vem de uma API real e pública, sem necessidade de chave: a TVMaze API.
 
-**Por que o tratamento de erro importa aqui**
+##### Por que o tratamento de erro importa aqui
 
 O array fictício do CineMatch JS nunca falhava — ele estava sempre ali, no código. Uma chamada de rede é diferente: a internet pode cair, a API pode estar fora do ar, a resposta pode vir vazia ou num formato inesperado. Sem tratar isso, a página trava ou fica em branco sem explicação nenhuma pra pessoa usuária. Tratar erro não é um extra — é parte do requisito de consumir uma API real.
 
@@ -443,13 +443,13 @@ Lembre-se:
 
 Você está livre para utilizar outras soluções como base, mas não é permitida a cópia.
 
-**Apresentação do Projeto**
+### Apresentação do Projeto
 
 | Nº | Critério de Avaliação | 0 | 1,00 | 1,50 |
 | --- | --- | --- | --- | --- |
 | 1 | Realizou a gravação de um vídeo? | Não foi realizada a gravação do vídeo. | Gravou o vídeo e abordou parte dos tópicos listados no item 5.8. | Gravou o vídeo e abordou todos os tópicos listados no item 5.8. |
 
-**Uso do GitHub e Readme.md**
+### Uso do GitHub e Readme.md
 
 | Nº | Critério de Avaliação | 0 | 0,25 | 1,00 |
 | --- | --- | --- | --- | --- |
@@ -458,7 +458,7 @@ Você está livre para utilizar outras soluções como base, mas não é permiti
 
 ===== PAGINA 14 =====
 
-**Desenvolvimento da Aplicação**
+### Desenvolvimento da Aplicação
 
 | Nº | Critério de Avaliação | 0 | 0,25 | 0,50 |
 | --- | --- | --- | --- | --- |

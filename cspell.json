@@ -1,9 +1,6 @@
 {
-  "version": 0,
-  "language": [
-    "en",
-    "pt-br"
-  ],
+  "version": "0.2",
+  "language": "en,pt-br",
   "words": [
     "acao",
     "Ação",
@@ -14,6 +11,7 @@
     "catálogo",
     "chcp",
     "cinematch",
+    "classificacao",
     "Comédia",
     "compatibilidade",
     "conteudo",
@@ -27,6 +25,7 @@
     "embalos",
     "Escolha",
     "ficcao",
+    "flexbox",
     "Flexbox",
     "genero",
     "Genero",
@@ -43,7 +42,9 @@
     "opção",
     "perfil",
     "playnow",
+    "Possivel",
     "prompt-sync",
+    "pypdf",
     "recomendacao",
     "Recomendacao",
     "Recomendacoes",
@@ -51,6 +52,7 @@
     "Sair",
     "saudacao",
     "sugestao",
+    "tvmaze",
     "usuario",
     "você"
   ]
