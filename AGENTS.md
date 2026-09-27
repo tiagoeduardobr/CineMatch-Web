@@ -40,13 +40,13 @@ Três módulos JavaScript, cada um com uma responsabilidade. O briefing diz que 
 
 | Arquivo | Responsabilidade |
 | --- | --- |
-| `script.js` | O **fluxo**: formulário, `localStorage`, busca na API e cálculo |
-| `ui.js` | Tudo que toca a **tela**: renderizar cards, mensagens de carregando, vazio e erro |
-| `modelo.js` | As **classes**: `Conteudo` e `Serie`, com herança e `this` |
+| `js/script.js` | O **fluxo**: formulário, `localStorage`, busca na API e cálculo |
+| `js/ui.js` | Tudo que toca a **tela**: renderizar cards, mensagens de carregando, vazio e erro |
+| `js/modelo.js` | As **classes**: `Conteudo` e `Serie`, com herança e `this` |
 
-Mais `index.html` e `style.css`, todos na raiz do repositório. O carregamento é feito por `<script type="module" src="script.js"></script>`.
+Mais `css/style.css` e `assets/main.png`, com o `index.html` na raiz do repositório. O carregamento é feito por `<script type="module" src="./js/script.js"></script>`.
 
-> A pasta `Frontend` aparece vazia na árvore de trabalho e **não é versionada** (o Git não versiona diretórios vazios). Não constróa o projeto dentro dela: os arquivos do RF14 vão na raiz.
+> **Onde cada coisa mora.** `css/` guarda a folha de estilo, `js/` guarda os módulos ES e `assets/` guarda as imagens. O `index.html` fica na raiz porque é o arquivo que o `live-server` serve em `/` — colocado em subpasta, a URL de entrada mudaria e o `npm start` deixaria de apontar para a página. Como os três módulos estão na mesma pasta, `script.js` importa `./ui.js` e `./modelo.js` com caminho relativo.
 
 ---
 
@@ -125,7 +125,7 @@ Os agentes deste ambiente vêm com regras padrão que **não se aplicam** aqui. 
 
 **Versione arquivos por nome explícito** (`git add <arquivo>`). Nunca `git add .` nem `git add -A`.
 
-**`.gitattributes` força LF** em `*.md`, `*.js`, `*.css` e `*.html`. Não remova: sem ele o Windows converte tudo para CRLF e o `docs/KANBAN.md` passa a aparecer sujo em todo diff.
+**`.gitattributes` fixa a quebra de linha por tipo de arquivo:** LF em `*.md`, `*.js`, `*.css` e `*.html`, e CRLF em `*.bat`. Não remova: sem as regras de LF o Windows converte tudo para CRLF e o `docs/KANBAN.md` passa a aparecer sujo em todo diff. A exceção do `*.bat` é o contrário: arquivo batch precisa de CRLF para o `cmd.exe` executar corretamente.
 
 Os arquivos de identidade do Git já estão configurados no repositório. Não rode `git config`.
 
@@ -241,8 +241,9 @@ Prazo: **05/10/2026 até 22h**, contado pela última atualização no repositór
 | --- | --- |
 | `docs/KANBAN.md` | **O backlog e a fonte de verdade do estado do quadro.** 24 tarefas, 15 RFs rastreados e 24 itens de checklist |
 | `docs/Projeto Avaliativo Final - Módulo 01 - Mobile React Native T1 - M1S13 (1).pdf` | O briefing original, 16 páginas. Fonte de verdade quando algo divergir |
-| `.gitattributes` | Força LF em `md`, `js`, `css` e `html`. Não remover |
-| `index.html`, `style.css`, `script.js`, `ui.js`, `modelo.js`, `package.json` | A aplicação e o `package.json` do `live-server`. O estado da implementação vive no `docs/KANBAN.md`, não aqui |
+| `.gitattributes` | Força LF em `md`, `js`, `css` e `html`, e CRLF em `bat`. Não remover |
+| `index.html`, `css/style.css`, `js/script.js`, `js/ui.js`, `js/modelo.js`, `assets/main.png`, `package.json` | A aplicação e o `package.json` do `live-server`. O estado da implementação vive no `docs/KANBAN.md`, não aqui |
+| `run_opencode_web.bat` | Sobe o `opencode web` em `127.0.0.1:4096`, sem senha e sem `.env`. Conveniência local |
 | `.opencode/plans/` | Planos de implementação, quando houver |
 
 > **Regra de precedência:** quando este arquivo, o `docs/KANBAN.md` e o PDF divergirem, o **PDF vence** — é o briefing do professor. Corrija os outros dois.
