@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CineMatch</title>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 
 <body>
@@ -14,6 +14,9 @@
    * M1-T01 (RF15 parcial) criou os arquivos do projeto em branco. O <link>
    * desta folha de estilo é da M1-T04 e a tag <script type="module"> é da
    * M1-T17; script.js por sua vez importa ui.js e modelo.js.
+   * Os módulos ES vivem em js/, a folha de estilo em css/ e as imagens em
+   * assets/. Como os três módulos estão na mesma pasta, script.js importa
+   * ui.js e modelo.js com caminho relativo dentro de js/.
    * Estado atual: <nav> com a marca e os links, e a capa .hero com a <img>
    * principal. Ainda não há header, section, article, footer nem formulário.
    * M1-T02 (RF01) traz header, section, article, footer, a meta description e
@@ -60,7 +63,7 @@
     <div class="hero-content">
       <img
         class="main-image"
-        src="./main.png"
+        src="./assets/main.png"
         alt="CineMatch em uma paisagem de montanhas, castelo e vulcão"
         width="2048"
         height="768"
@@ -68,7 +71,7 @@
     </div>
   </main>
 
-  <script type="module" src="./script.js"></script>
+  <script type="module" src="./js/script.js"></script>
 
 </body>
 </html>
