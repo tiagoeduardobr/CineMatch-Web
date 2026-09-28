@@ -14,7 +14,7 @@ Evolução do *CineMatch JS* (motor de recomendação que rodava no terminal Nod
 | **API utilizada** | TVMaze API — `https://api.tvmaze.com/shows?page=0` (API pública, sem chave) |
 | **Stack** | HTML5 + CSS3 (Flexbox, mobile-first) + JavaScript com módulos ES nativos — sem frameworks, sem build |
 | **Pacote de apoio** | `live-server` via npm (apenas servidor local de desenvolvimento) |
-| **Total de tarefas** | 24 tarefas (`M1-T00` a `M1-T23`) + 8 itens no Backlog (7 bônus das seções 8 e RF12 + 1 opcional da seção 5.4) |
+| **Total de tarefas** | 24 tarefas (`M1-T00` a `M1-T23`) + 9 itens no Backlog (7 bônus das seções 8 e RF12 + 1 opcional da seção 5.4 + 1 bônus de interface fora do escopo do briefing) |
 
 ---
 
@@ -74,7 +74,7 @@ Regras do bloco:
 
 Ideias de bônus da seção 8 do briefing e melhorias possíveis. **Não contam para nota** — só entram na coluna *Concluído* depois que todos os RFs estiverem entregues.
 
-> Os itens do Backlog reproduzem as ideias de bônus da seção 8 do briefing (opcional, sem nota) mais o bônus opcional do RF12 (Geolocation) e o item opcional da seção 5.4 (Bootstrap / Font Awesome via CDN). Nenhum deles conta para a nota.
+> Os itens do Backlog reproduzem as ideias de bônus da seção 8 do briefing (opcional, sem nota), o bônus opcional do RF12 (Geolocation), o item opcional da seção 5.4 (Bootstrap / Font Awesome via CDN) e a tela de login, que é um bônus de interface e não consta do briefing. São **9 itens**, e nenhum deles conta para a nota.
 
 - [ ] **Filtro por gênero** na tela de resultados, para refinar sem preencher o formulário de novo
 - [ ] **Ordenar os cards** por compatibilidade, nome ou avaliação (reaproveitando `sort`)
@@ -84,6 +84,7 @@ Ideias de bônus da seção 8 do briefing e melhorias possíveis. **Não contam 
 - [ ] **Combinar com uma API de filmes**, voltando a ter "filmes e séries" como no mini-projeto original
 - [ ] **Geolocation API** para uma sugestão contextual (saudação ou recomendação diferente conforme a localização), como bônus do RF12
 - [ ] **Bootstrap / Font Awesome** via CDN (opcional do PDF, seção 5.4) — se usar, apenas via CDN e sem `npm install`
+- [ ] **Tela de login** (e-mail, senha, "Entrar" e "Criar conta") na seção `.secao-login` do `index.html` — é bônus de interface e **não consta do briefing**, cuja seção 3 mostra só os dois estados do projeto, o formulário de perfil e os resultados; back-end é proibido no Módulo 01, então os dois botões são `type="button"` e **ainda não têm comportamento**, são só layout e estilo. **Não conta nota**
 
 ---
 
