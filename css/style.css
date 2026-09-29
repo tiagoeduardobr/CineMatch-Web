@@ -14,55 +14,68 @@
 		do login, do formulário de perfil e dos cards partem do mobile e estendem
 		por @media (min-width: 769px), sem sobreposição nem buraco no corte.
 
-	Variáveis (o bloco :root fica no topo, antes do reset, porque ele serve de
-		referência de cor para o arquivo inteiro):
-		- --cor-fundo: fundo da página e da capa, o preto mais escuro da paleta.
-		- --cor-fundo-navbar: o mesmo --cor-fundo em versão translúcida, para a
+	Variáveis (o bloco de variáveis fica no topo, antes do reset, porque ele
+		serve de referência de cor para os dois arquivos de estilo). Este é o
+		único bloco de variáveis do projeto: o css/pages.css consome estas mesmas
+		variáveis e não declara nenhuma, para não haver duas listas de cor para
+		manter em sincronia. O prefixo é --cine- porque é o da paleta que
+		sobreviveu à consolidação das duas folhas de estilo.
+		- --cine-bg: fundo da página e da capa, o preto mais escuro da paleta.
+		- --cine-navbar: o mesmo --cine-bg em versão translúcida, para a
 		  capa aparecer por trás da navbar.
-		- --cor-superficie: fundo dos cards e do container do formulário.
-		- --cor-campo: fundo dos campos de entrada, mais escuro que a superfície.
-		- --cor-borda: contorno dourado translúcido, compartilhado por cards,
+		- --cine-panel: fundo dos cards e do container do formulário.
+		- --cine-field: fundo dos campos de entrada, mais escuro que a superfície.
+		- --cine-line: contorno dourado translúcido, compartilhado por cards,
 		  campos e fieldset.
-		- --cor-borda-navbar: a mesma cor de --cor-borda com o alfa mais baixo,
+		- --cine-line-nav: a mesma cor de --cine-line com o alfa mais baixo,
 		  na borda inferior da navbar.
-		- --cor-texto: cor de texto do corpo e dos campos.
-		- --cor-texto-claro: texto claro da navbar e dos labels, um tom mais
-		  quente e um pouco menos luminoso que o --cor-texto, para separar o
+		- --cine-text: cor de texto do corpo e dos campos.
+		- --cine-text-soft: texto claro da navbar e dos labels, um tom mais
+		  quente e um pouco menos luminoso que o --cine-text, para separar o
 		  texto de apoio do texto corrente.
-		- --cor-texto-suave: texto de apoio, o menos contrastado da paleta.
-		- --cor-texto-botao: texto escuro sobre o botão primário preenchido.
-		- --cor-destaque: o dourado dos títulos de seção, do preenchimento e da
+		- --cine-muted: texto de apoio, o menos contrastado da paleta.
+		- --cine-btn-text: texto escuro sobre o botão primário preenchido.
+		- --cine-gold: o dourado dos títulos de seção, do preenchimento e da
 		  borda do botão primário, do texto do botão contornado, do anel de foco
 		  dos campos e botões dos dois formulários, do legend do fieldset de
 		  gêneros, do accent-color do checkbox, do filete lateral do card de
 		  série e do hover dos links e dos botões da navbar.
-		- --cor-foco: só o contorno do foco visível da navbar, em .nav-links a e
-		  em .nav-action; o anel de foco dos formulários usa --cor-destaque.
-		- --cor-hover-botao: dourado mais claro no hover do botão primário.
+		- --cine-gold-light: o dourado claro da navegação, o contorno do foco
+		  visível em .links-navegacao a e .botao-navegacao, e o que o
+		  css/pages.css aplica no título, na nota e na ação de cada card.
+		- --cine-gold-hover: dourado mais claro no hover do botão primário.
+		  Precisa ficar mais claro que o --cine-gold-light, senão o hover deixa
+		  de aparecer como mudança de estado.
+		- --cine-volcano: o vermelho do hover dos links da tela inicial em
+		  css/pages.css.
+		- --cine-slate: o cinza-azulado do terceiro cartaz de exemplo em
+		  css/pages.css.
 
 	Sem !important: a divisão do login entre botão primário e botão contornado
-		resolve por pseudo-classe, porque .form-login button:last-of-type (0,2,1)
-		pesa mais que .form-login button (0,1,1); e o botão de #form-perfil
+		resolve por pseudo-classe, porque .formulario-login button:last-of-type (0,2,1)
+			pesa mais que .formulario-login button (0,1,1); e o botão de #form-perfil
 		ganha o visual primário pelo seletor de ID (1,0,1), já que a regra do
-		contornado exige a classe .form-login e não casa com aquele formulário.
+		contornado exige a classe .formulario-login e não casa com aquele formulário.
 		O KANBAN exige nome de classe bem escolhido em vez de !important.
 	CSS Grid, Sass e CSS-in-JS estão fora do escopo do Módulo 01 (AGENTS.md §2).
 */
 
 :root {
-	--cor-fundo: #050505;
-	--cor-fundo-navbar: rgba(5, 5, 5, 0.68);
-	--cor-superficie: #100e0b;
-	--cor-campo: #090908;
-	--cor-borda: rgba(190, 150, 85, 0.35);
-	--cor-borda-navbar: rgba(190, 150, 85, 0.28);
-	--cor-texto: #f5eee5;
-	--cor-texto-claro: #eee3d5;
-	--cor-texto-suave: #c9bca9;
-	--cor-texto-botao: #17120a;
-	--cor-destaque: #e8c88f;
-	--cor-foco: #d9ae6d;
-	--cor-hover-botao: #f0d9ac;
+	--cine-bg: #050505;
+	--cine-navbar: rgba(5, 5, 5, 0.82);
+	--cine-panel: #11100e;
+	--cine-field: #0a0b0a;
+	--cine-line: rgba(174, 145, 103, 0.27);
+	--cine-line-nav: rgba(174, 145, 103, 0.22);
+	--cine-text: #e4ded4;
+	--cine-text-soft: #eee5d8;
+	--cine-muted: #b9b0a4;
+	--cine-btn-text: #15120d;
+	--cine-gold: #b99b6c;
+	--cine-gold-light: #e0d1b8;
+	--cine-gold-hover: #f0e3cd;
+	--cine-volcano: #d84129;
+	--cine-slate: #303438;
 }
 
 * {
@@ -74,65 +87,79 @@
 body {
 	min-height: 100vh;
 	min-height: 100svh;
-	background: var(--cor-fundo);
-	color: var(--cor-texto);
+	background: var(--cine-bg);
+	color: var(--cine-text);
 	font-family: Georgia, "Times New Roman", serif;
 }
 
-.navbar {
+.barra-navegacao {
 	position: absolute;
 	top: 0;
 	left: 0;
 	z-index: 10;
-	height: 72px;
+	height: 56px;
 	width: 100%;
 	display: flex;
 	align-items: center;
 	padding: 0 5%;
-	background: var(--cor-fundo-navbar);
-	border-bottom: 1px solid var(--cor-borda-navbar);
+	background: var(--cine-navbar);
+	border-bottom: 1px solid var(--cine-line-nav);
 }
 
-.logo {
+.marca {
 	font-weight: 400;
-	font-size: 28px;
+	font-size: 26px;
 	letter-spacing: 2px;
-	color: var(--cor-texto-claro);
-	margin-right: 70px;
+	color: var(--cine-text-soft);
+	margin-right: 52px;
 	white-space: nowrap;
 }
 
-.nav-links {
+.links-navegacao {
 	display: flex;
 	gap: 42px;
 	list-style: none;
 }
 
-.nav-links a {
-	color: var(--cor-texto-claro);
+.links-navegacao a {
+	color: var(--cine-text-soft);
 	text-decoration: none;
-	font-size: 17px;
+	font-size: 15px;
 	transition: color 0.2s ease;
 }
 
-.nav-links a:focus-visible {
-	outline: 2px solid var(--cor-foco);
+.links-navegacao li:first-child a {
+	position: relative;
+}
+
+.links-navegacao li:first-child a::after {
+	position: absolute;
+	right: 0;
+	bottom: -12px;
+	left: 0;
+	height: 2px;
+	background: var(--cine-gold);
+	content: "";
+}
+
+.links-navegacao a:focus-visible {
+	outline: 2px solid var(--cine-gold-light);
 	outline-offset: 3px;
 	border-radius: 2px;
 }
 
-.nav-links a:hover {
-	color: var(--cor-destaque);
+.links-navegacao a:hover {
+	color: var(--cine-gold);
 }
 
-.nav-actions {
+.acoes-navegacao {
 	display: flex;
 	align-items: center;
 	gap: 14px;
 	margin-left: auto;
 }
 
-.nav-action {
+.botao-navegacao {
 	display: inline-flex;
 	width: 32px;
 	height: 32px;
@@ -141,13 +168,13 @@ body {
 	padding: 0;
 	border: 0;
 	border-radius: 50%;
-	color: var(--cor-texto-claro);
+	color: var(--cine-text-soft);
 	background: transparent;
 	cursor: pointer;
 	transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-.nav-action svg {
+.botao-navegacao svg {
 	width: 19px;
 	height: 19px;
 	fill: none;
@@ -157,52 +184,50 @@ body {
 	stroke-width: 1.8;
 }
 
-.nav-action:hover,
-.nav-action:focus-visible {
-	color: var(--cor-destaque);
+.botao-navegacao:hover,
+.botao-navegacao:focus-visible {
+	color: var(--cine-gold);
 	background: rgba(238, 227, 213, 0.12);
 }
 
-.nav-action--perfil {
+.botao-navegacao--perfil {
 	background: rgba(238, 227, 213, 0.2);
 }
 
-.nav-action--perfil:hover,
-.nav-action--perfil:focus-visible {
+.botao-navegacao--perfil:hover,
+.botao-navegacao--perfil:focus-visible {
 	background: rgba(238, 227, 213, 0.3);
 }
 
-.nav-action:focus-visible {
-	outline: 2px solid var(--cor-foco);
+.botao-navegacao:focus-visible {
+	outline: 2px solid var(--cine-gold-light);
 	outline-offset: 3px;
 }
 
-.hero {
+.capa {
 	position: relative;
 	width: 100%;
-	min-height: 100vh;
-	min-height: 100svh;
-	background: var(--cor-fundo);
+	height: clamp(190px, 32vw, 390px);
+	background: var(--cine-bg);
 	display: flex;
 	overflow: hidden;
 }
 
-.hero-content {
+.conteudo-capa {
 	width: 100%;
-	height: 100vh;
-	height: 100svh;
+	height: 100%;
 }
 
-.main-image {
+.imagem-capa {
 	display: block;
 	width: 100%;
 	height: 100%;
-	object-fit: contain;
-	object-position: center;
+	object-fit: cover;
+	object-position: center 46%;
 }
 
 @media (max-width: 768px) {
-	.navbar {
+	.barra-navegacao {
 		height: auto;
 		min-height: 64px;
 		padding: 16px 5%;
@@ -210,33 +235,24 @@ body {
 		gap: 14px;
 	}
 
-	.logo {
+	.marca {
 		margin-right: 20px;
 		font-size: 22px;
 	}
 
-	.nav-links {
+	.links-navegacao {
 		gap: 18px;
 		flex-wrap: wrap;
 	}
 
-	.nav-actions {
+	.acoes-navegacao {
 		gap: 8px;
 	}
 
-	.nav-links a {
+	.links-navegacao a {
 		font-size: 14px;
 	}
 
-	.hero {
-		min-height: 100vh;
-		min-height: 100svh;
-	}
-
-	.hero-content {
-		height: 100vh;
-		height: 100svh;
-	}
 }
 
 .secao-login,
@@ -245,42 +261,42 @@ body {
 	padding: 48px 5%;
 }
 
-.card-login,
-.card-perfil {
+.cartao-login,
+.cartao-perfil {
 	width: 100%;
 	margin: 0 auto;
 	padding: 26px 20px;
-	border: 1px solid var(--cor-borda);
+	border: 1px solid var(--cine-line);
 	border-radius: 4px;
-	background: var(--cor-superficie);
+	background: var(--cine-panel);
 	box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
 }
 
-.card-login {
+.cartao-login {
 	max-width: 520px;
 }
 
-.card-perfil {
+.cartao-perfil {
 	max-width: 880px;
 }
 
-.card-login h2,
-.card-perfil h2,
+.cartao-login h2,
+.cartao-perfil h2,
 .cabecalho-resultados h2 {
 	margin-bottom: 12px;
-	color: var(--cor-destaque);
+	color: var(--cine-gold);
 	font-size: 26px;
 	font-weight: 400;
 	line-height: 1.2;
 }
 
-.card-login > p,
+.cartao-login > p,
 .cabecalho-resultados p {
-	color: var(--cor-texto-suave);
+	color: var(--cine-muted);
 	line-height: 1.6;
 }
 
-.form-login,
+.formulario-login,
 #form-perfil {
 	display: flex;
 	flex-direction: column;
@@ -288,76 +304,76 @@ body {
 	margin-top: 24px;
 }
 
-.form-login > div,
+.formulario-login > div,
 #form-perfil > div {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 }
 
-.form-login label,
+.formulario-login label,
 #form-perfil > div label {
-	color: var(--cor-texto-claro);
+	color: var(--cine-text-soft);
 	font-size: 15px;
 }
 
-.form-login input,
+.formulario-login input,
 #form-perfil input[type="text"],
 #form-perfil input[type="number"] {
 	width: 100%;
 	min-height: 44px;
 	padding: 10px 12px;
-	border: 1px solid var(--cor-borda);
+	border: 1px solid var(--cine-line);
 	border-radius: 3px;
-	background: var(--cor-campo);
-	color: var(--cor-texto);
+	background: var(--cine-field);
+	color: var(--cine-text);
 	font: inherit;
 }
 
-.form-login input:focus-visible,
+.formulario-login input:focus-visible,
 #form-perfil input:focus-visible,
-.form-login button:focus-visible,
+.formulario-login button:focus-visible,
 #form-perfil button:focus-visible {
-	outline: 2px solid var(--cor-destaque);
+	outline: 2px solid var(--cine-gold);
 	outline-offset: 3px;
 }
 
-.form-login button,
+.formulario-login button,
 #form-perfil button {
 	min-height: 44px;
 	padding: 10px 16px;
-	border: 1px solid var(--cor-destaque);
+	border: 1px solid var(--cine-gold);
 	border-radius: 3px;
-	background: var(--cor-destaque);
-	color: var(--cor-texto-botao);
+	background: var(--cine-gold);
+	color: var(--cine-btn-text);
 	font: inherit;
 	cursor: pointer;
 	transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.form-login button:hover,
+.formulario-login button:hover,
 #form-perfil button:hover {
-	background: var(--cor-hover-botao);
+	background: var(--cine-gold-hover);
 }
 
-.form-login button:last-of-type {
+.formulario-login button:last-of-type {
 	background: transparent;
-	color: var(--cor-destaque);
+	color: var(--cine-gold);
 }
 
-.form-login button:last-of-type:hover {
+.formulario-login button:last-of-type:hover {
 	background: rgba(232, 200, 143, 0.1);
 }
 
 .generos {
 	min-width: 0;
 	padding: 16px;
-	border: 1px solid var(--cor-borda);
+	border: 1px solid var(--cine-line);
 }
 
 .generos legend {
 	padding: 0 8px;
-	color: var(--cor-destaque);
+	color: var(--cine-gold);
 }
 
 .lista-generos {
@@ -372,9 +388,9 @@ body {
 	align-items: center;
 	gap: 8px;
 	padding: 7px 10px;
-	border: 1px solid var(--cor-borda);
+	border: 1px solid var(--cine-line);
 	border-radius: 3px;
-	color: var(--cor-texto-claro);
+	color: var(--cine-text-soft);
 	cursor: pointer;
 }
 
@@ -382,7 +398,7 @@ body {
 	width: 16px;
 	height: 16px;
 	margin: 0;
-	accent-color: var(--cor-destaque);
+	accent-color: var(--cine-gold);
 }
 
 .cabecalho-resultados {
@@ -398,20 +414,80 @@ body {
 	margin: 24px auto 0;
 }
 
-.card-serie {
+.cartao-filme {
 	width: 100%;
 	min-width: 0;
+	display: flex;
+	align-items: flex-start;
+	gap: 18px;
 	padding: 20px;
-	border: 1px solid var(--cor-borda);
-	border-left: 3px solid var(--cor-destaque);
+	border: 1px solid var(--cine-line);
+	border-left: 3px solid var(--cine-gold);
 	border-radius: 3px;
-	background: var(--cor-superficie);
+	background: var(--cine-panel);
+}
+
+.cartao-filme[hidden] {
+	display: none;
+}
+
+.cartaz-filme {
+	flex: 0 0 140px;
+	width: 140px;
+	aspect-ratio: 2 / 3;
+	object-fit: cover;
+	background: var(--cine-field);
+}
+
+.conteudo-filme {
+	min-width: 0;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 9px;
+}
+
+.titulo-filme {
+	color: var(--cine-text-soft);
+	font-size: 20px;
+	font-weight: 400;
+}
+
+.metadados-filme,
+.generos-filme {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	color: var(--cine-muted);
+	font-size: 13px;
+}
+
+.nota-filme {
+	color: var(--cine-gold);
+}
+
+.sinopse-filme {
+	color: var(--cine-muted);
+	line-height: 1.5;
+}
+
+.status-filme,
+.plataforma-filme {
+	color: var(--cine-text-soft);
+	font-size: 13px;
+}
+
+.link-filme {
+	width: fit-content;
+	color: var(--cine-gold);
+	font-size: 14px;
 }
 
 footer {
 	padding: 24px 5%;
-	border-top: 1px solid var(--cor-borda);
-	color: var(--cor-texto-suave);
+	border-top: 1px solid var(--cine-line);
+	color: var(--cine-muted);
 	text-align: center;
 }
 
@@ -422,8 +498,8 @@ footer {
 		padding: 64px 8%;
 	}
 
-	.card-login,
-	.card-perfil {
+	.cartao-login,
+	.cartao-perfil {
 		padding: 34px;
 	}
 
@@ -452,7 +528,23 @@ footer {
 		flex-wrap: wrap;
 	}
 
-	.card-serie {
+	.cartao-filme {
 		flex: 1 1 calc(50% - 8px);
+	}
+}
+
+@media (max-width: 560px) {
+	.cartao-filme {
+		gap: 12px;
+		padding: 14px;
+	}
+
+	.cartaz-filme {
+		flex-basis: 92px;
+		width: 92px;
+	}
+
+	.titulo-filme {
+		font-size: 17px;
 	}
 }

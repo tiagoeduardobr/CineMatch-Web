@@ -1,6 +1,6 @@
 # Contexto de Handover — CineMatch Web
 
-> Gerado em **28/09/2026**. Commit base no momento da escrita: **`91ed3a7`** (`develop`, merge da interface do ciclo anterior). Branch no momento da escrita: `feature/cinematch-web-interface` em `167aa01` — versionada no commit `812321c` e integrada na `develop` pelo merge `286cab2`, que é a `develop` de agora. Detalhes na seção 2.
+> Gerado em **29/09/2026**. `HEAD` no momento da escrita: **`4a89b5d`** (`docs: sincroniza o quadro com o estado real do código`), branch corrente `feature/cinematch-web-interface`, **1 commit à frente do remoto** — o `4a89b5d` **não foi pushado**. `develop` = `9914ee5`, `main` = `e47b81d`, `feature/cinematch-web` = `8af3368`. Detalhes na seção 2.
 
 ## O que este arquivo é
 
@@ -14,9 +14,9 @@ Ele **não** substitui nada:
 
 O que este arquivo acrescenta é o **raciocínio** e a **memória de pesquisa** da sessão: fatos já apurados que a próxima sessão não precisa rederivar, e erros de agente que já custaram tempo. **Substituir a cada nova sessão.** Se um número aqui não bater com o que você encontrar no repositório, o repositório vence: atualize este arquivo.
 
-**A propriedade do formato: os hashes aqui ficam um commit atrás de si mesmos.** Este arquivo é versionado dentro do próprio repositório que ele descreve. No instante em que o snapshot é commitado, os hashes que ele cita passam a ser os de **antes** do próprio commit — não há como ser de outro jeito sem uma corrida. Concretamente: este arquivo é commitado em `812321c` e cita `develop` = `286cab2`, um merge que só nasceu **depois**, quando `812321c` foi integrado na `develop`. Ler `develop` = `286cab2` num arquivo commitado em `812321c` é o resultado esperado, não inconsistência. A regra acima continua valendo e é a que resolve: **quando um hash aqui não bater com o repositório, o repositório vence** — e o caso mais comum de divergência é justamente este, o de um commit atrás.
+**A propriedade do formato: os hashes aqui ficam um commit atrás de si mesmos.** Este arquivo é versionado dentro do próprio repositório que ele descreve. No instante em que o snapshot é commitado, os hashes que ele cita passam a ser os de **antes** do próprio commit — não há como ser de outro jeito sem uma corrida. Concretamente: este arquivo é escrito sobre a árvore de `4a89b5d` e cita `feature/cinematch-web-interface` = `4a89b5d` e `develop` = `9914ee5`; o commit que o carregar terá outro hash, e a `develop` só ganha um merge depois disso. Ler `develop` = `9914ee5` num arquivo commitado acima de `4a89b5d` é o resultado esperado, não inconsistência. A regra acima continua valendo e é a que resolve: **quando um hash aqui não bater com o repositório, o repositório vence** — e o caso mais comum de divergência é justamente este, o de um commit atrás.
 
-**Como este arquivo foi escrito.** Todo hash, contagem, caminho e linha aqui veio de um comando rodado nesta sessão, em `C:\Users\Lucas\CineMatch-Web`. O que não deu para verificar está marcado como **não verificado**, e o motivo está escrito. Não acrescente número de memória.
+**Como este arquivo foi escrito.** Todo hash, contagem, caminho e linha aqui veio de um comando rodado nesta sessão, em `C:\Users\Lucas\CineMatch-Web`. Duas coisas **não** foram feitas e por isso não têm número: `git fetch` não foi rodado (problema 3 da seção 7) e **nenhum navegador foi aberto** — nem nesta sessão, nem na anterior. O que não deu para verificar está marcado como **não verificado**, e o motivo está escrito. Não acrescente número de memória.
 
 ---
 
@@ -30,7 +30,7 @@ CineMatch Web — recomendação de séries em tempo real. Projeto avaliativo fi
 | --- | --- |
 | Peso na nota | **60% da nota do módulo** — 15 critérios somando 10,00 pontos |
 | Prazo | **05/10/2026 até 22h**, contado pela última atualização no GitHub |
-| Margem no momento desta escrita | cerca de **7 dias** |
+| Margem no momento desta escrita | Cerca de **6 dias** — a versão de 28/09 dizia 7, e a diferença é exatamente um dia |
 | API de catálogo | TVMaze — `https://api.tvmaze.com/shows?page=0` (pública, sem chave) |
 | Remoto | `https://github.com/tiagoeduardobr/CineMatch-Web.git` |
 
@@ -44,7 +44,7 @@ O nome da disciplina engana: o Módulo 01 é **HTML + CSS + JS puros**. O briefi
 
 ### O que existe em disco nesta sessão
 
-`git ls-tree -r --name-only HEAD` devolve **21 arquivos rastreados**:
+`git ls-tree -r --name-only HEAD` devolve **21 arquivos rastreados** — o mesmo número de 28/09, porque a sessão não versionou nada novo.
 
 | Caminho | Linhas | Papel |
 | --- | --- | --- |
@@ -61,158 +61,156 @@ O nome da disciplina engana: o Módulo 01 é **HTML + CSS + JS puros**. O briefi
 | `cspell.json` | 60 | dicionário do Code Spell Checker |
 | `.gitattributes` | 6 | LF em `md`, `js`, `css`, `html`; CRLF em `bat` |
 
-`git grep "preventDefault\|addEventListener\|localStorage\|fetch" -- js/` só encontra as duas menções **dentro de comentários**. **Nenhum comportamento existe nos três módulos ainda** — é o próximo trabalho de verdade.
+Os 21 rastreados incluem ainda `.gitignore`, `.opencode/plans/m1-t01-bootstrap.md`, `package-lock.json`, `run_opencode_web.bat`, o PDF do briefing e os três arquivos de `cinematch_antigo/`.
 
-`node_modules` **não existe** (`Test-Path` deu `False`): o `npm install` é a `M1-T18`.
+**Nenhuma linha de código mudou nesta sessão.** `git status --short` não devolve nenhum arquivo rastreado modificado, o que prova que `index.html`, `css/style.css`, os três `.js` e o `package.json` estão idênticos ao `HEAD` = `4a89b5d`.
 
----
+`Select-String` com `-SimpleMatch` nos três módulos: `addEventListener` = 0, `preventDefault` = 0, `fetch` = 0, `setTimeout` = 0, `createElement` = 0, `.map` = 0, `.filter` = 0, `.sort` = 0, `.find` = 0. As 2 ocorrências de `localStorage` estão em `js/script.js:4` e `js/script.js:21`, ambas **dentro de comentário**, e as 2 ocorrências de `Conteudo` e `Serie` estão em `js/modelo.js:4` e `js/modelo.js:5`, também em comentário — **nenhuma classe existe**. Os placeholders continuam: `export const PLACEHOLDER_UI` (`js/ui.js:11`, com `pronto: false` na 12) e `export const PLACEHOLDER_MODELO` (`js/modelo.js:11`, `pronto: false` na 12). **Nenhum comportamento existe nos três módulos ainda** — é o próximo trabalho de verdade.
 
-## 2. Estado do Git — verificado em 28/09/2026
+### 1.1 O que o `npm install` deixou em disco — e o que ele não deixou
 
-### Commits desta sessão
-
-Cinco commits criados em 28/09/2026, todos já publicados. Os três primeiros são novos desta sessão; `4ce8c97` e `2dcae95` já eram locais e saíram no mesmo push.
-
-| Commit | Data e hora | Autor | Mensagem |
-| --- | --- | --- | --- |
-| `4ce8c97` | 28/09 19:14:21 | lucas | `feat: add navigation actions with buttons for search, theme toggle, and profile access` |
-| `2dcae95` | 28/09 19:23:40 | lucas | `Merge remote updates into interface branch` (merge de `4ce8c97` com `ae5046b`) |
-| `f3afebb` | 28/09 20:48:20 | lucas | `feat: completa formulário de perfil e nomeia o grupo de ações da navbar` |
-| `b188f1e` | 28/09 20:48:27 | lucas | `style: centraliza as cores em variáveis e documenta a folha de estilo` |
-| `167aa01` | 28/09 20:48:34 | lucas | `docs: registra a tela de login como bônus e ajusta o dicionário do editor` |
-
-O que cada um mudou (`git show --stat`):
-
-- `f3afebb` — só `index.html`, +194/−61.
-- `b188f1e` — só `css/style.css`, +290/−18. Criou o bloco `:root` e o cabeçalho de 51 linhas que documenta as variáveis.
-- `167aa01` — `cspell.json` +1 (`"svh"`) e `docs/KANBAN.md` +3/−2 (contagem do Backlog de 8 para 9 e o item novo).
-
-### Branches
-
-`git branch -a -vv` e `git ls-remote --heads origin` concordam. **Quatro branches**, todas com tracking e em sincronia com o remoto. `origin/HEAD` aponta para `origin/main`.
-
-| Branch | Commit | Observação |
-| --- | --- | --- |
-| `main` | `e47b81d` | **32 commits atrás** de `develop` (`git rev-list --count main..develop` = 32) e 0 no sentido inverso. Único commit: `docs: cria quadro kanban com os 15 RFs do CineMatch Web` |
-| `develop` | `286cab2` | merge de integração desta sessão, pais `91ed3a7` e `812321c` — detalhe na subseção seguinte |
-| `feature/cinematch-web` | `8af3368` | **8 commits atrás** de `develop` e **0 exclusivos** (`git rev-list --count develop..feature/cinematch-web` = 0) — a leitura correta do número está logo abaixo |
-| `feature/cinematch-web-interface` | `812321c` | branch corrente, `HEAD` = `812321c64e9b2afbc6a41e1ca9b16df51232c7fb`, em sincronia com `origin/feature/cinematch-web-interface` |
-
-O arquivo anterior dizia 17 commits de distância entre `main` e `develop`. Hoje são **32** — o número cresce a cada integração, não é um valor fixo.
-
-**Os 32 commits entre `main` e `develop` são o estado esperado do fluxo, não um atraso de sincronização.** O `AGENTS.md` §6 manda integrar `develop` → `main` só no fim do projeto, então a `main` fica parada em `e47b81d` de propósito. **Nenhum agente deve "corrigir" a `main` por conta própria** — ela não pode e não deve ser tocada antes do fim, porque merge nela agora quebra o fluxo que o Critério 2 do briefing avalia. `git rev-list --count develop..main` = 0 confirma que a `main` não tem nada exclusivo: ela é ancestral da `develop`, e a distância é só o grafo de merges acumuladas.
-
-**A `feature/cinematch-web` estar 8 atrás não é trabalho perdido.** Com `git rev-list --count develop..feature/cinematch-web` = 0 e `git merge-base --is-ancestor feature/cinematch-web develop` saindo com código 0, ela é **ancestral** da `develop`: está atrasada, e só isso. O número sozinho sugere risco e não há risco — o que falta é um fast-forward para enxergar o trabalho de interface na própria árvore.
-
-**Nada foi mergeado na `main`.** Comportamento correto: o `AGENTS.md` §6 proíbe merge na `main` antes do fim do projeto.
-
-### Working tree
-
-**Limpa.** `git status --short --branch` devolve só a linha `## feature/cinematch-web-interface...origin/feature/cinematch-web-interface`, sem `ahead` nem arquivos. `git ls-files --others --exclude-standard` não devolve nada.
-
-### O merge na `develop` e a árvore resultante
-
-`develop` é o commit de merge `286cab21c8cc4b8f7068d795f9f81fdbbe363746`, mensagem `Merge branch 'feature/cinematch-web-interface' into develop`, dois pais: `91ed3a7` e `812321c`. Saiu sem conflito.
-
-A medição que interessa é a do **ciclo anterior**, feita **antes** do merge que produziu `91ed3a7`:
+`node_modules` **agora existe**. É a mudança material da sessão, e ela muda o problema 4 da seção 7.
 
 | Medida | Comando | Resultado |
 | --- | --- | --- |
-| Ponto de divergência | `git merge-base 8af3368 167aa01` | `ae5046b` |
-| `develop` à frente da interface | `git rev-list --count 167aa01..8af3368` | **6** |
-| Interface à frente da `develop` | `git rev-list --count 8af3368..167aa01` | **5** |
-| Conteúdo dos 6 commits da `develop` | `git diff --name-only ae5046b 8af3368` | **0 arquivos** |
+| Existe? | `Test-Path -LiteralPath node_modules` | `True` |
+| Criado em | `Get-Item node_modules \| Select CreationTime` | **29/09/2026 14:58:36** |
+| Pacotes de primeiro nível | `Get-ChildItem node_modules -Directory -Force \| Where-Object Name -ne '.bin'` | **146** |
+| Deles, quantos têm `package.json` | mesmo comando, filtrando por `Test-Path package.json` | **146** |
+| Pastas com escopo `@...` | mesmo comando, `Where-Object Name -like '@*'` | **0** |
+| Pacotes contando os aninhados | `Get-ChildItem node_modules -Directory -Force -Recurse \| Where-Object { Test-Path $_/package.json -and Name -notin 'node_modules','.bin' }` | **191** |
+| Só os aninhados | o mesmo, filtrando `\node_modules\[^\\]+\node_modules\` | **45** |
+| `node_modules\.bin\live-server.cmd` | `Test-Path -LiteralPath node_modules\.bin\live-server.cmd` | `True` |
+| Versão do `live-server` | `node_modules/live-server/package.json` → `.version` | **1.2.2** |
+| Entradas de primeiro nível no lock | `Select-String package-lock.json -Pattern '^\s{4}"node_modules/[^/]+"'` | **150** |
+| Versão do Node | `node --version` | **v26.7.0** |
+| `package-lock.json` sujou o repositório? | `git status --short --untracked-files=no` | **vazio** — conteúdo inalterado |
 
-Ou seja: os 6 commits que a `develop` tinha à frente eram **merges de sincronização, sem conteúdo** — mesma árvore, grafo diferente. É por isso que aquele merge não tinha risco de conflito.
+O número **146** é de pacotes **de primeiro nível**; o **191** conta os 45 aninhados; o **150** é de chaves de primeiro nível no `package-lock.json`, das quais 4 são opcionais e não instalam no Windows (`bindings`, `file-uri-to-path`, `fsevents`, `nan` — `Select-String` com contexto no lock). São três métricas diferentes, e o multiplicador muda conforme a escolhida: **escreva sempre qual métrica você usou**.
 
-**Neste ciclo a premissa estava errada.** A previsão era fast-forward, e não era: `167aa01` era o **segundo pai** de `91ed3a7`, ou seja, a `develop` **já tinha integrado** a branch de interface no ciclo anterior e por isso estava **7 commits à frente** da interface, não atrás. Com `merge-base` = `167aa01`, as branches tinham divergido e fast-forward era impossível. A lição completa está na seção 4.4.
+**O que o `npm install` NÃO fez:** ninguém subiu o `live-server`, ninguém conferiu se os três `.js` voltam com `Content-Type: text/javascript`, e **a página nunca foi aberta no navegador**. A validação do servidor é **não verificada** nesta sessão e na anterior — o bloqueio deixou de ser a instalação, mas continua sendo a validação.
 
-Depois do merge, a prova de que nada foi perdido nem enxertado:
+### 1.2 Três PNGs untracked em `assets/`
 
-| Árvore | Hash |
-| --- | --- |
-| `git rev-parse 'develop^{tree}'` | `12dbbb67664d73f977add235bcfbe4be3de16d74` |
-| `git rev-parse 'feature/cinematch-web-interface^{tree}'` | `12dbbb67664d73f977add235bcfbe4be3de16d74` |
+`git ls-files --others --exclude-standard` devolve exatamente três arquivos, todos em `assets/`, com nomes de captura de tela de 28/09:
 
-**Idênticas.**
+- `Captura de tela 2026-09-28 223830.png` (67.405 bytes)
+- `Captura de tela 2026-09-28 223843.png` (66.973 bytes)
+- `Captura de tela 2026-09-28 223908.png` (60.745 bytes)
 
-### Branch apagada e branch ressincronizada
+Já estavam untracked **antes** desta sessão e **não** foram adicionados, movidos nem removidos: ficaram de fora do commit `4a89b5d` de propósito, porque versionar captura de tela de tela não é artefato do projeto. `git ls-files assets` devolve só `assets/main.png`. Decisão de mantê-los fora do versionamento é do usuário — **não** os versione nem os apague por conta própria.
 
-**`feature/cinematch-web-bootstrap` foi apagada**, local e remota. Nada se perdeu:
+---
 
-- A ponta remota **já não existia** no GitHub — `acd92b5`, de 26/09/2026 12:15:49, é o `Merge pull request #1 from tiagoeduardobr/feature/cinematch-web-bootstrap`, com pais `e47b81d` e `ac072eb`. O PR #1 consumiu a branch. Por isso o `git push --delete` respondeu `remote ref does not exist`: **esse é o estado desejado, não um erro.**
-- A ponta local era `af49c56`, commit não publicado de 26/09 13:58:00, com a **mesma árvore** de `dd89698`, que já está no histórico da `develop` (foi cherry-picked para a interface no mesmo dia, 26/09 14:16:36). `git rev-parse 'af49c56^{tree}'` e `git rev-parse 'dd89698^{tree}'` devolvem os dois `a09e94d0775ec30639a5c26cfc5f40eb0d099eb3`.
+## 2. Estado do Git — verificado em 29/09/2026
 
-**`feature/cinematch-web` foi feita fast-forward** de `fcfa9eb` para `8af3368`, +21 commits (`git rev-list --count fcfa9eb..8af3368`). A árvore antiga era `git ls-tree --name-only fcfa9eb` = `.gitattributes`, `AGENTS.md`, `docs` — **sem `index.html`, sem `js/`, sem `css/`, sem `package.json`**. Era anterior ao bootstrap e à reorganização em pastas. A branch não tinha nada de exclusivo: a diferença toda era o que o `develop` já tinha.
+### 2.1 O commit da sessão
 
-O `reflog` confirma as duas operações: `8af3368 HEAD@{2026-09-28 20:56:48}: merge origin/feature/cinematch-web: Fast-forward` e `91ed3a7 develop@{2026-09-28 21:07:58}: merge feature/cinematch-web-interface`.
+Um único commit, e ele **não foi pushado**.
 
-### Os quatro push de 28/09
+| Commit | Branch | Mensagem |
+| --- | --- | --- |
+| `4a89b5d` | `feature/cinematch-web-interface` | `docs: sincroniza o quadro com o estado real do código` |
 
-Confirmados pelo reflog das referências remotas, que registra `update by push` com o valor antigo e o novo. O horário é o de cada `ref` **no reflog dela própria**, não o do `origin/develop` — é por isso que o push da interface aparece às 21:25:53 e o da integração às 21:26:39:
+`git status --short --branch` devolve `## feature/cinematch-web-interface...origin/feature/cinematch-web-interface [ahead 1]`. O único arquivo versionado foi `docs/KANBAN.md`; a mensagem do commit descreve a sincronização em detalhe.
 
-| Push | Ref | Movimento | Horário |
+`git rev-list --count HEAD` = **27** commits no total. O `4a89b5d` é o último; o anterior na branch é o `279d8e0`, que é também a ponta remota da branch de interface.
+
+### 2.2 Branches
+
+`git branch -a -vv` e `git rev-parse` das quatro branches. As quatro têm tracking.
+
+| Branch | Commit | Distâncias medidas |
+| --- | --- | --- |
+| `main` | `e47b81d` | `develop..main` = **0** · `main..develop` = **36** |
+| `develop` | `9914ee5` | — |
+| `feature/cinematch-web` | `8af3368` | `develop..feature/cinematch-web` = **0** · `feature/cinematch-web..develop` = **12** |
+| `feature/cinematch-web-interface` | `4a89b5d` | `develop..feature/cinematch-web-interface` = **1** · `feature/cinematch-web-interface..develop` = **11** |
+
+Todos os números saem de `git rev-list --count <a>..<b>`.
+
+**`git rev-list --count develop..main` = 0: a `main` é ancestral da `develop` e nada foi mergeado nela. Comportamento correto**, conforme o `AGENTS.md` §6, que manda integrar `develop` → `main` só no fim do projeto. **Não é atraso, e nenhum agente deve "corrigir" a `main` por conta própria** — merge nela agora quebra o fluxo que o Critério 2 do briefing avalia.
+
+**`develop..feature/cinematch-web` = 0 e `feature/cinematch-web..develop` = 12: a branch de lógica é ancestral da `develop`.** `git merge-base --is-ancestor feature/cinematch-web develop` sai com código **0**, confirmando. Ela está **atrasada, e só isso** — nenhum commit exclusivo, nenhum trabalho perdido. O único número isolado sugere risco e não há risco; o que falta é um fast-forward para enxergar o trabalho de interface na própria árvore.
+
+**A branch de interface está 1 à frente da `develop`, e esse commit é o `4a89b5d`, ainda não publicado.** A integrate em 28/09 (`286cab2`) já está dentro da `develop` de agora: `develop` = `9914ee5` tem a mensagem `Merge branch 'feature/cinematch-web-interface' into develop`.
+
+### 2.3 Working tree
+
+**3 arquivos untracked, nenhum rastreado modificado.** `git status --short` devolve só as três linhas `?? assets/…` descritas na subseção 1.2. É o único ruído do repositório, e é intencional.
+
+### 2.4 O remoto andou depois do último `fetch` — os refs de tracking estão defasados
+
+Este é o achado de medição mais importante desta sessão, e ele **não** aparece em `git branch -vv`.
+
+`git ls-remote --heads origin` conversa com o servidor **sem** precisar de `fetch`, e ele discorda de dois dos refs de tracking locais:
+
+| Branch | ref local `origin/<branch>` | servidor (`git ls-remote --heads origin`) | Situação |
 | --- | --- | --- | --- |
-| Interface | `origin/feature/cinematch-web-interface` | `ae5046b` → `167aa01` | 28/09 21:06:38 |
-| Integração | `origin/develop` | `8af3368` → `91ed3a7` | 28/09 21:08:18 |
-| Interface | `origin/feature/cinematch-web-interface` | `167aa01` → `812321c` | 28/09 21:25:53 |
-| Integração | `origin/develop` | `91ed3a7` → `286cab2` | 28/09 21:26:39 |
+| `main` | `e47b81d` | `e47b81d` | igual |
+| `feature/cinematch-web-interface` | `279d8e0` | `279d8e0` | igual |
+| `develop` | `9914ee5` | **`ce13eaf1`** | **servidor à frente** |
+| `feature/cinematch-web` | `de67ecf` | **`d77920c`** | **servidor à frente** |
 
-**Sem force push, sem merge na `main`.** Todos foram autorizados explicitamente pelo usuário.
+Ou seja: a afirmação "as 4 branches estão em sincronia com o remoto" é verdadeira **contra o ref de tracking** e **falsa contra o servidor**, em duas branches. O `git fetch` desta sessão **não foi rodado** — foi uma decisão de escopo, para não tocar em refs locais num arquivo de snapshot. **Quanto o servidor está à frente é não verificado**: só um `git fetch` responderia, e ele não foi feito. É o problema 3 da seção 7.
 
-Os dois últimos são da rodada que fechou este arquivo. Os horários vêm de `git reflog show origin/feature/cinematch-web-interface --date=iso` e `git reflog show origin/develop --date=iso`. A ordem real é a da tabela: publica-se a branch de interface e, 46 segundos depois, o merge na `develop`.
+> **Regra prática herdada da lição 4.3 e reconfirmada aqui:** antes de afirmar o estado de uma branch remota, compare `git rev-parse origin/<branch>` com `git ls-remote --heads origin`. Se divergirem, o servidor está à frente e o `origin/*` no disco é lixo de quando o `fetch` rodou. A lição 4.3 dizia "rode `git fetch`"; a variante **sem escrita** é comparar com o `ls-remote`, que não altera ref nenhum e por isso é seguro dentro de uma sessão de snapshot.
+
+### 2.5 O que **não** foi feito nesta sessão
+
+Explicitamente, para que a próxima sessão não assuma o contrário:
+
+- **Nenhum `git fetch`** (e ver 2.4 — por isso há um problema aberto).
+- **Nenhum `git push`**, nem de `4a89b5d`, nem de outra coisa.
+- **Nenhum `git add`, `git commit`, `git merge` ou criação de branch** por este agente — o commit é de outro agente.
+- **Nenhum `npm install` novo** e **nenhum `live-server` subido**.
+- **Nenhum navegador aberto.**
 
 ---
 
 ## 3. O que foi feito nesta sessão
 
-### 3.1 Três arquivos rastreados estavam deletados do disco, sem commit
+### 3.1 Um subagente cancelado deixou um `npm install` rodado até o fim
 
-`package.json`, `.gitignore` e o PDF do briefing em `docs/` sumiram da working tree sem nenhum commit registrando a remoção. Restaurados do `HEAD`, byte a byte. O que cada um custaria se tivesse ficado perdido:
+O briefing passado ao subagente dizia que `node_modules` **não existia** — e dizia com razão, porque a medição de pouco antes confirmava. O subagente executou o `npm install` e, em seguida, **foi cancelado**. A instalação, porém, **continuou no disco** e terminou sozinha: `node_modules` tem CreationTime **29/09/2026 14:58:36** e está completo, com `live-server` 1.2.2 e o executável em `.bin`.
 
-| Arquivo | Por que é indispensável |
+Consequência prática: a **task seguinte foi escrita com a instrução de que `node_modules` não existia**, e o subagente que a executou conseguiu **corrigir a premissa errada sozinho**, medindo o disco e ajustando a nota de progresso da `M1-T18` no quadro. Isso salvou a task, mas só porque o subagente **mediu em vez de confiar no briefing**. A lição está na subseção 4.6.
+
+### 3.2 O quadro foi sincronizado com o código — commit `4a89b5d`
+
+O único arquivo versionado na sessão. O que mudou em `docs/KANBAN.md`:
+
+| Mudança | Detalhe |
 | --- | --- |
-| `package.json` | É o que faz o `npm start` funcionar (RF15) e é onde mora o `"type": "module"` que declara o projeto como ESM de ponta a ponta |
-| `.gitignore` | Protege o `node_modules` de ser versionado |
-| `docs/Projeto Avaliativo Final - ... .pdf` | É a **fonte de verdade de precedência** — perde para nada, e o `BRIEFING.md` é só a cópia pesquisável |
+| `M1-T05` voltou de *Em Andamento* para *A Fazer* | estava com timestamp desde 26/09 mas com **implementação zero**; o bloco de proveniência foi removido, porque task em *A Fazer* não o leva. Derrubou o WIP de 3 para 2 |
+| 8 tasks ganharam nota `*Progresso:*` com referência de linha | `M1-T02`, `M1-T04`, `M1-T05`, `M1-T12`, `M1-T16`, `M1-T17`, `M1-T18`, `M1-T21` |
+| 2 tasks ganharam nota `*Bloqueio:*`, que faltava | `M1-T18` e `M1-T21` |
+| Rastreabilidade | RF02 passou a `Em Andamento / A Fazer`; Critério 4 passou a `A Fazer` — as duas tasks de cada um caíram na mesma coluna |
+| Riscos | risco 10 revisado; **risco 11 criado** para a `M1-T12` atrasada em relação ao próprio código |
 
-### 3.2 Defeitos corrigidos no HTML e no CSS que o usuário já tinha escrito
+**Nenhuma task foi movida para *Concluído*.** A regra do `AGENTS.md` §5 só deixa uma task sair de *A Fazer* quando o código funciona **e** foi testado, e nada foi testado em navegador. É por isso que o quadro segue com 2 tasks em *Concluído* e 2 em *Em Andamento*.
 
-| Defeito | Correção | Verificável no repositório? |
-| --- | --- | --- |
-| `#form-perfil` sem botão de submit, que a `M1-T03` exige literalmente | `<button type="submit">Ver recomendações</button>` na linha 188 do `index.html` | **Não.** O `index.html` versionado em `2dcae95` tinha 77 linhas e **não tinha `#form-perfil` nenhum**. O formulário vivia só na cópia de trabalho, nunca commitada. O que dá para afirmar é o estado atual, não o defeito |
-| `<div class="nav-actions">` com `aria-label` em elemento de `role="generic"`, que não aceita nome acessível, então o rótulo era descartado | `role="group"` na linha 61 | **Sim.** O `index.html` de `2dcae95`, linha 40, era `<div class="nav-actions" aria-label="Ações rápidas">`, sem `role` |
-| Bloco `:root` no meio do arquivo | `:root` na linha 52, antes do reset, com as **13** variáveis `--cor-*` documentadas no cabeçalho | **Parcialmente.** O CSS de `2dcae95` tinha 186 linhas e **nenhum** `:root` — ele foi criado no `b188f1e`. A posição antiga de linha 188 não é verificável: o arquivo da working tree nunca foi commitado |
-| Comentários de cabeçalho afirmavam coisas falsas: diziam que a grade de cards era trabalho futuro, quando já existia no CSS, e que o formulário ainda não existia | Cabeçalho reescrito com o estado real | Sim, por inspeção do `git show b188f1e` |
+Uma divergência menor que vale registrar: a nota de progresso da `M1-T21` diz "**26 commits** no `HEAD`". Era verdade quando a nota foi escrita; depois do próprio commit `4a89b5d` o número virou **27**. O número na nota é um instantâneo, não uma constante — meça antes de citar.
 
-### 3.3 A tela de login foi mantida, por decisão do usuário
+### 3.3 Nenhuma linha de código mudou
 
-A seção `.secao-login` (e-mail, senha, "Entrar" e "Criar conta") **não consta do briefing**. A seção 3 do PDF, transcrita em `docs/BRIEFING.md:81`, diz: *"O wireframe abaixo mostra dois estados da aplicação: o formulário de perfil e os resultados com os cards de recomendação."* **Dois estados, nenhum login** — e a palavra "login" não aparece nenhuma vez no `BRIEFING.md`. Some a isso que back-end é proibido no Módulo 01.
+Evidência, não impressão: `git status --short` não lista nenhum arquivo rastreado modificado, e `docs/KANBAN.md` é o único arquivo do commit `4a89b5d`. Contagens de linha de `index.html` (210), `css/style.css` (458), `js/script.js` (25), `js/ui.js` (13), `js/modelo.js` (13) e `package.json` (13) são **as mesmas de 28/09**, medidas por `[System.IO.File]::ReadAllLines(...)`. O `package-lock.json` também está com o conteúdo inalterado — o `npm install` não sujou o repositório.
 
-Decisão do usuário: manter. O risco de rasgo Some, e a divergência fica **declarada**, nunca silenciada:
+### 3.4 O code-review pegou um número escrito sem comando
 
-- No comentário do `index.html`, linhas 36 a 42.
-- No item do Backlog, `docs/KANBAN.md:87`, que diz na íntegra que **não consta do briefing**, que os dois botões são `type="button"` e **ainda não têm comportamento**, e que **não conta nota**.
-
-Os dois botões estão assim hoje: `<button type="button">Entrar</button>` e `<button type="button">Criar conta</button>` (`index.html` linhas 122 e 123). São layout e estilo, nada mais. A contagem do Backlog foi de **8 para 9** nos dois lugares onde aparece: nos metadados (linha 17) e na nota acima da lista (linha 77).
-
-### 3.4 Limite de escopo explícito
-
-O usuário foi claro: **não desenvolver o projeto, só corrigir o que ele já tinha escrito.** Então não foram adicionados `meta description`, og tags nem skip link. `git grep "skip\|description" -- index.html` não devolve nada, e o `index.html` só tem `meta charset`, `meta viewport` e `<title>`. Essas são da `M1-T02` e da `M1-T16`, que **seguem pendentes de propósito** — mexer nelas agora roubaria o objeto das duas tasks.
-
-### 3.5 `"svh"` no dicionário do editor
-
-O Code Spell Checker assinalava as 5 ocorrências de `100svh` no CSS (`git grep -c "100svh" -- css/style.css` = 5). Acrescentado `"svh"` em `cspell.json:55`. É configuração de editor, não entra na aplicação nem em nenhum RF.
+O quadro recebeu "**148 pacotes**" em uma nota, e **nenhuma medida defensável dava 148**: são 146 de primeiro nível, 191 com aninhados, 150 no lock. O code-review pegou antes do commit, e o número foi removido. A lição está na subseção 4.7.
 
 ---
 
-## 4. A lição mais importante desta sessão
+## 4. A lição mais importante
+
+As subseções 4.1 a 4.5 são a **memória de pesquisa** deste arquivo e foram verificadas de novo nesta sessão: todas as afirmações continuam verdadeiras. As subseções 4.6 e 4.7 são novas.
 
 ### 4.1 Dois agentes anteriores afirmaram fatos errados
 
 Um agente anterior **afirmou dois fatos errados** numa seção que existe justamente para não afirmar fatos errados:
 
-1. Escreveu que `??` não aparecia em nenhum dos dois repositórios das aulas. **Aparece** — em `cinematch_antigo/cinematch.js:211`, no cálculo do próximo id. Ele não foi ensinado, mas existe.
+1. Escreveu que `??` não aparecia em nenhum dos dois repositórios das aulas. **Aparece** — em `cinematch_antigo/cinematch.js:211`, no cálculo do próximo id. Ele não foi ensinado, mas existe. **Reverificado hoje:** o arquivo tem 533 linhas e exatamente 1 ocorrência, na linha 211.
 2. Escreveu que os `.js` de `semana-12/modulos/` ainda estavam em CommonJS. **Já são ESM**: `index.js` faz `import`, `slug.js` faz `export`, e o `package.json` já tem `"type": "module"`. O professor corrigiu o exercício no commit `a413b0c`, de 18/09/2026.
 
 Nos dois casos o agente **tinha a evidência na tela e escreveu o contrário**. Ambos foram encontrados pelo code review, um por um.
@@ -221,11 +219,13 @@ Nos dois casos o agente **tinha a evidência na tela e escreveu o contrário**. 
 
 **Assertar de memória é o modo de falha mais provável neste projeto.** Toda afirmação factual nova precisa ser conferida contra o arquivo antes de virar texto de documentação. Se você não abriu o arquivo, você não sabe — escreva "não verificado" em vez de arriscar. A versão 27/09 deste arquivo existia justamente para carregar esse histórico, e por isso ele foi preservado em vez de reescrito do zero.
 
-### 4.3 A ocorrência desta sessão, do mesmo tipo
+**A forma que o mesmo erro assume quando o fato é um número.** Um número sem o comando que o produziu é um número inventado, por mais plausível que pareça — "148 pacotes instalados" é exatamente o tipo de valor que a memória produz e a medição não confirma. E o multiplicador de contagem **varia conforme a métrica escolhida**: pacotes de primeiro nível, pacotes com aninhados e entradas do lock são três números diferentes para o mesmo `node_modules`. **Escreva qual métrica você usou**, junto com o comando. Um número acompanhado do método que o produziu é um fato; um número sozinho é um palpite bem vestido.
+
+### 4.3 A ocorrência de 28/09, do mesmo tipo
 
 Um agente **afirmou que a `develop` não tinha nada exclusivo em relação à branch de interface, e que a integração seria um fast-forward. Estava errado.** A razão foi específica e generalizável: o `origin/develop` **local estava desatualizado**, porque o clone não tinha feito `fetch`. O `fetch` da sessão seguinte revelou que a `develop` tinha andado. A correção não veio de raciocínio, veio de `git fetch`.
 
-> **Regra: antes de afirmar qualquer coisa sobre o estado de uma branch remota, rode `git fetch` e releia o ref. Um `origin/*` no disco é uma cópia de quando o `fetch` rodou, não o estado do servidor.**
+> **Regra: antes de afirmar qualquer coisa sobre o estado de uma branch remota, compare `git rev-parse origin/<branch>` com `git ls-remote --heads origin` — ou rode `git fetch` e releia o ref. Um `origin/*` no disco é uma cópia de quando o `fetch` rodou, não o estado do servidor.** Esta sessão remedeu o achado pelo caminho sem escrita: o `ls-remote` mostrou `develop` em `ce13eaf1` no servidor contra `9914ee5` no disco.
 
 O mesmo agente chegou a dizer, mais tarde, que uma branch local "já existia" quando outra medição recente mostrava que não existia, e que um `git merge` tinha retornado `Already up to date` apesar de ele estar na branch errada. **O estado final estava correto, mas a narrativa do agente não batia com a sequência.**
 
@@ -233,7 +233,7 @@ O mesmo agente chegou a dizer, mais tarde, que uma branch local "já existia" qu
 
 Foi o que salvou a operação aqui: `git rev-parse` das árvores e `git branch -a -vv` confirmaram o resultado independentemente do que o agente dizia. São comandos de leitura, não de escrita, e podem ser repetidos sem risco.
 
-### 4.4 A ocorrência desta sessão, do mesmo tipo: a estratégia de merge
+### 4.4 A ocorrência de 28/09, do mesmo tipo: a estratégia de merge
 
 O orquestrador **previu que o merge da interface na `develop` seria um fast-forward. Estava errado.** A causa foi a mesma da 4.3: tratou *"a `develop` é ancestral da branch de feature"* como se valesse sempre. Não vale.
 
@@ -241,13 +241,37 @@ O que aconteceu, medido: `167aa01` era o **segundo pai** do merge `91ed3a7` — 
 
 > **Regra: antes de escolher a estratégia de merge, confira a topologia, não a posição aparente das branches.** Os dois comandos são `git show --no-patch --format='%P' develop` (quem são os pais do merge anterior) e `git merge-base <a> <b>` (onde as branches se separaram). Quem prevê a estratégia pela posição aparente erra; quem olha a topologia acerta.
 
-**O comportamento do subagente de Git foi o correto.** Ele **parou e reportou a premissa errada** em vez de executar o merge sob uma estratégia que sabia incompatível com a topologia. E, antes de commitar, fez um **teste round-trip de acentuação** — gravar e reler a mensagem de commit e comparar os bytes — porque o `--amend` estava proibido e uma mensagem corrompida seria **irreversível**. Vale registrar o cuidado: é o `--amend` proibido que transforma a checagem em obrigatória, e a checagem é o que torna a correção possível sem reescrever histórico.
+**O comportamento do subagente de Git foi o correto.** Ele **parou e reportou a premissa errada** em vez de executar o merge sob uma estratégia que sabia incompatível com a topologia. E, antes de commitar, fez um **teste round-trip de acentuação** — gravar e reler a mensagem de commit e comparar os bytes — porque o `--amend` estava proibido e uma mensagem corrompida seria **irreversível**. Vale registrar o cuidado: é o `--amend` proibido que transforma a checagem em obrigatória, e a checagem é o que torna a correção possível sem reescrever histórico. Essa checagem voltou a ser necessária em 29/09 — ver o gotcha da codepage na seção 9.
 
-### 4.5 Um erro de processo da sessão anterior
+### 4.5 Um erro de processo da sessão de 27/09
 
 O mesmo agente da seção 4.1 rodou `git restore docs/KANBAN.md` ao achar que um subagente tinha escrito fora do escopo — e as edições eram do usuário, feitas em paralelo. Não houve perda (o usuário reaplicou), mas a decisão foi tomar **ação destrutiva sobre trabalho do usuário sem perguntar**.
 
 Daí decorre a regra de orquestração deste projeto: **delegar implementação ao `dev` e revisão ao `code-review` antes de seguir**; nunca editar arquivo do projeto diretamente; **nunca reverter alteração do usuário sem antes perguntar**.
+
+### 4.6 Um subagente cancelado deixa efeito no disco, e a task seguinte herda a premissa velha
+
+O briefing da `M1-T18` dizia que `node_modules` não existia. **A premissa estava certa quando foi escrita** — foi medida pouco antes — e **ficou errada antes de a task ser executada**, porque o subagente da task anterior tinha iniciado o `npm install` e então foi cancelado. A instalação continuou rodando sozinha e deixou 146 pacotes de primeiro nível em disco.
+
+Duas lições, e a segunda é a que evita a próxima:
+
+> **Regra 1: um subagente cancelado pode ter dejado efeito de filesystem.** Cancelar o agente não desfaz o processo que ele disparou. Antes de tratar qualquer premissa de briefing como atual, meça o disco de novo.
+
+> **Regra 2: a task seguinte precisa reter o estado remede-o, não confiar no briefing anterior.** O briefing descreve o momento em que foi escrito, e o disco muda entre a escrita e a execução. Quem redige a task tem que reescrever no próprio texto o que é **verificável agora** — "o `node_modules` pode ou não existir: meça com `Test-Path` antes de agir" — em vez de afirmar o que era verdade na hora da redação.
+
+O que salvou a execução foi o comportamento do subagente: ele **mediu, encontrou a premissa falsa e corrigiu a nota do quadro por conta própria**, em vez de tentar satisfazer um briefing impossível. Isso é o comportamento certo e vale como exemplo — é a mesma lição 4.3, aplicada a um efeito de disco em vez de um ref de branch.
+
+### 4.7 Número escrito sem comando: a mesma lição da 4.2, aplicada ao quadro
+
+O quadro ganhou "**148 pacotes**" numa nota de progresso. **Nenhuma medição defensável produz 148.** As três que existem hoje, todas reproduzíveis:
+
+| Métrica | Comando | Resultado |
+| --- | --- | --- |
+| Pacotes de primeiro nível (sem `.bin`) | `Get-ChildItem node_modules -Directory -Force \| Where-Object Name -ne '.bin'` | **146** |
+| Pacotes com os aninhados | idem, `-Recurse`, filtrando os que têm `package.json` | **191** (45 aninhados) |
+| Entradas de primeiro nível no lock | `Select-String package-lock.json -Pattern '^\s{4}"node_modules/[^/]+"'` | **150** |
+
+O 148 não é aproximação de nenhum deles. **A lição já está escrita na 4.2 e vale reforçada com o caso concreto:** em documentação — e o quadro é documentação — um número sem o comando que o produziu é um número inventado, e o multiplicador de contagem varia conforme a métrica escolhida. **Escreva qual métrica**, ou não escreva o número. Quem pegou foi o code-review; quem não pegasse publicaria um dado falso no entregável avaliado.
 
 ---
 
@@ -282,7 +306,7 @@ Nenhum dos dois repositórios tem pasta da semana 6 nem da semana 13.
 
 | Fato | Onde |
 | --- | --- |
-| `??` aparece 1×, e não foi ensinado | `cinematch_antigo/cinematch.js:211` |
+| `??` aparece 1×, e não foi ensinado | `cinematch_antigo/cinematch.js:211` (arquivo com 533 linhas, 1 ocorrência) |
 | `semana-12/modulos/` já é ESM | `index.js` faz `import`, `slug.js` faz `export`, `package.json` com `"type": "module"`; commit `a413b0c`, 18/09/2026 — confirmado pelo `AGENTS.md` §2.1 |
 | `normalizarTexto()` | `cinematch_antigo/cinematch.js:284`, **não** em `catalogo.js` |
 | Globais implícitos quebram em módulo ES | `cinematch_antigo/cinematch.js` linhas 31 (`opcao = prompt(...)`), 171 (`for (i = 0; i < catalogo.length; i++)`) e 330 (`for (i = 0; i < resultado.length; i++)`) |
@@ -291,64 +315,118 @@ Nenhum dos dois repositórios tem pasta da semana 6 nem da semana 13.
 | `og:` e `meta description` só no `ceu-aberto` | os `index.html` das semanas 09 e 10 têm `lang`, `<title>` e landmarks, mas zero `og`/`description` |
 | Briefing não menciona LF/CRLF, encoding nem `.gitattributes` | varredura das 16 páginas, zero ocorrências |
 | Escopo real do versionamento (5.6) | branches mínimas, mínimo 5 commits individual / 8 squad, prefixos exemplificados (`feat:`, `style:`, `docs:`), fluxo até a `main` |
-| **A seção 3 do briefing tem só DOIS estados e nenhum login** | `docs/BRIEFING.md:81` — *"o formulário de perfil e os resultados com os cards de recomendação"*. "login" não aparece nenhuma vez no `BRIEFING.md`. É o que autoriza tratar a tela de login como bônus fora do escopo |
-| **Os 6 commits que a `develop` tinha à frente da interface eram vazios de conteúdo** | `git merge-base 8af3368 167aa01` = `ae5046b`; `git rev-list --count 167aa01..8af3368` = 6; `git diff --name-only ae5046b 8af3368` = **0 arquivos**. Por isso o merge de 28/09 não tinha risco de conflito |
-| **A ponta remota da branch de bootstrap já não existia** | `acd92b5` (26/09/2026 12:15:49) é o `Merge pull request #1 from tiagoeduardobr/feature/cinematch-web-bootstrap`, com pais `e47b81d` e `ac072eb` — `git ls-remote --heads origin` hoje devolve só 4 branches |
-| **`core.autocrlf = true` nesta máquina** | `git config --get core.autocrlf` |
+| **A seção 3 do briefing tem só DOIS estados e nenhum login** | `docs/BRIEFING.md:81` — *"o formulário de perfil e os resultados com os cards de recomendação"*. `Select-String -Pattern login` no `BRIEFING.md` devolve **0** ocorrências. É o que autoriza tratar a tela de login como bônus fora do escopo |
+| **A ponta remota da branch de bootstrap já não existia** | `acd92b5` (26/09/2026 12:15:49) é o `Merge pull request #1 from tiagoeduardobr/feature/cinematch-web-bootstrap`, com pais `e47b81d` e `ac072eb` |
+| **`core.autocrlf = true` nesta máquina** | `git config --get core.autocrlf` = `true` |
 | **Identidade do Git já configurada** | `git config --get user.name` = `lucas`; `user.email` = `lucasgd123@gmail.com`. Não rode `git config` |
-| **Não existe configuração de lint de Markdown** | `git ls-files` só devolve `cspell.json` entre os arquivos de configuração. Não há `.markdownlint.json`, nem `.editorconfig`, nem `.eslintrc`, e não existe comentário `markdownlint-disable` em lugar nenhum |
+| **Não existe configuração de lint de Markdown** | `git ls-files` filtrado por `markdownlint\|editorconfig\|eslint\|prettier` devolve **nada**. Não há `.markdownlint.json`, nem `.editorconfig`, nem `.eslintrc` |
+| **`docs/KANBAN.md` está com LF puro** | varredura byte a byte: **0** bytes CR em 34.525 bytes, 215 linhas |
+| **A grade de cards já existe no CSS** | `css/style.css`: `.resultados` nas linhas 393 e 450, `.card-serie` nas linhas 401 e 455, `flex-wrap: wrap` nas linhas 209, 220, 365, 432 e 452, `@media (max-width: 768px)` na 204 e `@media (min-width: 769px)` na 418 |
+| **Os botões da tela** | `index.html:188` é o `<button type="submit">Ver recomendações</button>`; `122` e `123` são `<button type="button">Entrar</button>` e `<button type="button">Criar conta</button>`; `62`, `68` e `73` são os três botões da navbar, todos `type="button"` com `aria-label` |
+| **O `index.html` já carrega os módulos ES** | `index.html:208` — `<script type="module" src="./js/script.js"></script>` |
+| **`node_modules` é ignorado pelo Git** | `.gitignore` lista `node_modules/`; `git status` não o mostra entre os untracked |
+| **A `main` é ancestral da `develop`, e isso é o comportamento correto** | `git rev-list --count develop..main` = **0**; `main..develop` = **36**. O `AGENTS.md` §6 proíbe merge na `main` antes do fim do projeto |
+| **A branch de lógica é ancestral da `develop`** | `git rev-list --count develop..feature/cinematch-web` = **0**; `feature/cinematch-web..develop` = **12**; `git merge-base --is-ancestor` sai com código 0 |
+| **A mensagem do commit `4a89b5d` está íntegra em UTF-8** | `git log -1 --format=%B 4a89b5d` gravado direto em arquivo: **1.039 bytes, sem BOM, UTF-8 estrito válido, 0 caractere de substituição**, e `$txt.Contains("código")` = `True` no primeiro byte do arquivo. O console mostra mojibake; o arquivo está certo — ver o gotcha da seção 9 |
+| **A mensagem do commit `279d8e0` continua sendo a ponta remota da interface** | `git ls-remote --heads origin` devolve `279d8e0` para `refs/heads/feature/cinematch-web-interface`, igual ao ref de tracking local |
 
 ---
 
 ## 7. Problemas abertos
 
-1. **A `M1-T12` está adiantada no quadro.** A grade de cards **já existe no CSS**: `.resultados` nas linhas 393 e 450, `.card-serie` nas linhas 401 e 455, `flex-wrap: wrap` nas linhas 365, 432 e 452, e as duas media queries em `@media (max-width: 768px)` (linha 204) e `@media (min-width: 769px)` (linha 418). Mas a `M1-T12`, em `docs/KANBAN.md:100`, ainda descreve `flex-wrap` como trabalho dela. **Quem for executar a `M1-T12` vai achar que já está feito** — e a task não sai de *A Fazer* sem estar funcionando e testada, o que ainda não aconteceu. O que falta ali é a verificação, não a propriedade.
+### 7.1 O botão de submit do perfil hoje recarrega a página
 
-2. **O botão de submit do perfil hoje recarrega a página.** Nada chama `preventDefault()` ainda, porque a `M1-T05` (Tiago) está em aberto. Clicar em "Ver recomendações" (`index.html:188`) faz um GET nativo e joga o perfil na query string. É o comportamento esperado do RF02 e quem fecha é a `M1-T05`.
+**Era o problema 2 de 28/09 e piorou em termos de rastreio.** Nada chama `preventDefault()`: `Select-String -SimpleMatch preventDefault` nos três módulos devolve **0**. Clicar em "Ver recomendações" (`index.html:188`) faz um GET nativo e joga o perfil na query string.
 
-3. **Risco latente na tela de login: e-mail e senha na query string.** Se o bônus virar `type="submit"` sem `preventDefault()`, o GET padrão manda **e-mail e senha para a query string** e para o histórico do navegador — CWE-598, owasp A02. Hoje é inerte, porque os dois botões são `type="button"`. Quem algum dia implementar esse bônus tem que colocar o `preventDefault()` **antes** de mexer no `type`.
+A mudança: a `M1-T05` **voltou para *A Fazer*** no commit `4a89b5d`, com implementação zero — `js/script.js` tem 25 linhas e só tem os dois `import` (16-17) e um `console.log` (22-24), sem `addEventListener`, sem `preventDefault` e sem o objeto `usuario`. **Ninguém está trabalhando nela agora**, e a dependência declarada continua registrada como `*Bloqueio:*` na própria linha do quadro, junto com o risco 10 revisado. O risco se mantém integralmente.
 
-4. **Não houve verificação em navegador.** `node_modules` não existe e a instalação é a `M1-T18`. A cascata dos três botões da navbar, do botão de submit e dos dois botões de login foi resolvida por **análise estática**, não por execução. Quando rodar `npm install`, abrir a página e olhar os três botões é a confirmação mais barata que existe — e o `AGENTS.md` §7 proíbe abrir via `file://`, porque os módulos ES morrem de CORS.
+### 7.2 Risco latente na tela de login: e-mail e senha na query string
 
-5. **Lacuna do `.gitattributes`:** a regra cobre `md`, `js`, `css`, `html` e `bat`, mas **não** `*.json`. Com `core.autocrlf=true`, o `cspell.json` está em disco com **60 linhas CRLF e 0 LF** (contagem por regex sobre os bytes, arquivo com 967 bytes). O `package.json` está no mesmo regime. Não quebra nada — o índice grava LF e o status fica limpo. É cosmético, a decisão é do usuário e **ainda não foi tomada**. Não "resolva" por conta própria: acrescentar `*.json` ao `.gitattributes` mexe em todos os `.json` do repositório, e essa é uma escolha do usuário.
+Inerte, e continua válido. Se o bônus virar `type="submit"` sem `preventDefault()`, o GET padrão manda **e-mail e senha para a query string** e para o histórico do navegador — CWE-598, owasp A02. Hoje é inerte, porque os dois botões são `type="button"` (`index.html:122` e `123`). Quem algum dia implementar esse bônus tem que colocar o `preventDefault()` **antes** de mexer no `type`.
 
-6. **Duas imagens do briefing não são verificáveis por texto.** O wireframe (Seção 3) e a **estrutura de pastas** (Seção 5.2) são figuras no PDF. A Seção 3 do `AGENTS.md`, que descreve `js/`, `css/`, `assets/` e `index.html` na raiz, é **derivada, não comprovada** pela transcrição. Alguém precisa abrir a página da Seção 5.2 no PDF e conferir com os olhos antes de apresentar isso como exigência do professor no vídeo.
+### 7.3 Os refs de tracking estão defasados: o servidor andou em 2 das 4 branches
 
-7. **A lógica da semana 6 ainda não foi portada.** `js/modelo.js` (13 linhas), `js/script.js` (25 linhas) e `js/ui.js` (13 linhas) são placeholders. É o próximo trabalho de verdade.
+**Novo nesta sessão.** `git ls-remote --heads origin` mostra `develop` em `ce13eaf1` e `feature/cinematch-web` em `d77920c` no servidor, contra `9914ee5` e `de67ecf` nos refs locais. O `git fetch` não foi rodado, por decisão de escopo.
 
-8. **Divisão de trabalho e WIP.** O `docs/KANBAN.md` marca `M1-T03` e `M1-T04` como "por Lucas" e `M1-T05` como "por Tiago" — dois nomes distintos, o que indica squad de 2. A divisão segue exatamente o que o `AGENTS.md` §5 descreve: HTML e CSS da mesma tela são tasks acopladas e compartilham um slot, enquanto a task de lógica ocupa o outro. Com 3 tasks em *Em Andamento*, o WIP está **no teto** que a regra define para squad de 2, e **2 acima** do limite de 1 do trabalho solo. O que falta confirmar com o usuário é se o squad ainda tem 2 pessoas ativas — disso dependem o WIP e a contagem mínima de commits (**5 no individual, 8 no squad**).
+**Não verificado, e por quê:** quanto o servidor está à frente. Só um `git fetch` — que altera refs locais e estava fora do escopo desta sessão — responderia. **Não rode `git push` para "resolver":** commitar e publicar com base num `origin/*` velho é exatamente o risco que a lição 4.3 descreve, e o `AGENTS.md` §6 proíbe push sem pedido explícito do usuário. **Antes de qualquer push, `git fetch` e releia os refs.**
+
+### 7.4 Não houve verificação em navegador — parcialmente resolvido
+
+**Era o problema 4 de 28/09.** A instalação deixou de ser o bloqueio: `node_modules` existe, com 146 pacotes de primeiro nível, `live-server` 1.2.2 e o executável em `.bin` (medições na subseção 1.1). A **validação continua pendente**: ninguém subiu o `live-server`, ninguém conferiu se os três `.js` voltam como `text/javascript`, e **a página nunca foi aberta no navegador** — nem nesta sessão, nem na anterior. Nenhuma afirmação de comportamento neste arquivo pode ser tratada como testada.
+
+A cascata dos três botões da navbar, do botão de submit e dos dois botões de login segue resolvida por **análise estática**, não por execução. A confirmação mais barata que existe é rodar `npm start`, abrir a página e olhar os três botões — e o `AGENTS.md` §7 proíbe abrir via `file://`, porque os módulos ES morrem de CORS.
+
+### 7.5 Lacuna do `.gitattributes` com `*.json`
+
+Continua válido, e continua sendo **decisão do usuário, não tomada**. A regra cobre `md`, `js`, `css`, `html` e `bat`, mas **não** `*.json`. Com `core.autocrlf=true`, o `cspell.json` está em disco em CRLF. Não quebra nada — o índice grava LF e o status fica limpo. É cosmético. **Não "resolva" por conta própria:** acrescentar `*.json` ao `.gitattributes` mexe em todos os `.json` do repositório, e essa é uma escolha do usuário.
+
+### 7.6 Duas imagens do briefing não são verificáveis por texto
+
+Continua válido. O wireframe (Seção 3) e a **estrutura de pastas** (Seção 5.2) são figuras no PDF. A Seção 3 do `AGENTS.md`, que descreve `js/`, `css/`, `assets/` e `index.html` na raiz, é **derivada, não comprovada** pela transcrição. Alguém precisa abrir a página da Seção 5.2 no PDF e conferir com os olhos antes de apresentar isso como exigência do professor no vídeo.
+
+### 7.7 A lógica da semana 6 ainda não foi portada — é o próximo trabalho de verdade
+
+**Continua válido e continua sendo a lacuna central do projeto.** `js/modelo.js` (13 linhas), `js/script.js` (25 linhas) e `js/ui.js` (13 linhas) são placeholders: `PLACEHOLDER_UI` e `PLACEHOLDER_MODELO`, ambos com `pronto: false`. **Não existe nenhuma classe `Conteudo` ou `Serie`**, e nenhum método de array, nenhum `fetch`, nenhum `setTimeout`, nenhum `localStorage` em código.
+
+**Oito RFs dependem disso e estão zerados:** RF04 a RF08 e RF10 a RF12, na cadeia de **nove tasks** `M1-T07` a `M1-T15`. Enquanto os três módulos não tiverem conteúdo, **a `M1-T17` não fecha, a `M1-T18` não valida, a `M1-T19` não testa, a `M1-T20` não escreve o README, e o vídeo da `M1-T22` não tem o que mostrar**. É a dependência de maior profundidade da cadeia inteira.
+
+### 7.8 Tamanho do squad — a pergunta continua aberta, o WIP não
+
+**Metade deste item foi resolvida nesta sessão, metade continua aberta.** O que **mudou:** o WIP saiu do teto. Com a `M1-T05` de volta para *A Fazer*, a coluna *Em Andamento* tem **2** tasks (`M1-T03` e `M1-T04`) em vez de 3 — dentro do limite de 3 do squad de 2 e acima do limite de 1 do trabalho solo. A pergunta de WIP está resolvida.
+
+O que **continua aberto:** o `docs/KANBAN.md` marca `M1-T03` e `M1-T04` como "por Lucas" e a `M1-T05` como "por Tiago" — dois nomes distintos, o que indica squad de 2. **Falta confirmar com o usuário se o squad ainda tem 2 pessoas ativas.** Disso dependem duas coisas concretas: o **limite de WIP** (1 no solo, 3 no squad) e a **meta de commits** (**5** no individual, **8** no squad). Não assuma nenhuma das duas.
+
+### Resolvidos nesta sessão
+
+| Item | Destino |
+| --- | --- |
+| **Problema 1 de 28/09 — a `M1-T12` adiantada no quadro.** A grade de cards já existe no CSS, mas a task em *A Fazer* ainda descrevia `flex-wrap` como trabalho dela | **Resolvido como problema deste arquivo.** Virou o **risco 11** do `docs/KANBAN.md`, que registra o bloqueio (sem o `<article>` da `M1-T11` não existe elemento para a regra estilizar) e a mitigação (fechar a `M1-T11` primeiro, depois conferir os dois breakpoints pelo `live-server`). A `M1-T12` também ganhou nota `*Progresso:*` e `*Bloqueio:*` no quadro |
+| **Problema 8 de 28/09 (parte do WIP) — WIP no teto com 3 tasks em *Em Andamento*** | **Resolvido.** WIP caiu para 2. A parte sobre o tamanho do squad reabriu como item 7.8 acima |
+| **`node_modules` inexistente** | **Resolvido.** `npm install` rodou em 29/09/2026 14:58:36, 146 pacotes de primeiro nível, `live-server` 1.2.2. A validação do servidor virou o item 7.4 |
 
 ---
 
 ## 8. Estado das tasks
 
-Conferido no `docs/KANBAN.md` em 28/09/2026.
+Conferido no `docs/KANBAN.md` em 29/09/2026, **por coluna**, e não por checkbox — ver a ressalva logo abaixo.
 
 | Coluna | Tasks | Quantidade |
 | --- | --- | --- |
 | Concluído | `M1-T00`, `M1-T01` | 2 |
-| Em Andamento | `M1-T03`, `M1-T04`, `M1-T05` | 3 |
-| A Fazer | `M1-T02` e `M1-T06` a `M1-T23` | 19 |
+| Em Andamento | `M1-T03`, `M1-T04` | 2 |
+| A Fazer | `M1-T02`, e `M1-T05` a `M1-T23` | 20 |
 | Backlog | 9 itens de bônus, sem ID — não contam nota | 9 |
 
-Total: **24 tarefas** (`M1-T00` a `M1-T23`) + **9 itens de Backlog**. Bate com os metadados do próprio quadro, na linha 17: *"24 tarefas (`M1-T00` a `M1-T23`) + 9 itens no Backlog (7 bônus das seções 8 e RF12 + 1 opcional da seção 5.4 + 1 bônus de interface fora do escopo do briefing)"*. A soma 2 + 3 + 19 = 24 fecha.
+Total: **24 tarefas** (`M1-T00` a `M1-T23`) + **9 itens de Backlog**. Bate com os metadados do próprio quadro, na linha 17. A soma 2 + 2 + 20 = 24 fecha.
 
-O Backlog subiu de **8 para 9** nesta sessão, com a tela de login, e a contagem foi corrigida nos dois lugares onde aparece (linhas 17 e 77).
+### A contagem de checkbox ingênua dá dois números errados
+
+`Select-String -Path docs\KANBAN.md -Pattern '\- \[x\]'` devolve **5**, e `-Pattern '\- \[ \]'` devolve **56**. **Os dois estão errados.** As ocorrências não são só de task:
+
+- Das **5** ocorrências de `- [x]`, **2 estão na legenda** — linhas 33 e 43, que descrevem a notação em prosa. Das 3 restantes, 2 são tasks (`M1-T00`, na linha 126, e `M1-T01`, na linha 127) e **1 é o item do checklist** "Criei o quadro Kanban", na linha 211.
+- Das **56** ocorrências de `- [ ]`, **2 também estão na legenda** — linhas 32 e 42, pela mesma razão. As 54 restantes são 20 de *A Fazer* + 2 de *Em Andamento* + 9 de *Backlog* + 23 do checklist.
+
+Os números reais de checkbox são **`- [x]` = 3** e **`- [ ]` = 54**. A conta fecha: a contagem ingênua soma 61, a real soma 57, e a diferença são exatamente as **4** ocorrências de legenda que o `Select-String` não distingue de uma task. **Nunca conte checkbox com substituição ingenua neste quadro: conte por coluna.**
+
+> **Este é exatamente o número que a versão de 28/09 já registrava** — o que confirma que **ele não tinha erro**. O que mudou entre 28/09 e 29/09 foi **só a distribuição entre colunas**: *A Fazer* foi de 19 para 20 (a `M1-T05` voltou), *Em Andamento* foi de 3 para 2. O total de 24 não se moveu.
 
 O checklist final de entrega do `KANBAN.md` tem **24 itens, dos quais 23 estão pendentes** — só "Criei o quadro Kanban" está marcado. Os itens de entrega ainda zerados são os três mais pesados do projeto: **vídeo de até 7 minutos** (peso 1,50), **quadro Kanban publicado com link** e **os três links no AVA**.
 
-A verificação cruzada fecha: `- [ ]` = 54 no arquivo = 19 (A Fazer) + 3 (Em Andamento) + 9 (Backlog) + 23 (checklist). E `- [x]` = 3, sendo `M1-T00`, `M1-T01` e o item do checklist.
+**Nenhuma task foi movida para *Concluído* nesta sessão**, e a razão está registrada no commit `4a89b5d`: nada foi testado em navegador, e a regra do `AGENTS.md` §5 só deixa uma task sair de *A Fazer* quando o código funciona **e** foi testado.
 
 ---
 
 ## 9. Gotchas do ambiente Windows
 
-- **O diretório temporário externo muda de máquina para máquina.** O valor literal é **`C:\Users\<usuário>\AppData\Local\Temp\opencode`**, e só existe uma cópia dele por usuário do Windows. **Confira, não copie do arquivo.** O `Test-Path` desta sessão, rodada na máquina do Lucas, deu `True` para `C:\Users\Lucas\AppData\Local\Temp\opencode` e `False` para `C:\Users\Tiago\AppData\Local\Temp\opencode`. A versão 27/09 deste arquivo trazia o caminho do Tiago com valor literal, e o próximo agente que o copiasse sem conferir iria escrever no lugar errado — ou, pior, concluiria que o diretório não existe. **Motivo da divergência: este arquivo foi escrito na máquina do Tiago e esta sessão rodou na do Lucas.** É o único lugar fora do repositório onde escrita é permitida.
-- **Python não está instalado nesta máquina.** `python` e `python3` resolvem só para o stub da Microsoft Store em `C:\Users\Lucas\AppData\Local\Microsoft\WindowsApps\`, e `python --version` falha com a mensagem de "instalar da Microsoft Store". `py` não existe. Então a receita do `AGENTS.md` de extrair texto de PDF com `pypdf` **não é utilizável aqui** — a versão 6.15.0 que o `AGENTS.md` cita **não foi verificada nesta máquina** e provavelmente pertence à máquina do Tiago. O `node` existe (`C:\Program Files\nodejs\node.exe`). Quem precisar ler o PDF, use a transcrição em `docs/BRIEFING.md` ou instale o Python.
-- **O console do PowerShell corrompe acentuação na saída** — acentos e cedilhas aparecem como `?` ou como um caractere de substituição Unicode (`U+FFFD`) no terminal, mesmo que o arquivo esteja correto em UTF-8. **Nunca** "conserte" acentuação que só está errada na tela do terminal: isso corromperia o arquivo de verdade.
-- **`Measure-Object -Line` conta só linhas não-vazias.** Use `$a = [System.IO.File]::ReadAllLines(<arquivo>); $a.Count` para a contagem real. Já causou um falso alarme numa sessão anterior: um arquivo com 186 linhas reportou 160.
-- **Comandos negados por permissão:** `python -c`, `node -e`, `sed`, `awk`, `tee`, `cat >`, `Set-Content`, `Out-File`. Grave um script em arquivo e execute. Atenção: nesta máquina o `python -c` nem chega à negativa do ambiente, porque o Python não existe (veja acima).
-- **`core.autocrlf=true` nesta máquina.** É a causa do comportamento de CRLF no `*.json` descrito no problema 5 da seção 7.
+- **O diretório temporário externo muda de máquina para máquina.** O valor literal é **`C:\Users\<usuário>\AppData\Local\Temp\opencode`**, e só existe uma cópia dele por usuário do Windows. **Confira, não copie do arquivo.** O `Test-Path` da sessão de 28/09, rodada na máquina do Lucas, deu `True` para `C:\Users\Lucas\AppData\Local\Temp\opencode` e `False` para o caminho do Tiago. **Motivo da divergência: o arquivo foi escrito na máquina do Tiago e aquela sessão rodou na do Lucas.** É o único lugar fora do repositório onde escrita é permitida.
+- **`rg` (ripgrep) não está instalado nesta máquina.** `Get-Command rg` falha e devolve `$null` — a documentação e os prompts de outros agentes assumem que ele existe. Um comando de verificação escrito com `rg` falha com "comando não reconhecido", e o pior efeito é **indireto**: uma checagem de ausência que usa `rg` falha pelo motivo errado e escreve mal como **"FALHA: ainda existe"**, jogando o agente na direção oposta da verdadeira. Use a ferramenta de busca dedicada ou `Select-String`. Vale conferir a existência da ferramenta antes de confiar no resultado de um comando que depende dela.
+- **O console do PowerShell está em codepage 850 e gera mojibake falso ao reler saída UTF-8 do git.** O número é medido: `[Console]::OutputEncoding.WebName` devolve `ibm850`, `CodePage` devolve `850`, e `chcp` confirma a página 850 ativa. São **dois** problemas distintos, e confundi-los custa tempo: um é a **escrita** do arquivo (o próximo gotcha), o outro é a **leitura** da saída. Este já produziu um resultado falso nesta sessão: `git log -1 --format=%B` pelo pipeline do PowerShell mostrou acentuação corrompida, e a leitura pelo console fez crer que a mensagem do commit `4a89b5d` estava estragada. **Estava certa.** A leitura confiável é gravar a saída do git **direto em arquivo via `cmd`** (`cmd /c "git ... > arquivo"`) e ler os bytes com .NET, conferindo `BOM`, validade de UTF-8 estrito, contagem de caractere de substituição e mojibake. Feito assim nesta sessão: **1.039 bytes, sem BOM, UTF-8 estrito válido, 0 caractere de substituição, e `.Contains("código")` = `True`** — o arquivo está correto e só a tela mente. Note que a corrupção é **intermitente**: a mesma mensagem passou limpa em uma leitura e suja em outra, o que é a assinatura de um problema de console e não de arquivo.
+- **O console do PowerShell corrompe acentuação na escrita** — acentos e cedilhas aparecem como `?` ou como um caractere de substituição Unicode (`U+FFFD`) no terminal, mesmo que o arquivo esteja correto em UTF-8. **Nunca** "conserte" acentuação que só está errada na tela do terminal: isso corromperia o arquivo de verdade.
+- **Python não está instalado nesta máquina.** `python` e `python3` resolvem só para o stub da Microsoft Store em `C:\Users\Lucas\AppData\Local\Microsoft\WindowsApps\`, e `python --version` falha com a mensagem de "instalar da Microsoft Store". `py` não existe. Então a receita do `AGENTS.md` de extrair texto de PDF com `pypdf` **não é utilizável aqui** — a versão 6.15.0 que o `AGENTS.md` cita **não foi verificada nesta máquina** e provavelmente pertence à máquina do Tiago. O `node` existe e é a **v26.7.0** nesta máquina. Quem precisar ler o PDF, use a transcrição em `docs/BRIEFING.md` ou instale o Python.
+- **`Measure-Object -Line` conta só linhas não-vazias.** Use `[System.IO.File]::ReadAllLines(<arquivo>); $a.Count` para a contagem real. Já causou um falso alarme numa sessão anterior: um arquivo com 186 linhas reportou 160.
+- **Comandos negados por permissão:** `python -c`, `node -e`, `sed`, `awk`, `tee`, `cat >`, `Set-Content`, `Out-File`. Grave um script em arquivo e execute. Atenção: nesta máquina o `python -c` nem chega à negativa do ambiente, porque o Python não existe (veja acima). **`rg` também entra nesta lista por ausência**, não por negativa.
+- **`core.autocrlf=true` nesta máquina.** É a causa do comportamento de CRLF no `*.json` descrito no problema 7.5. Não remova as regras do `.gitattributes`: sem as de LF o Windows converte tudo e o `docs/KANBAN.md` aparece sujo em todo diff.
+- **`Select-String` sem `-SimpleMatch` trata o padrão como regex**, e um parêntese não escapado — `fetch(`, `.map(` — faz o comando inteiro falhar com "expressão regular não válida". Pior: a variável de resultado **fica com o valor da iteração anterior**, e o número impresso em seguida é o do item anterior, não o do atual. **Use `-SimpleMatch` para padrão literal e uma variável nova por padrão.**
 - `cspell.json` é configuração do Code Spell Checker, não faz parte da aplicação. Não entra em nenhum RF.
 - **O modelo não lê PDF.** Para extrair, use `pypdf` a partir de um script gravado — viável apenas onde o Python exista.
 
@@ -356,10 +434,11 @@ A verificação cruzada fecha: `- [ ]` = 54 no arquivo = 19 (A Fazer) + 3 (Em An
 
 ## 10. Próximos passos sugeridos
 
-1. **Fechar o `M1-T02` e o `M1-T16`, que destravam três tasks.** O `index.html` tem hoje só `charset`, `viewport` e `<title>`. Faltam a `meta description`, as og tags e o skip link. Cuidado com a `M1-T12`, que está adiantada (problema 1): ela descreve trabalho já feito no CSS, então confirme o que ainda falta antes de marcar.
-2. **Portar a lógica da semana 6 para módulos ES:** as classes `Conteudo` e `Serie extends Conteudo` em `js/modelo.js`, e a compatibilidade com `compatibilidade()` e `obterConteudosPorGenero()` em `js/script.js`. **Porte a lógica, não o estilo**: o `cinematch.js` é código de terminal e usa globais sem declarar (linhas 31, 171 e 330), que quebram com `ReferenceError` em módulo ES. Declare com `let` ou `const` ao portar.
-3. **Confirmar se a `M1-T05` deve ser feita na branch de lógica.** A branch corrente é `feature/cinematch-web-interface`, mas a `M1-T05` (modelagem do perfil, marcada "por Tiago") é task de **lógica**, e o `AGENTS.md` §6 atribui lógica a `feature/cinematch-web`. Confirmar com o usuário. A branch de lógica está 8 commits atrás da `develop` e já pode ser um fast-forward puro — ela é ancestral da `develop`, como medido na seção 2.
-4. **Rodar `npm install` (`M1-T18`) e abrir a página.** É a confirmação pendente do problema 4 e a única forma de sair da análise estática.
-5. **Abrir a Seção 5.2 do PDF** e conferir a estrutura de pastas com os olhos, antes de apresentá-la como exigência do professor.
-6. **Confirmar o tamanho do squad** — se ainda são 2 pessoas ativas. Disso dependem o limite de WIP e a meta de commits: **5 no individual, 8 no squad**.
-7. **Push é decisão do usuário.** Nunca fazer push sem pedido explícito. E nunca force push neste repositório, nem com `--force` nem com `--force-with-lease`.
+1. **Portar a lógica da semana 6 para módulos ES. Este é o próximo trabalho de verdade** (problema 7.7), e é a dependência de maior profundidade da cadeia: **oito RFs e nove tasks** estão bloqueados atrás dele. As classes `Conteudo` e `Serie extends Conteudo` em `js/modelo.js`, e a compatibilidade com `compatibilidade()` e `obterConteudosPorGenero()` em `js/script.js`. **Porte a lógica, não o estilo**: o `cinematch.js` é código de terminal e usa globais sem declarar (linhas 31, 171 e 330), que quebram com `ReferenceError` em módulo ES. Declare com `let` ou `const` ao portar.
+2. **Subir o `live-server` e abrir a página no navegador** (problema 7.4). O `npm install` já está feito, então o passo é curto e é a única forma de sair da análise estática: `npm start`, abrir a página, olhar os três botões da navbar, o botão de submit e os dois botões de login, e conferir na aba Network que os três `.js` voltam como `text/javascript`. **Não abra via `file://`.** Enquanto isso não acontecer, nenhuma task pode sair de *A Fazer* pela regra do `AGENTS.md` §5.
+3. **Retomar a `M1-T05` junto com a `M1-T03`**, como bloco acoplado, e só depois da validação do passo 2. A task está em *A Fazer* com implementação zero e com a dependência declarada registrada; o risco 10 do quadro descreve exatamente por que a captura do `submit` não pode ser aberta antes de o formulário existir e passar no teste integrado.
+4. **Fechar o `M1-T02` e o `M1-T16`, que destravam três tasks.** O `index.html` tem hoje só `charset`, `viewport` e `<title>`. Faltam a `meta description`, as og tags e o skip link. A `M1-T12` está no risco 11: o CSS da grade já existe, então confirme o que ainda falta antes de marcar.
+5. **Rodar `git fetch` antes de qualquer push**, e comparar `git rev-parse origin/<branch>` com `git ls-remote --heads origin` (problema 7.3). O commit `4a89b5d` está **1 à frente e não foi pushado**, e duas branches do servidor já divergiram dos refs locais. **Push é decisão do usuário**: nunca faça push sem pedido explícito, e nunca force push neste repositório, nem com `--force` nem com `--force-with-lease`.
+6. **Confirmar o tamanho do squad** — se ainda são 2 pessoas ativas (problema 7.8). Disso dependem o limite de WIP e a meta de commits: **5 no individual, 8 no squad**.
+7. **Abrir a Seção 5.2 do PDF** e conferir a estrutura de pastas com os olhos, antes de apresentá-la como exigência do professor.
+8. **Decidir o `.gitattributes` para `*.json`** — decisão do usuário, ainda não tomada (problema 7.5).
