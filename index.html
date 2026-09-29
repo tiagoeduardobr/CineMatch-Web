@@ -9,49 +9,202 @@
 
 <body>
   <!--
-   * CineMatch Web — página da aplicação.
-   *
-   * M1-T01 (RF15 parcial) criou os arquivos do projeto em branco. O <link>
-   * desta folha de estilo é da M1-T04 e a tag <script type="module"> é da
-   * M1-T17; script.js por sua vez importa ui.js e modelo.js.
-   * Os módulos ES vivem em js/, a folha de estilo em css/ e as imagens em
-   * assets/. Como os três módulos estão na mesma pasta, script.js importa
-   * ui.js e modelo.js com caminho relativo dentro de js/.
-   * Estado atual: <nav> com a marca e os links, e a capa .hero com a <img>
-   * principal. Ainda não há header, section, article, footer nem formulário.
-   * M1-T02 (RF01) traz header, section, article, footer, a meta description e
-   * as og tags, mantendo um único h1. M1-T16 (RF13) consolida SEO e
-   * acessibilidade, entre elas o foco visível e o contraste de cor.
-   * A marca é o <h1> da página; quando os landmarks chegarem, ele migra para
-   * dentro do <header>.
-   * AGENTS.md, seção 2: HTML, CSS e JS de módulos ES nativos, sem frameworks.
-   -->
+    CineMatch Web — por que esta página é organizada assim.
 
-  <nav class="navbar">
-    <h1 class="logo">CineMatch</h1>
+    1. Onde cada coisa mora. O index.html fica na raiz porque é o arquivo que o
+       live-server serve em "/": colocado em subpasta, a URL de entrada mudaria
+       e o "npm start" deixaria de apontar para a página. A folha de estilo vai
+       em css/, os três módulos ES em js/ e a imagem em assets/. Os três módulos
+       (script.js, ui.js e modelo.js) estão na mesma pasta de propósito, para
+       que o import entre eles seja um caminho relativo curto, "./ui.js", sem
+       subir e descer diretórios.
 
-    <ul class="nav-links">
-      <li><a href="#">Início</a></li>
-      <li><a href="#">Explorar</a></li>
-      <li><a href="#">Minha Lista</a></li>
-      <li><a href="#">Meu Perfil</a></li>
-    </ul>
-  </nav>
+    2. Por que <script type="module"> e não um <script> comum. Um módulo ES é
+       buscado com a política de origem do documento, então ele nunca carrega
+       via file://: abrir o index.html por duplo clique dispara erro de CORS nos
+       import e a página fica sem JavaScript. Por isso a página só funciona
+       servida, com "npm start" subindo o live-server na porta 8080.
 
-  <!-- Imagem de capa que abre a página; o recorte responsivo é feito por object-fit no .main-image -->
-  <main class="hero">
-    <div class="hero-content">
-      <img
-        class="main-image"
-        src="./assets/main.png"
-        alt="CineMatch em uma paisagem de montanhas, castelo e vulcão"
-        width="2048"
-        height="768"
-      >
-    </div>
+    3. O único h1. A marca "CineMatch" no nav é o único <h1> da página, porque
+       existe um único h1 por documento e ele identifica o assunto dela. As
+       seções usam <h2>, que é a hierarquia com que o leitor de tela navega.
+       Os cards de série ainda não existem: a base da grade (".resultados" e
+       ".card-serie") já está no CSS, mas o <article> por série é a M1-T11, com
+       o render no DOM feito por js/ui.js.
+
+    4. Divergência do briefing, declarada e não silenciada. A seção
+       ".secao-login" (e-mail, senha, "Entrar" e "Criar conta") NÃO consta do
+       briefing: a seção 3 mostra só dois estados, o formulário de perfil e os
+       resultados, e back-end é proibido no Módulo 01 (AGENTS.md §2), então não
+       há servidor contra o qual autenticar. Ela foi mantida como bônus de
+       interface, não conta nota, e está registrada como item de bônus no
+       docs/KANBAN.md. Os dois botões são type="button" e deliberadamente não
+       fazem nada: um type="submit" sem back-end apenas recarregaria a página.
+
+    5. De qual task do quadro vem cada bloco. M1-T02 dá os landmarks
+       (header, main, section e footer), o lang e o title; M1-T03 dá o
+       #form-perfil (nome, idade, o fieldset de gêneros e o botão de submit,
+       cuja captura pelo evento submit é a M1-T05); M1-T04 dá o estilo, externo
+       em css/style.css, mobile-first e com Flexbox.
+  -->
+  <header>
+    <nav class="navbar">
+      <h1 class="logo">CineMatch</h1>
+
+      <ul class="nav-links">
+        <li><a href="#">Início</a></li>
+        <li><a href="#">Sobre nós</a></li>
+        <li><a href="#">Minha Lista</a></li>
+        <li><a href="#">Meu Perfil</a></li>
+      </ul>
+
+      <div class="nav-actions" role="group" aria-label="Ações rápidas">
+        <button class="nav-action" type="button" aria-label="Pesquisar">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="11" cy="11" r="6.5"></circle>
+            <path d="m16 16 4.5 4.5"></path>
+          </svg>
+        </button>
+        <button class="nav-action" type="button" aria-label="Alternar tema">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"></path>
+          </svg>
+        </button>
+        <button class="nav-action nav-action--perfil" type="button" aria-label="Abrir perfil">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="8" r="3.25"></circle>
+            <path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path>
+          </svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Capa CineMatch">
+      <div class="hero-content">
+        <img
+          class="main-image"
+          src="./assets/main.png"
+          alt="CineMatch em uma paisagem de montanhas, castelo e vulcão"
+          width="2048"
+          height="768"
+        >
+      </div>
+    </section>
+
+    <section class="secao-login" aria-labelledby="login-titulo">
+      <div class="card-login">
+        <h2 id="login-titulo">Bem-vindo ao CineMatch</h2>
+        <p>Entre para receber recomendações de séries feitas para você.</p>
+
+        <form class="form-login">
+          <div>
+            <label for="login-email">E-mail</label>
+            <input
+              type="email"
+              id="login-email"
+              name="email"
+              autocomplete="email"
+              required
+            >
+          </div>
+          <div>
+            <label for="login-senha">Senha</label>
+            <input
+              type="password"
+              id="login-senha"
+              name="senha"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+          <button type="button">Entrar</button>
+          <button type="button">Criar conta</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="secao-perfil" aria-labelledby="perfil-titulo">
+      <div class="card-perfil">
+        <h2 id="perfil-titulo">Crie seu perfil</h2>
+
+        <form id="form-perfil">
+          <div>
+            <label for="nome">Nome</label>
+            <input type="text" id="nome" name="nome" autocomplete="name" required>
+          </div>
+          <div>
+            <label for="idade">Idade</label>
+            <input type="number" id="idade" name="idade" min="1" required>
+          </div>
+
+          <fieldset class="generos">
+            <legend>Gêneros favoritos</legend>
+            <div class="lista-generos">
+              <label class="genero" for="genero-drama">
+                <input type="checkbox" id="genero-drama" name="genero" value="Drama">
+                Drama
+              </label>
+              <label class="genero" for="genero-comedia">
+                <input type="checkbox" id="genero-comedia" name="genero" value="Comedy">
+                Comédia
+              </label>
+              <label class="genero" for="genero-acao">
+                <input type="checkbox" id="genero-acao" name="genero" value="Action">
+                Ação
+              </label>
+              <label class="genero" for="genero-ficcao-cientifica">
+                <input type="checkbox" id="genero-ficcao-cientifica" name="genero" value="Science-Fiction">
+                Ficção Científica
+              </label>
+              <label class="genero" for="genero-terror">
+                <input type="checkbox" id="genero-terror" name="genero" value="Horror">
+                Terror
+              </label>
+              <label class="genero" for="genero-romance">
+                <input type="checkbox" id="genero-romance" name="genero" value="Romance">
+                Romance
+              </label>
+              <label class="genero" for="genero-fantasia">
+                <input type="checkbox" id="genero-fantasia" name="genero" value="Fantasy">
+                Fantasia
+              </label>
+              <label class="genero" for="genero-aventura">
+                <input type="checkbox" id="genero-aventura" name="genero" value="Adventure">
+                Aventura
+              </label>
+              <label class="genero" for="genero-suspense">
+                <input type="checkbox" id="genero-suspense" name="genero" value="Thriller">
+                Suspense
+              </label>
+              <label class="genero" for="genero-documentario">
+                <input type="checkbox" id="genero-documentario" name="genero" value="Documentary">
+                Documentário
+              </label>
+            </div>
+          </fieldset>
+
+          <button type="submit">Ver recomendações</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="secao-resultados" aria-labelledby="resultados-titulo">
+      <div class="cabecalho-resultados">
+        <h2 id="resultados-titulo">Recomendações para você</h2>
+        <p id="resultados-status" role="status" aria-live="polite">
+          As recomendações serão exibidas aqui.
+        </p>
+      </div>
+      <div id="resultados" class="resultados"></div>
+    </section>
   </main>
 
-  <script type="module" src="./js/script.js"></script>
+  <footer>
+    <p>CineMatch — Te acompanha em todas as aventuras.</p>
+  </footer>
 
+  <script type="module" src="./js/script.js"></script>
 </body>
 </html>

@@ -2,14 +2,68 @@
 	CineMatch Web — estilos da aplicação.
 
 	M1-T01 (RF15 parcial) criou este arquivo em branco; a folha de estilo
-		externa é a M1-T04. Regras atuais: navbar translúcida sobre a capa e
-		recorte da imagem com object-fit.
-	M1-T04 reescreve para mobile-first e a tela do formulário; M1-T12 adiciona a
-		grade de cards com flex-wrap.
-	Sem !important: a especificidade dos seletores de classe já resolve, e o
-		KANBAN exige nome de classe bem escolhido em vez de !important.
+		externa é a M1-T04, com responsividade. Hoje a folha cobre a
+		navbar translúcida sobre a capa (com recorte da imagem por object-fit),
+		a tela de login, o formulário de perfil e a base da grade de cards.
+	A grade segue a M1-T12, e a direção é sempre com Flexbox: coluna no celular
+		por flex-direction: column, linha no desktop por flex-wrap — sem CSS Grid,
+		que está fora do escopo do Módulo 01 (AGENTS.md §2).
+
+	A responsividade mistura as duas estratégias de propósito: a navbar e a capa,
+		que já existiam, refinam por @media (max-width: 768px), enquanto as seções
+		do login, do formulário de perfil e dos cards partem do mobile e estendem
+		por @media (min-width: 769px), sem sobreposição nem buraco no corte.
+
+	Variáveis (o bloco :root fica no topo, antes do reset, porque ele serve de
+		referência de cor para o arquivo inteiro):
+		- --cor-fundo: fundo da página e da capa, o preto mais escuro da paleta.
+		- --cor-fundo-navbar: o mesmo --cor-fundo em versão translúcida, para a
+		  capa aparecer por trás da navbar.
+		- --cor-superficie: fundo dos cards e do container do formulário.
+		- --cor-campo: fundo dos campos de entrada, mais escuro que a superfície.
+		- --cor-borda: contorno dourado translúcido, compartilhado por cards,
+		  campos e fieldset.
+		- --cor-borda-navbar: a mesma cor de --cor-borda com o alfa mais baixo,
+		  na borda inferior da navbar.
+		- --cor-texto: cor de texto do corpo e dos campos.
+		- --cor-texto-claro: texto claro da navbar e dos labels, um tom mais
+		  quente e um pouco menos luminoso que o --cor-texto, para separar o
+		  texto de apoio do texto corrente.
+		- --cor-texto-suave: texto de apoio, o menos contrastado da paleta.
+		- --cor-texto-botao: texto escuro sobre o botão primário preenchido.
+		- --cor-destaque: o dourado dos títulos de seção, do preenchimento e da
+		  borda do botão primário, do texto do botão contornado, do anel de foco
+		  dos campos e botões dos dois formulários, do legend do fieldset de
+		  gêneros, do accent-color do checkbox, do filete lateral do card de
+		  série e do hover dos links e dos botões da navbar.
+		- --cor-foco: só o contorno do foco visível da navbar, em .nav-links a e
+		  em .nav-action; o anel de foco dos formulários usa --cor-destaque.
+		- --cor-hover-botao: dourado mais claro no hover do botão primário.
+
+	Sem !important: a divisão do login entre botão primário e botão contornado
+		resolve por pseudo-classe, porque .form-login button:last-of-type (0,2,1)
+		pesa mais que .form-login button (0,1,1); e o botão de #form-perfil
+		ganha o visual primário pelo seletor de ID (1,0,1), já que a regra do
+		contornado exige a classe .form-login e não casa com aquele formulário.
+		O KANBAN exige nome de classe bem escolhido em vez de !important.
 	CSS Grid, Sass e CSS-in-JS estão fora do escopo do Módulo 01 (AGENTS.md §2).
 */
+
+:root {
+	--cor-fundo: #050505;
+	--cor-fundo-navbar: rgba(5, 5, 5, 0.68);
+	--cor-superficie: #100e0b;
+	--cor-campo: #090908;
+	--cor-borda: rgba(190, 150, 85, 0.35);
+	--cor-borda-navbar: rgba(190, 150, 85, 0.28);
+	--cor-texto: #f5eee5;
+	--cor-texto-claro: #eee3d5;
+	--cor-texto-suave: #c9bca9;
+	--cor-texto-botao: #17120a;
+	--cor-destaque: #e8c88f;
+	--cor-foco: #d9ae6d;
+	--cor-hover-botao: #f0d9ac;
+}
 
 * {
 	margin: 0;
@@ -20,8 +74,8 @@
 body {
 	min-height: 100vh;
 	min-height: 100svh;
-	background: #050505;
-	color: #f5eee5;
+	background: var(--cor-fundo);
+	color: var(--cor-texto);
 	font-family: Georgia, "Times New Roman", serif;
 }
 
@@ -35,15 +89,15 @@ body {
 	display: flex;
 	align-items: center;
 	padding: 0 5%;
-	background: rgba(5, 5, 5, 0.68);
-	border-bottom: 1px solid rgba(190, 150, 85, 0.28);
+	background: var(--cor-fundo-navbar);
+	border-bottom: 1px solid var(--cor-borda-navbar);
 }
 
 .logo {
 	font-weight: 400;
 	font-size: 28px;
 	letter-spacing: 2px;
-	color: #eee3d5;
+	color: var(--cor-texto-claro);
 	margin-right: 70px;
 	white-space: nowrap;
 }
@@ -55,30 +109,80 @@ body {
 }
 
 .nav-links a {
-	color: #eee3d5;
+	color: var(--cor-texto-claro);
 	text-decoration: none;
 	font-size: 17px;
 	transition: color 0.2s ease;
 }
 
 .nav-links a:focus-visible {
-	outline: 2px solid #d9ae6d;
+	outline: 2px solid var(--cor-foco);
 	outline-offset: 3px;
 	border-radius: 2px;
 }
 
 .nav-links a:hover {
-	color: #e8c88f;
+	color: var(--cor-destaque);
+}
+
+.nav-actions {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	margin-left: auto;
+}
+
+.nav-action {
+	display: inline-flex;
+	width: 32px;
+	height: 32px;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	color: var(--cor-texto-claro);
+	background: transparent;
+	cursor: pointer;
+	transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.nav-action svg {
+	width: 19px;
+	height: 19px;
+	fill: none;
+	stroke: currentColor;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 1.8;
+}
+
+.nav-action:hover,
+.nav-action:focus-visible {
+	color: var(--cor-destaque);
+	background: rgba(238, 227, 213, 0.12);
+}
+
+.nav-action--perfil {
+	background: rgba(238, 227, 213, 0.2);
+}
+
+.nav-action--perfil:hover,
+.nav-action--perfil:focus-visible {
+	background: rgba(238, 227, 213, 0.3);
+}
+
+.nav-action:focus-visible {
+	outline: 2px solid var(--cor-foco);
+	outline-offset: 3px;
 }
 
 .hero {
 	position: relative;
 	width: 100%;
-	/* Fallback de viewport: a primeira declaração (100vh) cobre navegadores sem
-		suporte a svh; a segunda (100svh) é o valor preferido. O mesmo par se
-		repite na media query do fim do arquivo. */
 	min-height: 100vh;
 	min-height: 100svh;
+	background: var(--cor-fundo);
 	display: flex;
 	overflow: hidden;
 }
@@ -93,7 +197,7 @@ body {
 	display: block;
 	width: 100%;
 	height: 100%;
-	object-fit: cover;
+	object-fit: contain;
 	object-position: center;
 }
 
@@ -116,6 +220,10 @@ body {
 		flex-wrap: wrap;
 	}
 
+	.nav-actions {
+		gap: 8px;
+	}
+
 	.nav-links a {
 		font-size: 14px;
 	}
@@ -128,5 +236,223 @@ body {
 	.hero-content {
 		height: 100vh;
 		height: 100svh;
+	}
+}
+
+.secao-login,
+.secao-perfil,
+.secao-resultados {
+	padding: 48px 5%;
+}
+
+.card-login,
+.card-perfil {
+	width: 100%;
+	margin: 0 auto;
+	padding: 26px 20px;
+	border: 1px solid var(--cor-borda);
+	border-radius: 4px;
+	background: var(--cor-superficie);
+	box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+}
+
+.card-login {
+	max-width: 520px;
+}
+
+.card-perfil {
+	max-width: 880px;
+}
+
+.card-login h2,
+.card-perfil h2,
+.cabecalho-resultados h2 {
+	margin-bottom: 12px;
+	color: var(--cor-destaque);
+	font-size: 26px;
+	font-weight: 400;
+	line-height: 1.2;
+}
+
+.card-login > p,
+.cabecalho-resultados p {
+	color: var(--cor-texto-suave);
+	line-height: 1.6;
+}
+
+.form-login,
+#form-perfil {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	margin-top: 24px;
+}
+
+.form-login > div,
+#form-perfil > div {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.form-login label,
+#form-perfil > div label {
+	color: var(--cor-texto-claro);
+	font-size: 15px;
+}
+
+.form-login input,
+#form-perfil input[type="text"],
+#form-perfil input[type="number"] {
+	width: 100%;
+	min-height: 44px;
+	padding: 10px 12px;
+	border: 1px solid var(--cor-borda);
+	border-radius: 3px;
+	background: var(--cor-campo);
+	color: var(--cor-texto);
+	font: inherit;
+}
+
+.form-login input:focus-visible,
+#form-perfil input:focus-visible,
+.form-login button:focus-visible,
+#form-perfil button:focus-visible {
+	outline: 2px solid var(--cor-destaque);
+	outline-offset: 3px;
+}
+
+.form-login button,
+#form-perfil button {
+	min-height: 44px;
+	padding: 10px 16px;
+	border: 1px solid var(--cor-destaque);
+	border-radius: 3px;
+	background: var(--cor-destaque);
+	color: var(--cor-texto-botao);
+	font: inherit;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.form-login button:hover,
+#form-perfil button:hover {
+	background: var(--cor-hover-botao);
+}
+
+.form-login button:last-of-type {
+	background: transparent;
+	color: var(--cor-destaque);
+}
+
+.form-login button:last-of-type:hover {
+	background: rgba(232, 200, 143, 0.1);
+}
+
+.generos {
+	min-width: 0;
+	padding: 16px;
+	border: 1px solid var(--cor-borda);
+}
+
+.generos legend {
+	padding: 0 8px;
+	color: var(--cor-destaque);
+}
+
+.lista-generos {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.genero {
+	display: inline-flex;
+	min-height: 38px;
+	align-items: center;
+	gap: 8px;
+	padding: 7px 10px;
+	border: 1px solid var(--cor-borda);
+	border-radius: 3px;
+	color: var(--cor-texto-claro);
+	cursor: pointer;
+}
+
+.genero input {
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	accent-color: var(--cor-destaque);
+}
+
+.cabecalho-resultados {
+	margin: 0 auto;
+	max-width: 1100px;
+}
+
+.resultados {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	max-width: 1100px;
+	margin: 24px auto 0;
+}
+
+.card-serie {
+	width: 100%;
+	min-width: 0;
+	padding: 20px;
+	border: 1px solid var(--cor-borda);
+	border-left: 3px solid var(--cor-destaque);
+	border-radius: 3px;
+	background: var(--cor-superficie);
+}
+
+footer {
+	padding: 24px 5%;
+	border-top: 1px solid var(--cor-borda);
+	color: var(--cor-texto-suave);
+	text-align: center;
+}
+
+@media (min-width: 769px) {
+	.secao-login,
+	.secao-perfil,
+	.secao-resultados {
+		padding: 64px 8%;
+	}
+
+	.card-login,
+	.card-perfil {
+		padding: 34px;
+	}
+
+	#form-perfil {
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	#form-perfil > div {
+		flex: 1 1 calc(50% - 9px);
+	}
+
+	#form-perfil .generos {
+		flex: 1 0 100%;
+	}
+
+	.cabecalho-resultados {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 24px;
+	}
+
+	.resultados {
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	.card-serie {
+		flex: 1 1 calc(50% - 8px);
 	}
 }
