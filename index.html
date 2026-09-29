@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CineMatch</title>
   <link rel="stylesheet" href="./css/style.css">
-  <link rel="stylesheet" href="./css/pages.css">
 </head>
 
 <body>
@@ -26,7 +25,7 @@
        import e a página fica sem JavaScript. Por isso a página só funciona
        servida, com "npm start" subindo o live-server na porta 8080.
 
-     3. O único h1. A marca "CineMatch" no nav é o único <h1> da página, porque
+    3. O único h1. A marca "CineMatch" no nav é o único <h1> da página, porque
        existe um único h1 por documento e ele identifica o assunto dela. As
        seções usam <h2>, que é a hierarquia com que o leitor de tela navega.
        A seção de resultados contém #template-card-filme, uma div oculta com
@@ -199,7 +198,7 @@
         </p>
       </div>
       <div id="resultados" class="resultados"></div>
-      <div id="template-card-filme" class="cartao-filme" data-tipo="filme">
+      <div id="template-card-filme" class="cartao-filme" data-tipo="filme" hidden>
         <img class="cartaz-filme" data-campo="poster" alt="Pôster do filme, aguardando catálogo">
         <div class="conteudo-filme">
           <h3 class="titulo-filme" data-campo="title">Título do filme</h3>

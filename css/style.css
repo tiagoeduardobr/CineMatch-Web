@@ -15,10 +15,10 @@
 		por @media (min-width: 769px), sem sobreposição nem buraco no corte.
 
 	Variáveis (o bloco de variáveis fica no topo, antes do reset, porque ele
-		serve de referência de cor para os dois arquivos de estilo). Este é o
-		único bloco de variáveis do projeto: o css/pages.css consome estas mesmas
-		variáveis e não declara nenhuma, para não haver duas listas de cor para
-		manter em sincronia. O prefixo é --cine- porque é o da paleta que
+		serve de referência de cor da folha de estilo). Este é o único bloco
+		de variáveis do projeto: todas as variáveis são declaradas aqui e
+		consumidas no próprio css/style.css, para não haver duas listas de cor
+		para manter em sincronia. O prefixo é --cine- porque é o da paleta que
 		sobreviveu à consolidação das duas folhas de estilo.
 		- --cine-bg: fundo da página e da capa, o preto mais escuro da paleta.
 		- --cine-navbar: o mesmo --cine-bg em versão translúcida, para a
@@ -40,16 +40,11 @@
 		  dos campos e botões dos dois formulários, do legend do fieldset de
 		  gêneros, do accent-color do checkbox, do filete lateral do card de
 		  série e do hover dos links e dos botões da navbar.
-		- --cine-gold-light: o dourado claro da navegação, o contorno do foco
-		  visível em .links-navegacao a e .botao-navegacao, e o que o
-		  css/pages.css aplica no título, na nota e na ação de cada card.
+		- --cine-gold-light: o contorno do foco visível nos links e no botão
+		  da navegação, .links-navegacao a e .botao-navegacao.
 		- --cine-gold-hover: dourado mais claro no hover do botão primário.
 		  Precisa ficar mais claro que o --cine-gold-light, senão o hover deixa
 		  de aparecer como mudança de estado.
-		- --cine-volcano: o vermelho do hover dos links da tela inicial em
-		  css/pages.css.
-		- --cine-slate: o cinza-azulado do terceiro cartaz de exemplo em
-		  css/pages.css.
 
 	Sem !important: a divisão do login entre botão primário e botão contornado
 		resolve por pseudo-classe, porque .formulario-login button:last-of-type (0,2,1)
@@ -74,8 +69,6 @@
 	--cine-gold: #b99b6c;
 	--cine-gold-light: #e0d1b8;
 	--cine-gold-hover: #f0e3cd;
-	--cine-volcano: #d84129;
-	--cine-slate: #303438;
 }
 
 * {
