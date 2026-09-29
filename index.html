@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CineMatch</title>
   <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/pages.css">
 </head>
 
 <body>
@@ -25,12 +26,12 @@
        import e a página fica sem JavaScript. Por isso a página só funciona
        servida, com "npm start" subindo o live-server na porta 8080.
 
-    3. O único h1. A marca "CineMatch" no nav é o único <h1> da página, porque
+     3. O único h1. A marca "CineMatch" no nav é o único <h1> da página, porque
        existe um único h1 por documento e ele identifica o assunto dela. As
        seções usam <h2>, que é a hierarquia com que o leitor de tela navega.
-       Os cards de série ainda não existem: a base da grade (".resultados" e
-       ".card-serie") já está no CSS, mas o <article> por série é a M1-T11, com
-       o render no DOM feito por js/ui.js.
+       A seção de resultados contém #template-card-filme, uma div oculta com
+       campos normalizados para a futura renderização dos filmes; ela ainda
+       não é preenchida pela lógica JavaScript.
 
     4. Divergência do briefing, declarada e não silenciada. A seção
        ".secao-login" (e-mail, senha, "Entrar" e "Criar conta") NÃO consta do
@@ -48,29 +49,29 @@
        em css/style.css, mobile-first e com Flexbox.
   -->
   <header>
-    <nav class="navbar">
-      <h1 class="logo">CineMatch</h1>
+    <nav class="barra-navegacao">
+      <h1 class="marca">CineMatch</h1>
 
-      <ul class="nav-links">
+      <ul class="links-navegacao">
         <li><a href="#">Início</a></li>
         <li><a href="#">Sobre nós</a></li>
         <li><a href="#">Minha Lista</a></li>
         <li><a href="#">Meu Perfil</a></li>
       </ul>
 
-      <div class="nav-actions" role="group" aria-label="Ações rápidas">
-        <button class="nav-action" type="button" aria-label="Pesquisar">
+      <div class="acoes-navegacao" role="group" aria-label="Ações rápidas">
+        <button class="botao-navegacao" type="button" aria-label="Pesquisar">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <circle cx="11" cy="11" r="6.5"></circle>
             <path d="m16 16 4.5 4.5"></path>
           </svg>
         </button>
-        <button class="nav-action" type="button" aria-label="Alternar tema">
+        <button class="botao-navegacao" type="button" aria-label="Alternar tema">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"></path>
           </svg>
         </button>
-        <button class="nav-action nav-action--perfil" type="button" aria-label="Abrir perfil">
+        <button class="botao-navegacao botao-navegacao--perfil" type="button" aria-label="Abrir perfil">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <circle cx="12" cy="8" r="3.25"></circle>
             <path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path>
@@ -81,10 +82,10 @@
   </header>
 
   <main>
-    <section class="hero" aria-label="Capa CineMatch">
-      <div class="hero-content">
+    <section class="capa" aria-label="Capa CineMatch">
+      <div class="conteudo-capa">
         <img
-          class="main-image"
+          class="imagem-capa"
           src="./assets/main.png"
           alt="CineMatch em uma paisagem de montanhas, castelo e vulcão"
           width="2048"
@@ -94,11 +95,11 @@
     </section>
 
     <section class="secao-login" aria-labelledby="login-titulo">
-      <div class="card-login">
+      <div class="cartao-login">
         <h2 id="login-titulo">Bem-vindo ao CineMatch</h2>
         <p>Entre para receber recomendações de séries feitas para você.</p>
 
-        <form class="form-login">
+        <form class="formulario-login">
           <div>
             <label for="login-email">E-mail</label>
             <input
@@ -126,7 +127,7 @@
     </section>
 
     <section class="secao-perfil" aria-labelledby="perfil-titulo">
-      <div class="card-perfil">
+      <div class="cartao-perfil">
         <h2 id="perfil-titulo">Crie seu perfil</h2>
 
         <form id="form-perfil">
@@ -198,9 +199,24 @@
         </p>
       </div>
       <div id="resultados" class="resultados"></div>
+      <div id="template-card-filme" class="cartao-filme" data-tipo="filme">
+        <img class="cartaz-filme" data-campo="poster" alt="Pôster do filme, aguardando catálogo">
+        <div class="conteudo-filme">
+          <h3 class="titulo-filme" data-campo="title">Título do filme</h3>
+          <div class="metadados-filme">
+            <span class="nota-filme">★ <span data-campo="rating">Sem nota</span>/10</span>
+            <span data-campo="releaseDate">Ano de lançamento</span>
+            <span data-campo="duration">Duração indisponível</span>
+          </div>
+          <div class="generos-filme" data-campo="genres">Gêneros</div>
+          <p class="sinopse-filme" data-campo="synopsis">Sinopse do filme em texto puro.</p>
+          <p class="status-filme">Status: <span data-campo="status">Indisponível</span></p>
+          <p class="plataforma-filme">Onde assistir: <span data-campo="platform">Indisponível</span></p>
+          <a class="link-filme" href="#" data-campo="url">Ver detalhes</a>
+        </div>
+      </div>
     </section>
   </main>
-
   <footer>
     <p>CineMatch — Te acompanha em todas as aventuras.</p>
   </footer>
