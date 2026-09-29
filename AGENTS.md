@@ -86,7 +86,7 @@ Dois contrapontos, porque a lista é curta e pode ser lida ao contrário. `local
 | `setTimeout` embrulhado em `Promise` para simular latência, em `cinematch_antigo/cinematch.js` | O RF12 aqui é de **exibição**: o atraso proposital vai na renderização, nunca dentro do `fetch`, onde mascararia o estado de erro |
 | `!important` | Reforço, não divergência: o curso já proíbe. `semana-10/exercicio-especificidade/` diz para ajustar o seletor ou apagar a regra, e o README do projeto exige explicar por que não usamos |
 
-A regra geral: o repositório das aulas diz o que **se sabe fazer**; o briefing diz o que **se pode entregar**. Conflando, o briefing vence — e o conflito vai registrado no `docs/KANBAN.md`, nunca silenciado.
+A regra geral: o repositório das aulas diz o que **se sabe fazer**; o briefing diz o que **se pode entregar**. Conflitando, o briefing vence — e o conflito vai registrado no `docs/KANBAN.md`, nunca silenciado.
 
 ---
 
