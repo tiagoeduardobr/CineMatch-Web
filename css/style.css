@@ -181,6 +181,8 @@ body {
 .botao-navegacao:focus-visible {
 	color: var(--cine-gold);
 	background: rgba(238, 227, 213, 0.12);
+	outline: 2px solid var(--cine-gold-light);
+	outline-offset: 3px;
 }
 
 .botao-navegacao--perfil {
@@ -190,11 +192,6 @@ body {
 .botao-navegacao--perfil:hover,
 .botao-navegacao--perfil:focus-visible {
 	background: rgba(238, 227, 213, 0.3);
-}
-
-.botao-navegacao:focus-visible {
-	outline: 2px solid var(--cine-gold-light);
-	outline-offset: 3px;
 }
 
 .capa {
