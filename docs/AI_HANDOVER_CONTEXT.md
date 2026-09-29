@@ -1,6 +1,6 @@
 # Contexto de Handover — CineMatch Web
 
-> Gerado em **28/09/2026**. Commit base: **`91ed3a7`** (`develop`, merge da interface). Branch no momento da escrita: `feature/cinematch-web-interface` em `167aa01`.
+> Gerado em **28/09/2026**. Commit base no momento da escrita: **`91ed3a7`** (`develop`, merge da interface do ciclo anterior). Branch no momento da escrita: `feature/cinematch-web-interface` em `167aa01` — versionada no commit `812321c` e integrada na `develop` pelo merge `286cab2`, que é a `develop` de agora. Detalhes na seção 2.
 
 ## O que este arquivo é
 
@@ -13,6 +13,8 @@ Ele **não** substitui nada:
 - O **PDF do briefing** continua sendo a fonte de verdade do **que é exigido**.
 
 O que este arquivo acrescenta é o **raciocínio** e a **memória de pesquisa** da sessão: fatos já apurados que a próxima sessão não precisa rederivar, e erros de agente que já custaram tempo. **Substituir a cada nova sessão.** Se um número aqui não bater com o que você encontrar no repositório, o repositório vence: atualize este arquivo.
+
+**A propriedade do formato: os hashes aqui ficam um commit atrás de si mesmos.** Este arquivo é versionado dentro do próprio repositório que ele descreve. No instante em que o snapshot é commitado, os hashes que ele cita passam a ser os de **antes** do próprio commit — não há como ser de outro jeito sem uma corrida. Concretamente: este arquivo é commitado em `812321c` e cita `develop` = `286cab2`, um merge que só nasceu **depois**, quando `812321c` foi integrado na `develop`. Ler `develop` = `286cab2` num arquivo commitado em `812321c` é o resultado esperado, não inconsistência. A regra acima continua valendo e é a que resolve: **quando um hash aqui não bater com o repositório, o repositório vence** — e o caso mais comum de divergência é justamente este, o de um commit atrás.
 
 **Como este arquivo foi escrito.** Todo hash, contagem, caminho e linha aqui veio de um comando rodado nesta sessão, em `C:\Users\Lucas\CineMatch-Web`. O que não deu para verificar está marcado como **não verificado**, e o motivo está escrito. Não acrescente número de memória.
 
@@ -91,12 +93,16 @@ O que cada um mudou (`git show --stat`):
 
 | Branch | Commit | Observação |
 | --- | --- | --- |
-| `main` | `e47b81d` | **30 commits atrás** de `develop` (`git rev-list --count main..develop` = 30) e 0 no sentido inverso. Único commit: `docs: cria quadro kanban com os 15 RFs do CineMatch Web` |
-| `develop` | `91ed3a7` | merge de integração desta sessão |
-| `feature/cinematch-web` | `8af3368` | **6 commits atrás** de `develop` e **0 atrás** no sentido inverso — não tem nada de exclusivo, só ainda não enxerga o trabalho de interface na própria árvore |
-| `feature/cinematch-web-interface` | `167aa01` | branch corrente, `HEAD` = `167aa01e443acd77d316697348ee01fc8affe497` |
+| `main` | `e47b81d` | **32 commits atrás** de `develop` (`git rev-list --count main..develop` = 32) e 0 no sentido inverso. Único commit: `docs: cria quadro kanban com os 15 RFs do CineMatch Web` |
+| `develop` | `286cab2` | merge de integração desta sessão, pais `91ed3a7` e `812321c` — detalhe na subseção seguinte |
+| `feature/cinematch-web` | `8af3368` | **8 commits atrás** de `develop` e **0 exclusivos** (`git rev-list --count develop..feature/cinematch-web` = 0) — a leitura correta do número está logo abaixo |
+| `feature/cinematch-web-interface` | `812321c` | branch corrente, `HEAD` = `812321c64e9b2afbc6a41e1ca9b16df51232c7fb`, em sincronia com `origin/feature/cinematch-web-interface` |
 
-O arquivo anterior dizia 17 commits de distância entre `main` e `develop`. Hoje são **30** — o número cresce a cada integração, não é um valor fixo.
+O arquivo anterior dizia 17 commits de distância entre `main` e `develop`. Hoje são **32** — o número cresce a cada integração, não é um valor fixo.
+
+**Os 32 commits entre `main` e `develop` são o estado esperado do fluxo, não um atraso de sincronização.** O `AGENTS.md` §6 manda integrar `develop` → `main` só no fim do projeto, então a `main` fica parada em `e47b81d` de propósito. **Nenhum agente deve "corrigir" a `main` por conta própria** — ela não pode e não deve ser tocada antes do fim, porque merge nela agora quebra o fluxo que o Critério 2 do briefing avalia. `git rev-list --count develop..main` = 0 confirma que a `main` não tem nada exclusivo: ela é ancestral da `develop`, e a distância é só o grafo de merges acumuladas.
+
+**A `feature/cinematch-web` estar 8 atrás não é trabalho perdido.** Com `git rev-list --count develop..feature/cinematch-web` = 0 e `git merge-base --is-ancestor feature/cinematch-web develop` saindo com código 0, ela é **ancestral** da `develop`: está atrasada, e só isso. O número sozinho sugere risco e não há risco — o que falta é um fast-forward para enxergar o trabalho de interface na própria árvore.
 
 **Nada foi mergeado na `main`.** Comportamento correto: o `AGENTS.md` §6 proíbe merge na `main` antes do fim do projeto.
 
@@ -106,9 +112,9 @@ O arquivo anterior dizia 17 commits de distância entre `main` e `develop`. Hoje
 
 ### O merge na `develop` e a árvore resultante
 
-`develop` é o commit de merge `91ed3a71439be57d203e3ac67bfd846d86ea5bec`, mensagem `Merge branch 'feature/cinematch-web-interface' into develop`, dois pais: `8af3368` e `167aa01`.
+`develop` é o commit de merge `286cab21c8cc4b8f7068d795f9f81fdbbe363746`, mensagem `Merge branch 'feature/cinematch-web-interface' into develop`, dois pais: `91ed3a7` e `812321c`. Saiu sem conflito.
 
-A medição que interessa, feita **antes** do merge:
+A medição que interessa é a do **ciclo anterior**, feita **antes** do merge que produziu `91ed3a7`:
 
 | Medida | Comando | Resultado |
 | --- | --- | --- |
@@ -117,14 +123,16 @@ A medição que interessa, feita **antes** do merge:
 | Interface à frente da `develop` | `git rev-list --count 8af3368..167aa01` | **5** |
 | Conteúdo dos 6 commits da `develop` | `git diff --name-only ae5046b 8af3368` | **0 arquivos** |
 
-Ou seja: os 6 commits que a `develop` tinha à frente eram **merges de sincronização, sem conteúdo** — mesma árvore, grafo diferente. É por isso que o merge não tinha risco de conflito.
+Ou seja: os 6 commits que a `develop` tinha à frente eram **merges de sincronização, sem conteúdo** — mesma árvore, grafo diferente. É por isso que aquele merge não tinha risco de conflito.
+
+**Neste ciclo a premissa estava errada.** A previsão era fast-forward, e não era: `167aa01` era o **segundo pai** de `91ed3a7`, ou seja, a `develop` **já tinha integrado** a branch de interface no ciclo anterior e por isso estava **7 commits à frente** da interface, não atrás. Com `merge-base` = `167aa01`, as branches tinham divergido e fast-forward era impossível. A lição completa está na seção 4.4.
 
 Depois do merge, a prova de que nada foi perdido nem enxertado:
 
 | Árvore | Hash |
 | --- | --- |
-| `git rev-parse 'develop^{tree}'` | `617433321dd51cb72bd91b083f6ed2303d1e7302` |
-| `git rev-parse 'feature/cinematch-web-interface^{tree}'` | `617433321dd51cb72bd91b083f6ed2303d1e7302` |
+| `git rev-parse 'develop^{tree}'` | `12dbbb67664d73f977add235bcfbe4be3de16d74` |
+| `git rev-parse 'feature/cinematch-web-interface^{tree}'` | `12dbbb67664d73f977add235bcfbe4be3de16d74` |
 
 **Idênticas.**
 
@@ -139,16 +147,20 @@ Depois do merge, a prova de que nada foi perdido nem enxertado:
 
 O `reflog` confirma as duas operações: `8af3368 HEAD@{2026-09-28 20:56:48}: merge origin/feature/cinematch-web: Fast-forward` e `91ed3a7 develop@{2026-09-28 21:07:58}: merge feature/cinematch-web-interface`.
 
-### Os dois push desta sessão
+### Os quatro push de 28/09
 
-Confirmados pelo reflog das referências remotas, que registra `update by push` com o valor antigo e o novo:
+Confirmados pelo reflog das referências remotas, que registra `update by push` com o valor antigo e o novo. O horário é o de cada `ref` **no reflog dela própria**, não o do `origin/develop` — é por isso que o push da interface aparece às 21:25:53 e o da integração às 21:26:39:
 
 | Push | Ref | Movimento | Horário |
 | --- | --- | --- | --- |
 | Interface | `origin/feature/cinematch-web-interface` | `ae5046b` → `167aa01` | 28/09 21:06:38 |
 | Integração | `origin/develop` | `8af3368` → `91ed3a7` | 28/09 21:08:18 |
+| Interface | `origin/feature/cinematch-web-interface` | `167aa01` → `812321c` | 28/09 21:25:53 |
+| Integração | `origin/develop` | `91ed3a7` → `286cab2` | 28/09 21:26:39 |
 
-**Sem force push, sem merge na `main`.** Ambos foram autorizados explicitamente pelo usuário na sessão.
+**Sem force push, sem merge na `main`.** Todos foram autorizados explicitamente pelo usuário.
+
+Os dois últimos são da rodada que fechou este arquivo. Os horários vêm de `git reflog show origin/feature/cinematch-web-interface --date=iso` e `git reflog show origin/develop --date=iso`. A ordem real é a da tabela: publica-se a branch de interface e, 46 segundos depois, o merge na `develop`.
 
 ---
 
@@ -221,7 +233,17 @@ O mesmo agente chegou a dizer, mais tarde, que uma branch local "já existia" qu
 
 Foi o que salvou a operação aqui: `git rev-parse` das árvores e `git branch -a -vv` confirmaram o resultado independentemente do que o agente dizia. São comandos de leitura, não de escrita, e podem ser repetidos sem risco.
 
-### 4.4 Um erro de processo da sessão anterior
+### 4.4 A ocorrência desta sessão, do mesmo tipo: a estratégia de merge
+
+O orquestrador **previu que o merge da interface na `develop` seria um fast-forward. Estava errado.** A causa foi a mesma da 4.3: tratou *"a `develop` é ancestral da branch de feature"* como se valesse sempre. Não vale.
+
+O que aconteceu, medido: `167aa01` era o **segundo pai** do merge `91ed3a7` — a `develop` **já tinha integrado** a branch de interface no ciclo anterior. Então estava **7 commits à frente** da interface, não atrás, e o ponto de divergência era o próprio `167aa01`. Com as branches divergidas, fast-forward era impossível. Saiu merge commit `286cab2`, sem conflito.
+
+> **Regra: antes de escolher a estratégia de merge, confira a topologia, não a posição aparente das branches.** Os dois comandos são `git show --no-patch --format='%P' develop` (quem são os pais do merge anterior) e `git merge-base <a> <b>` (onde as branches se separaram). Quem prevê a estratégia pela posição aparente erra; quem olha a topologia acerta.
+
+**O comportamento do subagente de Git foi o correto.** Ele **parou e reportou a premissa errada** em vez de executar o merge sob uma estratégia que sabia incompatível com a topologia. E, antes de commitar, fez um **teste round-trip de acentuação** — gravar e reler a mensagem de commit e comparar os bytes — porque o `--amend` estava proibido e uma mensagem corrompida seria **irreversível**. Vale registrar o cuidado: é o `--amend` proibido que transforma a checagem em obrigatória, e a checagem é o que torna a correção possível sem reescrever histórico.
+
+### 4.5 Um erro de processo da sessão anterior
 
 O mesmo agente da seção 4.1 rodou `git restore docs/KANBAN.md` ao achar que um subagente tinha escrito fora do escopo — e as edições eram do usuário, feitas em paralelo. Não houve perda (o usuário reaplicou), mas a decisão foi tomar **ação destrutiva sobre trabalho do usuário sem perguntar**.
 
@@ -336,7 +358,7 @@ A verificação cruzada fecha: `- [ ]` = 54 no arquivo = 19 (A Fazer) + 3 (Em An
 
 1. **Fechar o `M1-T02` e o `M1-T16`, que destravam três tasks.** O `index.html` tem hoje só `charset`, `viewport` e `<title>`. Faltam a `meta description`, as og tags e o skip link. Cuidado com a `M1-T12`, que está adiantada (problema 1): ela descreve trabalho já feito no CSS, então confirme o que ainda falta antes de marcar.
 2. **Portar a lógica da semana 6 para módulos ES:** as classes `Conteudo` e `Serie extends Conteudo` em `js/modelo.js`, e a compatibilidade com `compatibilidade()` e `obterConteudosPorGenero()` em `js/script.js`. **Porte a lógica, não o estilo**: o `cinematch.js` é código de terminal e usa globais sem declarar (linhas 31, 171 e 330), que quebram com `ReferenceError` em módulo ES. Declare com `let` ou `const` ao portar.
-3. **Confirmar se a `M1-T05` deve ser feita na branch de lógica.** A branch corrente é `feature/cinematch-web-interface`, mas a `M1-T05` (modelagem do perfil, marcada "por Tiago") é task de **lógica**, e o `AGENTS.md` §6 atribui lógica a `feature/cinematch-web`. Confirmar com o usuário. A branch de lógica está 6 commits atrás da `develop` e já pode ser um fast-forward puro.
+3. **Confirmar se a `M1-T05` deve ser feita na branch de lógica.** A branch corrente é `feature/cinematch-web-interface`, mas a `M1-T05` (modelagem do perfil, marcada "por Tiago") é task de **lógica**, e o `AGENTS.md` §6 atribui lógica a `feature/cinematch-web`. Confirmar com o usuário. A branch de lógica está 8 commits atrás da `develop` e já pode ser um fast-forward puro — ela é ancestral da `develop`, como medido na seção 2.
 4. **Rodar `npm install` (`M1-T18`) e abrir a página.** É a confirmação pendente do problema 4 e a única forma de sair da análise estática.
 5. **Abrir a Seção 5.2 do PDF** e conferir a estrutura de pastas com os olhos, antes de apresentá-la como exigência do professor.
 6. **Confirmar o tamanho do squad** — se ainda são 2 pessoas ativas. Disso dependem o limite de WIP e a meta de commits: **5 no individual, 8 no squad**.
