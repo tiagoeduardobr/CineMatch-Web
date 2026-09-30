@@ -255,8 +255,7 @@ O briefing da `M1-T18` dizia que `node_modules` não existia. **A premissa estav
 
 Duas lições, e a segunda é a que evita a próxima:
 
-> **Regra 1: um subagente cancelado pode ter dejado efeito de filesystem.** Cancelar o agente não desfaz o processo que ele disparou. Antes de tratar qualquer premissa de briefing como atual, meça o disco de novo.
-
+> **Regra 1: um subagente cancelado pode ter deixado efeito de filesystem.** Cancelar o agente não desfaz o processo que ele disparou. Antes de tratar qualquer premissa de briefing como atual, meça o disco de novo.
 > **Regra 2: a task seguinte precisa reter o estado remede-o, não confiar no briefing anterior.** O briefing descreve o momento em que foi escrito, e o disco muda entre a escrita e a execução. Quem redige a task tem que reescrever no próprio texto o que é **verificável agora** — "o `node_modules` pode ou não existir: meça com `Test-Path` antes de agir" — em vez de afirmar o que era verdade na hora da redação.
 
 O que salvou a execução foi o comportamento do subagente: ele **mediu, encontrou a premissa falsa e corrigiu a nota do quadro por conta própria**, em vez de tentar satisfazer um briefing impossível. Isso é o comportamento certo e vale como exemplo — é a mesma lição 4.3, aplicada a um efeito de disco em vez de um ref de branch.
