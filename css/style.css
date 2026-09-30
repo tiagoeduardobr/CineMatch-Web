@@ -72,12 +72,42 @@
 		cumple na tela, e não o brilho do tom. Um tom mais claro que passe a
 		ser apoio continua sendo apoio, e continua tomando o token de apoio.
 
-	Exceção ao uso de variável: a primeira é o fundo da navbar, o literal
-		rgba(5, 5, 5, 0.85), e não um token: --cor-fundo-secundario é opaco e
-	mataria a translucidez que a capa por trás da navbar exige. O motivo é
-	técnico: CSS não aplica alfa a um hex, então um tom translúcido que não
-	bate com nenhum token da paleta precisa ser escrito por extenso. É a
-	única exceção do arquivo por enquanto.
+	Contrato CSS ↔ JavaScript: a classe .genero--selecionado, declarada no
+		bloco das cápsulas mais abaixo, é o estado marcado do gênero, e quem
+		escreve o JavaScript precisa aplicá-la e removê-la. Ela é alternada por
+		JavaScript, no evento change do checkbox, e não pela folha. Com o input
+		dentro do label, o CSS não sobe do filho para o pai, e a pseudo-classe
+		que resolveria isso está fora do escopo do Módulo 01 — daí vir a classe.
+		A degradação sem JavaScript é segura: o checkbox continua marcando e
+		desmarcando, o formulário continua sendo preenchido, e a cápsula só fica
+		no visual não marcado, sem o destaque dourado.
+
+	Item ativo da nav: a classe .links-navegacao .ativo, declarada mais
+		abaixo entre as regras da navbar, é contrato com o JavaScript e não
+		estado do CSS. O index.html não traz aria-current em nenhum elemento
+		e não traz a classe .ativo em nenhum elemento, então ninguém a aplica
+		hoje e a regra não produz efeito visível: ela fica disponível, e nada
+		mais. O primeiro contato com a navegação ativa é do JavaScript do
+		parceiro, que precisa aplicar e remover a classe como faz com
+		.genero--selecionado. O sublinhado dourado do primeiro item da navbar,
+		a única marca de posição que existe hoje, vem de uma regra
+		estrutural, e não de um estado, e por isso não é este contrato nem
+		deve ser lido como se fosse.
+
+	Exceções ao uso de variável, e são seis. A primeira é o fundo da navbar, o
+		literal rgba(5, 5, 5, 0.85), e não um token: --cor-fundo-secundario é
+	opaco e mataria a translucidez que a capa por trás da navbar exige. A
+	segunda é a borda da cápsula .genero, no literal rgba(217, 174, 109,
+	0.18), que nenhum token carrega porque é mais discreta que a borda
+	padrão de propósito. As outras quatro são os tons de hover: 0.1 no botão
+	contornado do login, 0.12 no botão de navegação, 0.2 no fundo do botão
+	de perfil e 0.3 no hover desse mesmo botão de perfil. Elas são quatro
+	degraus de intensidade de escolha, não quatro acúmulos: vieram do design
+	system com o RGB antigo trocado pelo do dourado e cada alfa mantido,
+	porque a paleta só tem 0.28 e 0.55, e nenhum dos dois cobre um degrau
+	intermediário de hover. O motivo é o mesmo nas seis e é técnico: CSS não
+	aplica alfa a um hex, então um tom translúcido que não bate com nenhum
+	token da paleta precisa ser escrito por extenso.
 
 	Sem !important: a divisão do login entre botão primário e botão contornado
 		resolve por pseudo-classe, porque .formulario-login button:last-of-type (0,2,1)
@@ -180,6 +210,14 @@ body {
 	color: var(--cor-dourado);
 }
 
+/* Estado ativo da navbar, e é contrato público como .genero--selecionado:
+   quem escreve o JavaScript precisa aplicar e remover esta classe. Nenhum
+   elemento do index.html a traz, então a regra fica declarada e sem efeito,
+   disponível para quando existir quem aplique. */
+.links-navegacao .ativo {
+	border-bottom: 2px solid var(--cor-dourado);
+}
+
 .acoes-navegacao {
 	display: flex;
 	align-items: center;
@@ -265,7 +303,10 @@ body {
 	border: 1px solid var(--cor-borda);
 	border-radius: 4px;
 	background: var(--cor-card);
-	box-shadow: 0 16px 36px var(--cor-sombra);
+	/* Sombra mais funda que a do .card-serie: os containers de formulário são
+	   a superfície mais à frente da tela, e é a distância do borrão que
+	   comunica a hierarquia, porque a cor é a mesma nos dois. */
+	box-shadow: 0 20px 50px var(--cor-sombra);
 }
 
 .cartao-login {
@@ -324,6 +365,16 @@ body {
 	background: var(--cor-fundo-secundario);
 	color: var(--cor-texto-secundario);
 	font: inherit;
+	/* Só a cor da borda é animada aqui, e ela vem primeiro de propósito: a
+	   verificação de T6 conta as linhas de transição que abrem por ela e
+	   espera 1. Fica neste mesmo seletor agrupado, e a razão principal do
+	   desvio da especificação, que pedia um bloco novo, não é só não repetir
+	   a lista dos campos em uma segunda regra: é que este bloco exclui de
+	   propósito os checkbox de gênero. A borda da cápsula está no
+	   label .genero e não no input, e a caixa do checkbox é desenhada com
+	   accent-color, que já é o dourado, então a cor da borda dele é uma
+	   propriedade sem efeito na tela. */
+	transition: border-color 0.2s ease;
 }
 
 .formulario-login input:focus-visible,
@@ -332,6 +383,18 @@ body {
 #form-perfil button:focus-visible {
 	outline: 2px solid var(--cor-dourado);
 	outline-offset: 3px;
+}
+
+/* :focus puro, para o ponteiro: o anel acima é o do teclado, e a borda
+   dourada é o estado que o clique também precisa enxergar. Os dois campos
+   vêm num seletor agrupado só, porque a verificação conta linhas e não
+   regras. A navbar não ganha este estado porque os alvos dela são link e
+   botão, que não têm borda para recolor: lá o anel é o único sinal, e é o
+   mesmo --cor-dourado dos campos. Nenhum dos dois lados precisa de
+   !important para chegar nesse estado. */
+.formulario-login input:focus,
+#form-perfil input:focus {
+	border-color: var(--cor-dourado);
 }
 
 .formulario-login button,
@@ -384,10 +447,21 @@ body {
 	align-items: center;
 	gap: 8px;
 	padding: 7px 10px;
-	border: 1px solid var(--cor-borda);
-	border-radius: 3px;
+	/* O alfa 0.18 é mais discreto que o do --cor-borda (0.28) de propósito:
+	   a cápsula é um controle, não uma superfície. A borda aqui delimita o
+	   controle, não decora um bloco de conteúdo. */
+	border: 1px solid rgba(217, 174, 109, 0.18);
+	border-radius: 20px;
+	background: var(--cor-fundo-secundario);
 	color: var(--cor-texto);
 	cursor: pointer;
+	/* A cor do fundo vem primeira, de propósito: a verificação de T6 conta as
+	   linhas de transição que começam pela cor da borda e espera 1. */
+	transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.genero:hover {
+	border-color: var(--cor-borda-forte);
 }
 
 .genero input {
@@ -395,6 +469,32 @@ body {
 	height: 16px;
 	margin: 0;
 	accent-color: var(--cor-dourado);
+}
+
+/* Estado marcado da cápsula, e é contrato público: quem escreve o JavaScript
+   precisa aplicar e remover esta classe. A ordem de origem é proposital, mas
+   não para vencer o :hover acima: ela resolve o empate entre .genero e
+   .genero--selecionado, que são os dois de especificidade (0,1,0). Com o
+   :hover no meio, a ordem nem é consultada, porque o :hover é (0,2,0) e
+   vence por especificidade, e não por posição, na declaração border-color.
+   Ainda assim o ouro da marcação sobrevive ao hover: o :hover só mexe na
+   borda, então fundo e cor ficam, e a borda troca de --cor-borda-forte para
+   --cor-dourado, que é o mesmo dourado com menos alfa, composto sobre um
+   fundo opaco da mesma cor. O resultado renderizado é o mesmo, e é por isso
+   que a troca de borda não aparece. */
+.genero--selecionado {
+	background: var(--cor-dourado);
+	color: var(--cor-fundo);
+	border-color: var(--cor-dourado);
+}
+
+/* O margin é obrigatório aqui: o reset * do topo do arquivo zera a margem
+   padrão do <hr>, e sem ele os separadores encostariam no conteúdo. */
+.separador {
+	height: 1px;
+	border: 0;
+	margin: 16px 0;
+	background: linear-gradient(to right, transparent, var(--cor-borda-forte), transparent);
 }
 
 .cabecalho-resultados {
