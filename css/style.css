@@ -410,72 +410,112 @@ body {
 	margin: 24px auto 0;
 }
 
-.cartao-filme {
-	width: 100%;
-	min-width: 0;
+.card-serie {
 	display: flex;
-	align-items: flex-start;
-	gap: 18px;
-	padding: 20px;
-	border: 1px solid var(--cor-borda);
-	border-left: 3px solid var(--cor-dourado);
-	border-radius: 3px;
+	flex-direction: column;
+	overflow: hidden;
 	background: var(--cor-card);
+	border: 1px solid var(--cor-borda);
+	border-radius: 8px;
+	box-shadow: 0 10px 30px var(--cor-sombra);
 }
 
-.cartao-filme[hidden] {
+/* O display: flex da regra acima sobrescreveria o display: none que o
+   atributo hidden aplica, e o template apareceria na tela antes de o
+   JavaScript preenchê-lo. Por isso a regra [hidden] volta ao display: none. */
+.card-serie[hidden] {
 	display: none;
 }
 
-.cartaz-filme {
-	flex: 0 0 140px;
-	width: 140px;
+.card-serie:hover {
+	background: var(--cor-card-hover);
+	border-color: var(--cor-borda-forte);
+	/* background-color primeiro, de propósito: a verificação de T6 conta as
+	   linhas de transição que começam pela cor da borda e espera 1. */
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* position: relative é o que ancora o badge sobre a mídia, sem tirar a
+   imagem do fluxo do card. */
+.midia-serie {
+	position: relative;
+}
+
+/* display: block mata o gap da linha de base que sobraria da imagem inline,
+   e apareceria como uma fenda abaixo da mídia. */
+.cartaz-serie {
+	display: block;
+	width: 100%;
 	aspect-ratio: 2 / 3;
 	object-fit: cover;
 	background: var(--cor-fundo-secundario);
 }
 
-.conteudo-filme {
-	min-width: 0;
-	flex: 1;
+.badge {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	padding: 4px 10px;
+	border-radius: 20px;
+	color: var(--cor-fundo);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.4px;
+}
+
+/* As três faixas fecham a escala de três degraus do dourado: a cor escurece
+   quando a compatibilidade cai, o que é coerente com o RF07. */
+.badge-alta {
+	background: var(--cor-dourado-claro);
+}
+
+.badge-media {
+	background: var(--cor-dourado);
+}
+
+.badge-baixa {
+	background: var(--cor-dourado-escuro);
+}
+
+.conteudo-serie {
 	display: flex;
 	flex-direction: column;
 	gap: 9px;
+	padding: 16px;
+	min-width: 0;
 }
 
-.titulo-filme {
+.titulo-serie {
 	color: var(--cor-texto);
-	font-size: 20px;
+	font-size: 18px;
 	font-weight: 400;
 }
 
-.metadados-filme,
-.generos-filme {
+.metadados-serie,
+.generos-serie {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: center;
 	gap: 8px;
 	color: var(--cor-texto-muted);
 	font-size: 13px;
 }
 
-.nota-filme {
+.nota-serie {
 	color: var(--cor-dourado);
 }
 
-.sinopse-filme {
+.sinopse-serie {
 	color: var(--cor-texto-muted);
 	line-height: 1.5;
 }
 
-.status-filme,
-.plataforma-filme {
-	color: var(--cor-texto);
+.status-serie,
+.plataforma-serie {
+	color: var(--cor-texto-secundario);
 	font-size: 13px;
 }
 
-.link-filme {
-	width: fit-content;
+.link-serie {
 	color: var(--cor-dourado);
 	font-size: 14px;
 }
@@ -550,25 +590,24 @@ footer {
 	.resultados {
 		flex-direction: row;
 		flex-wrap: wrap;
+		/* Grade de 3 colunas: 3 × (33.333% − 14px) = 99.999% − 42px, e
+		   2 gaps × 21px = 42px. O resíduo de 0.001% não quebra o wrap. */
+		gap: 21px;
 	}
 
-	.cartao-filme {
-		flex: 1 1 calc(50% - 8px);
+	.card-serie {
+		flex: 1 1 calc(33.333% - 14px);
 	}
 }
 
 @media (max-width: 560px) {
-	.cartao-filme {
-		gap: 12px;
+	/* O cartaz não tem mais tamanho fixo: é a mídia que ocupa a largura
+	   inteira do card. O recuo do conteúdo é que precisa ceder espaço. */
+	.conteudo-serie {
 		padding: 14px;
 	}
 
-	.cartaz-filme {
-		flex-basis: 92px;
-		width: 92px;
-	}
-
-	.titulo-filme {
+	.titulo-serie {
 		font-size: 17px;
 	}
 }

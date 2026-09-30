@@ -28,8 +28,8 @@
     3. O único h1. A marca "CineMatch" no nav é o único <h1> da página, porque
        existe um único h1 por documento e ele identifica o assunto dela. As
        seções usam <h2>, que é a hierarquia com que o leitor de tela navega.
-       A seção de resultados contém #template-card-filme, uma div oculta com
-       campos normalizados para a futura renderização dos filmes; ela ainda
+       A seção de resultados contém #template-card-serie, um article oculto com
+       campos normalizados para a futura renderização das séries; ela ainda
        não é preenchida pela lógica JavaScript.
 
     4. Divergência do briefing, declarada e não silenciada. A seção
@@ -198,22 +198,25 @@
         </p>
       </div>
       <div id="resultados" class="resultados"></div>
-      <div id="template-card-filme" class="cartao-filme" data-tipo="filme" hidden>
-        <img class="cartaz-filme" data-campo="poster" alt="Pôster do filme, aguardando catálogo">
-        <div class="conteudo-filme">
-          <h3 class="titulo-filme" data-campo="title">Título do filme</h3>
-          <div class="metadados-filme">
-            <span class="nota-filme">★ <span data-campo="rating">Sem nota</span>/10</span>
+      <article id="template-card-serie" class="card-serie" data-tipo="serie" hidden>
+        <div class="midia-serie">
+          <img class="cartaz-serie" data-campo="poster" alt="Pôster da série, aguardando catálogo">
+          <span class="badge badge-media">Média</span>
+        </div>
+        <div class="conteudo-serie">
+          <h3 class="titulo-serie" data-campo="title">Título da série</h3>
+          <div class="metadados-serie">
+            <span class="nota-serie">★ <span data-campo="rating">Sem nota</span>/10</span>
             <span data-campo="releaseDate">Ano de lançamento</span>
             <span data-campo="duration">Duração indisponível</span>
           </div>
-          <div class="generos-filme" data-campo="genres">Gêneros</div>
-          <p class="sinopse-filme" data-campo="synopsis">Sinopse do filme em texto puro.</p>
-          <p class="status-filme">Status: <span data-campo="status">Indisponível</span></p>
-          <p class="plataforma-filme">Onde assistir: <span data-campo="platform">Indisponível</span></p>
-          <a class="link-filme" href="#" data-campo="url">Ver detalhes</a>
+          <div class="generos-serie" data-campo="genres">Gêneros</div>
+          <p class="sinopse-serie" data-campo="synopsis">Sinopse da série em texto puro.</p>
+          <p class="status-serie">Status: <span data-campo="status">Indisponível</span></p>
+          <p class="plataforma-serie">Onde assistir: <span data-campo="platform">Indisponível</span></p>
+          <a class="link-serie" href="#" data-campo="url">Ver detalhes</a>
         </div>
-      </div>
+      </article>
     </section>
   </main>
   <footer>
