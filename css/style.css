@@ -1,121 +1,14 @@
 /*
-	CineMatch Web — estilos da aplicação.
+	CineMatch Web — identidade visual.
 
-	M1-T01 (RF15 parcial) criou este arquivo em branco; a folha de estilo
-		externa é a M1-T04, com responsividade. Hoje a folha cobre a
-		navbar translúcida sobre a capa (com recorte da imagem por object-fit),
-		a tela de login, o formulário de perfil e a base da grade de cards.
-	A grade segue a M1-T12, e a direção é sempre com Flexbox: coluna no celular
-		por flex-direction: column, linha no desktop por flex-wrap — sem CSS Grid,
-		que está fora do escopo do Módulo 01 (AGENTS.md §2).
-
-	A responsividade mistura as duas estratégias de propósito, e isso produz
-		uma ilha. A navbar é desktop-first: ela já existia e só refina por
-		@media (max-width: 768px). O login, o formulário de perfil e os cards
-		são mobile-first: partem do celular e estendem por
-		@media (min-width: 769px), sem sobreposição nem buraco no corte. A
-		ilha é deliberada e está contida na navbar: cada bloco declara a
-		estratégia de que precisa, e nenhuma regra é reescrita do zero no
-		outro breakpoint. A capa não entra na ilha — ela tem só regra base,
-		com a altura em clamp() e o recorte em object-fit, que já respondem
-		sozinhos.
-
-	Breakpoints: 560px, para celulares estreitos; 768px, que é a própria
-		media query max-width: 768px e portanto o corte do mobile, e não do
-		desktop; e 769px, o primeiro pixel do desktop, em min-width: 769px.
-		Os dois lados do corte são 768 e 769 de propósito, para que nenhum
-		pixel caia ao mesmo tempo nas duas estratégias ou em nenhuma delas.
-
-	Escala de raio: 8px nos cards e 20px nas cápsulas.
-
-	Variáveis: o bloco de variáveis fica no topo, antes do reset, porque ele
-		serve de referência de cor da folha de estilo. Este é o único bloco
-		de variáveis do projeto: todas as variáveis são declaradas aqui e
-		consumidas no próprio css/style.css, para não haver duas listas de cor
-		para manter em sincronia. Os valores ficam no :root logo abaixo; aqui
-		cada token é descrito só pelo nome e pelo papel, para que nenhum
-		literal de cor apareça duas vezes no mesmo arquivo.
-		- --cor-fundo: o superfundo da página e da capa, o tom mais escuro
-		  da paleta.
-		- --cor-fundo-secundario: superfície um passo acima do superfundo, o
-		  fundo dos campos de entrada e do fieldset de gêneros.
-		- --cor-card: superfície dos cards e dos containers de formulário.
-		- --cor-card-hover: a mesma superfície de card no estado de hover, um
-		  passo acima dela.
-		- --cor-dourado: a cor de marca — títulos de seção, preenchimento e
-		  borda do botão primário, texto do botão contornado, anel de foco
-		  dos campos e botões, legend do fieldset, accent-color do checkbox,
-		  nota da série e hover dos links e dos botões da navbar.
-		- --cor-dourado-claro: o dourado de destaque, no hover do botão
-		  primário e no fundo do badge .badge-alta, a faixa alta da escala
-		  de classificação. Precisa ficar mais claro que --cor-dourado, senão
-		  o hover deixa de aparecer como mudança de estado.
-		- --cor-dourado-escuro: a faixa baixa da escala de classificação.
-		- --cor-texto: o texto principal — marca, links da navbar, labels,
-		  título do card, status e plataforma.
-		- --cor-texto-secundario: o texto corrente do corpo e dos campos de
-		  entrada, um passo abaixo do principal.
-		- --cor-texto-muted: o texto de apoio, o menos contrastado da paleta.
-		- --cor-borda: a borda dourada discreta, compartilhada por cards,
-		  campos e fieldset.
-		- --cor-borda-forte: a mesma família de borda com o alfa mais alto,
-		  para os casos em que a borda precisa ser vista.
-		- --cor-sombra: a sombra projetada dos cards e dos containers.
-
-	Hierarquia de profundidade: fundo, fundo-secundario, card, card-hover. Os
-		quatro tons sobem de escuro para claro conforme o elemento avança para
-		a frente, e é essa ordem, e não a sombra, que dá a sensação de altura.
-
-	Hierarquia de texto em três níveis: --cor-texto, --cor-texto-secundario e
-		--cor-texto-muted. A escala é semântica, e não uma ordenação por
-		proximidade de luminância: quem escolhe o nível é o papel que o texto
-		cumple na tela, e não o brilho do tom. Um tom mais claro que passe a
-		ser apoio continua sendo apoio, e continua tomando o token de apoio.
-
-	Contrato CSS ↔ JavaScript: a classe .genero--selecionado, declarada no
-		bloco das cápsulas mais abaixo, é o estado marcado do gênero, e quem
-		escreve o JavaScript precisa aplicá-la e removê-la. Ela é alternada por
-		JavaScript, no evento change do checkbox, e não pela folha. Com o input
-		dentro do label, o CSS não sobe do filho para o pai, e a pseudo-classe
-		que resolveria isso está fora do escopo do Módulo 01 — daí vir a classe.
-		A degradação sem JavaScript é segura: o checkbox continua marcando e
-		desmarcando, o formulário continua sendo preenchido, e a cápsula só fica
-		no visual não marcado, sem o destaque dourado.
-
-	Item ativo da nav: a classe .links-navegacao .ativo, declarada mais
-		abaixo entre as regras da navbar, é contrato com o JavaScript e não
-		estado do CSS. O index.html não traz aria-current em nenhum elemento
-		e não traz a classe .ativo em nenhum elemento, então ninguém a aplica
-		hoje e a regra não produz efeito visível: ela fica disponível, e nada
-		mais. O primeiro contato com a navegação ativa é do JavaScript do
-		parceiro, que precisa aplicar e remover a classe como faz com
-		.genero--selecionado. O sublinhado dourado do primeiro item da navbar,
-		a única marca de posição que existe hoje, vem de uma regra
-		estrutural, e não de um estado, e por isso não é este contrato nem
-		deve ser lido como se fosse.
-
-	Exceções ao uso de variável, e são seis. A primeira é o fundo da navbar, o
-		literal rgba(5, 5, 5, 0.85), e não um token: --cor-fundo-secundario é
-	opaco e mataria a translucidez que a capa por trás da navbar exige. A
-	segunda é a borda da cápsula .genero, no literal rgba(217, 174, 109,
-	0.18), que nenhum token carrega porque é mais discreta que a borda
-	padrão de propósito. As outras quatro são os tons de hover: 0.1 no botão
-	contornado do login, 0.12 no botão de navegação, 0.2 no fundo do botão
-	de perfil e 0.3 no hover desse mesmo botão de perfil. Elas são quatro
-	degraus de intensidade de escolha, não quatro acúmulos: vieram do design
-	system com o RGB antigo trocado pelo do dourado e cada alfa mantido,
-	porque a paleta só tem 0.28 e 0.55, e nenhum dos dois cobre um degrau
-	intermediário de hover. O motivo é o mesmo nas seis e é técnico: CSS não
-	aplica alfa a um hex, então um tom translúcido que não bate com nenhum
-	token da paleta precisa ser escrito por extenso.
-
-	Sem !important: a divisão do login entre botão primário e botão contornado
-		resolve por pseudo-classe, porque .formulario-login button:last-of-type (0,2,1)
-			pesa mais que .formulario-login button (0,1,1); e o botão de #form-perfil
-		ganha o visual primário pelo seletor de ID (1,0,1), já que a regra do
-		contornado exige a classe .formulario-login e não casa com aquele formulário.
-		O KANBAN exige nome de classe bem escolhido em vez de !important.
-	CSS Grid, Sass e CSS-in-JS estão fora do escopo do Módulo 01 (AGENTS.md §2).
+	Base visual:
+	- fantasia cinematográfica sombria;
+	- preto profundo como superfundo;
+	- superfícies pretas em camadas;
+	- dourado envelhecido como cor de destaque;
+	- textos em marfim e cinza quente;
+	- bordas finas, sombras profundas e cantos discretamente arredondados;
+	- Flexbox e responsividade, sem CSS Grid e sem !important.
 */
 
 :root {
@@ -123,12 +16,15 @@
 	--cor-fundo-secundario: #0b0b0b;
 	--cor-card: #111111;
 	--cor-card-hover: #171717;
+
 	--cor-dourado: #d9ae6d;
 	--cor-dourado-claro: #e8c88f;
 	--cor-dourado-escuro: #9c7743;
+
 	--cor-texto: #eee3d5;
 	--cor-texto-secundario: #bdb3a7;
 	--cor-texto-muted: #81786e;
+
 	--cor-borda: rgba(217, 174, 109, 0.28);
 	--cor-borda-forte: rgba(217, 174, 109, 0.55);
 	--cor-sombra: rgba(0, 0, 0, 0.55);
@@ -140,28 +36,36 @@
 	box-sizing: border-box;
 }
 
+html {
+	scroll-behavior: smooth;
+}
+
 body {
 	min-height: 100vh;
 	min-height: 100svh;
 	background: var(--cor-fundo);
 	color: var(--cor-texto-secundario);
 	font-family: Georgia, "Times New Roman", serif;
+	line-height: 1.5;
 }
+
+/* =========================
+   NAVBAR
+   ========================= */
 
 .barra-navegacao {
 	position: absolute;
 	top: 0;
 	left: 0;
 	z-index: 10;
-	height: 56px;
 	width: 100%;
+	min-height: 64px;
 	display: flex;
 	align-items: center;
-	padding: 0 5%;
-	/* Exceção documentada no cabeçalho: --cor-fundo-secundario é opaco e
-	   mataria a translucidez da navbar sobre a capa. */
-	background: rgba(5, 5, 5, 0.85);
-	border-bottom: 1px solid var(--cor-borda-forte);
+	padding: 12px 5%;
+	background: rgba(5, 5, 5, 0.86);
+	border-bottom: 1px solid var(--cor-borda);
+	backdrop-filter: blur(4px);
 }
 
 .marca {
@@ -175,60 +79,66 @@ body {
 
 .links-navegacao {
 	display: flex;
-	gap: 42px;
+	align-items: center;
+	gap: 38px;
 	list-style: none;
 }
 
 .links-navegacao a {
+	position: relative;
+	display: inline-block;
+	padding: 8px 0;
 	color: var(--cor-texto);
 	text-decoration: none;
 	font-size: 15px;
 	transition: color 0.2s ease;
 }
 
-.links-navegacao li:first-child a {
-	position: relative;
+.links-navegacao a:hover {
+	color: var(--cor-dourado-claro);
+}
+
+.links-navegacao a:focus-visible {
+	outline: 2px solid var(--cor-dourado);
+	outline-offset: 4px;
+	border-radius: 2px;
 }
 
 .links-navegacao li:first-child a::after {
 	position: absolute;
 	right: 0;
-	bottom: -12px;
+	bottom: -5px;
 	left: 0;
 	height: 2px;
 	background: var(--cor-dourado);
 	content: "";
 }
 
-.links-navegacao a:focus-visible {
-	outline: 2px solid var(--cor-dourado);
-	outline-offset: 3px;
-	border-radius: 2px;
-}
-
-.links-navegacao a:hover {
-	color: var(--cor-dourado);
-}
-
-/* Estado ativo da navbar, e é contrato público como .genero--selecionado:
-   quem escreve o JavaScript precisa aplicar e remover esta classe. Nenhum
-   elemento do index.html a traz, então a regra fica declarada e sem efeito,
-   disponível para quando existir quem aplique. */
 .links-navegacao .ativo {
-	border-bottom: 2px solid var(--cor-dourado);
+	color: var(--cor-dourado-claro);
+}
+
+.links-navegacao .ativo::after {
+	position: absolute;
+	right: 0;
+	bottom: -5px;
+	left: 0;
+	height: 2px;
+	background: var(--cor-dourado);
+	content: "";
 }
 
 .acoes-navegacao {
 	display: flex;
 	align-items: center;
-	gap: 14px;
+	gap: 12px;
 	margin-left: auto;
 }
 
 .botao-navegacao {
 	display: inline-flex;
-	width: 32px;
-	height: 32px;
+	width: 34px;
+	height: 34px;
 	align-items: center;
 	justify-content: center;
 	padding: 0;
@@ -252,25 +162,32 @@ body {
 
 .botao-navegacao:hover,
 .botao-navegacao:focus-visible {
-	color: var(--cor-dourado);
+	color: var(--cor-dourado-claro);
 	background: rgba(217, 174, 109, 0.12);
+}
+
+.botao-navegacao:focus-visible {
 	outline: 2px solid var(--cor-dourado);
 	outline-offset: 3px;
 }
 
 .botao-navegacao--perfil {
-	background: rgba(217, 174, 109, 0.2);
+	background: rgba(238, 227, 213, 0.14);
 }
 
 .botao-navegacao--perfil:hover,
 .botao-navegacao--perfil:focus-visible {
-	background: rgba(217, 174, 109, 0.3);
+	background: rgba(217, 174, 109, 0.24);
 }
+
+/* =========================
+   CAPA
+   ========================= */
 
 .capa {
 	position: relative;
 	width: 100%;
-	height: clamp(190px, 32vw, 390px);
+	height: clamp(260px, 43vw, 560px);
 	background: var(--cor-fundo);
 	display: flex;
 	overflow: hidden;
@@ -286,26 +203,56 @@ body {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	object-position: center 46%;
+	object-position: center center;
 }
+
+/* Escurecimento sutil na parte inferior para integrar a capa ao conteúdo. */
+.capa::after {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: 30%;
+	background: linear-gradient(
+		to bottom,
+		transparent,
+		var(--cor-fundo)
+	);
+	pointer-events: none;
+	content: "";
+}
+
+/* =========================
+   PADRÃO DAS SEÇÕES
+   ========================= */
 
 .secao-login,
 .secao-perfil,
 .secao-resultados {
-	padding: 48px 5%;
+	width: 100%;
+	padding: 52px 5%;
+	background: var(--cor-fundo);
+}
+
+.secao-login + .secao-perfil,
+.secao-perfil + .secao-resultados {
+	border-top: 1px solid rgba(217, 174, 109, 0.08);
 }
 
 .cartao-login,
 .cartao-perfil {
 	width: 100%;
 	margin: 0 auto;
-	padding: 26px 20px;
+	padding: 28px 22px;
+	background:
+		linear-gradient(
+			145deg,
+			rgba(255, 255, 255, 0.018),
+			transparent 45%
+		),
+		var(--cor-card);
 	border: 1px solid var(--cor-borda);
-	border-radius: 4px;
-	background: var(--cor-card);
-	/* Sombra mais funda que a do .card-serie: os containers de formulário são
-	   a superfície mais à frente da tela, e é a distância do borrão que
-	   comunica a hierarquia, porque a cor é a mesma nos dois. */
+	border-radius: 8px;
 	box-shadow: 0 20px 50px var(--cor-sombra);
 }
 
@@ -314,24 +261,52 @@ body {
 }
 
 .cartao-perfil {
-	max-width: 880px;
+	max-width: 900px;
 }
 
 .cartao-login h2,
 .cartao-perfil h2,
 .cabecalho-resultados h2 {
-	margin-bottom: 12px;
-	color: var(--cor-dourado);
-	font-size: 26px;
+	margin-bottom: 10px;
+	color: var(--cor-texto);
+	font-size: 27px;
 	font-weight: 400;
 	line-height: 1.2;
+	letter-spacing: 0.4px;
+}
+
+.cartao-login h2::first-letter,
+.cartao-perfil h2::first-letter {
+	color: var(--cor-dourado-claro);
 }
 
 .cartao-login > p,
 .cabecalho-resultados p {
 	color: var(--cor-texto-muted);
-	line-height: 1.6;
+	line-height: 1.7;
 }
+
+/* =========================
+   SEPARADOR DOURADO
+   ========================= */
+
+.separador {
+	width: 100%;
+	height: 1px;
+	border: 0;
+	margin: 18px 0 22px;
+	background: linear-gradient(
+		to right,
+		transparent,
+		var(--cor-dourado),
+		transparent
+	);
+	opacity: 0.7;
+}
+
+/* =========================
+   FORMULÁRIOS
+   ========================= */
 
 .formulario-login,
 #form-perfil {
@@ -359,22 +334,31 @@ body {
 #form-perfil input[type="number"] {
 	width: 100%;
 	min-height: 44px;
-	padding: 10px 12px;
+	padding: 10px 13px;
 	border: 1px solid var(--cor-borda);
-	border-radius: 3px;
+	border-radius: 4px;
 	background: var(--cor-fundo-secundario);
-	color: var(--cor-texto-secundario);
+	color: var(--cor-texto);
 	font: inherit;
-	/* Só a cor da borda é animada aqui, e ela vem primeiro de propósito: a
-	   verificação de T6 conta as linhas de transição que abrem por ela e
-	   espera 1. Fica neste mesmo seletor agrupado, e a razão principal do
-	   desvio da especificação, que pedia um bloco novo, não é só não repetir
-	   a lista dos campos em uma segunda regra: é que este bloco exclui de
-	   propósito os checkbox de gênero. A borda da cápsula está no
-	   label .genero e não no input, e a caixa do checkbox é desenhada com
-	   accent-color, que já é o dourado, então a cor da borda dele é uma
-	   propriedade sem efeito na tela. */
-	transition: border-color 0.2s ease;
+	transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.formulario-login input::placeholder,
+#form-perfil input::placeholder {
+	color: var(--cor-texto-muted);
+}
+
+.formulario-login input:hover,
+#form-perfil input[type="text"]:hover,
+#form-perfil input[type="number"]:hover {
+	border-color: var(--cor-borda-forte);
+}
+
+.formulario-login input:focus,
+#form-perfil input:focus {
+	border-color: var(--cor-dourado);
+	background: #0e0e0e;
+	outline: none;
 }
 
 .formulario-login input:focus-visible,
@@ -385,34 +369,31 @@ body {
 	outline-offset: 3px;
 }
 
-/* :focus puro, para o ponteiro: o anel acima é o do teclado, e a borda
-   dourada é o estado que o clique também precisa enxergar. Os dois campos
-   vêm num seletor agrupado só, porque a verificação conta linhas e não
-   regras. A navbar não ganha este estado porque os alvos dela são link e
-   botão, que não têm borda para recolor: lá o anel é o único sinal, e é o
-   mesmo --cor-dourado dos campos. Nenhum dos dois lados precisa de
-   !important para chegar nesse estado. */
-.formulario-login input:focus,
-#form-perfil input:focus {
-	border-color: var(--cor-dourado);
-}
+/* =========================
+   BOTÕES
+   ========================= */
 
 .formulario-login button,
 #form-perfil button {
 	min-height: 44px;
-	padding: 10px 16px;
+	padding: 11px 18px;
 	border: 1px solid var(--cor-dourado);
-	border-radius: 3px;
+	border-radius: 4px;
 	background: var(--cor-dourado);
 	color: var(--cor-fundo);
 	font: inherit;
+	font-size: 15px;
 	cursor: pointer;
-	transition: background-color 0.2s ease, color 0.2s ease;
+	transition:
+		background-color 0.2s ease,
+		border-color 0.2s ease,
+		color 0.2s ease;
 }
 
 .formulario-login button:hover,
 #form-perfil button:hover {
 	background: var(--cor-dourado-claro);
+	border-color: var(--cor-dourado-claro);
 }
 
 .formulario-login button:last-of-type {
@@ -424,15 +405,22 @@ body {
 	background: rgba(217, 174, 109, 0.1);
 }
 
+/* =========================
+   GÊNEROS
+   ========================= */
+
 .generos {
 	min-width: 0;
-	padding: 16px;
+	padding: 18px;
 	border: 1px solid var(--cor-borda);
+	border-radius: 6px;
+	background: var(--cor-fundo-secundario);
 }
 
 .generos legend {
-	padding: 0 8px;
-	color: var(--cor-dourado);
+	padding: 0 9px;
+	color: var(--cor-dourado-claro);
+	font-size: 16px;
 }
 
 .lista-generos {
@@ -443,25 +431,24 @@ body {
 
 .genero {
 	display: inline-flex;
-	min-height: 38px;
+	min-height: 40px;
 	align-items: center;
 	gap: 8px;
-	padding: 7px 10px;
-	/* O alfa 0.18 é mais discreto que o do --cor-borda (0.28) de propósito:
-	   a cápsula é um controle, não uma superfície. A borda aqui delimita o
-	   controle, não decora um bloco de conteúdo. */
+	padding: 8px 13px;
 	border: 1px solid rgba(217, 174, 109, 0.18);
 	border-radius: 20px;
-	background: var(--cor-fundo-secundario);
-	color: var(--cor-texto);
+	background: #0d0d0d;
+	color: var(--cor-texto-secundario);
 	cursor: pointer;
-	/* A cor do fundo vem primeira, de propósito: a verificação de T6 conta as
-	   linhas de transição que começam pela cor da borda e espera 1. */
-	transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+	transition:
+		background-color 0.2s ease,
+		border-color 0.2s ease,
+		color 0.2s ease;
 }
 
 .genero:hover {
 	border-color: var(--cor-borda-forte);
+	color: var(--cor-texto);
 }
 
 .genero input {
@@ -471,44 +458,38 @@ body {
 	accent-color: var(--cor-dourado);
 }
 
-/* Estado marcado da cápsula, e é contrato público: quem escreve o JavaScript
-   precisa aplicar e remover esta classe. A ordem de origem é proposital, mas
-   não para vencer o :hover acima: ela resolve o empate entre .genero e
-   .genero--selecionado, que são os dois de especificidade (0,1,0). Com o
-   :hover no meio, a ordem nem é consultada, porque o :hover é (0,2,0) e
-   vence por especificidade, e não por posição, na declaração border-color.
-   Ainda assim o ouro da marcação sobrevive ao hover: o :hover só mexe na
-   borda, então fundo e cor ficam, e a borda troca de --cor-borda-forte para
-   --cor-dourado, que é o mesmo dourado com menos alfa, composto sobre um
-   fundo opaco da mesma cor. O resultado renderizado é o mesmo, e é por isso
-   que a troca de borda não aparece. */
 .genero--selecionado {
-	background: var(--cor-dourado);
-	color: var(--cor-fundo);
+	background: rgba(217, 174, 109, 0.14);
 	border-color: var(--cor-dourado);
+	color: var(--cor-dourado-claro);
 }
 
-/* O margin é obrigatório aqui: o reset * do topo do arquivo zera a margem
-   padrão do <hr>, e sem ele os separadores encostariam no conteúdo. */
-.separador {
-	height: 1px;
-	border: 0;
-	margin: 16px 0;
-	background: linear-gradient(to right, transparent, var(--cor-borda-forte), transparent);
-}
+/* =========================
+   RESULTADOS
+   ========================= */
 
 .cabecalho-resultados {
+	width: 100%;
+	max-width: 1180px;
 	margin: 0 auto;
-	max-width: 1100px;
+}
+
+.cabecalho-resultados h2 {
+	font-size: 30px;
 }
 
 .resultados {
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
-	max-width: 1100px;
-	margin: 24px auto 0;
+	gap: 18px;
+	width: 100%;
+	max-width: 1180px;
+	margin: 26px auto 0;
 }
+
+/* =========================
+   CARD DE SÉRIE
+   ========================= */
 
 .card-serie {
 	display: flex;
@@ -518,11 +499,12 @@ body {
 	border: 1px solid var(--cor-borda);
 	border-radius: 8px;
 	box-shadow: 0 10px 30px var(--cor-sombra);
+	transition:
+		transform 0.2s ease,
+		background-color 0.2s ease,
+		border-color 0.2s ease;
 }
 
-/* O display: flex da regra acima sobrescreveria o display: none que o
-   atributo hidden aplica, e o template apareceria na tela antes de o
-   JavaScript preenchê-lo. Por isso a regra [hidden] volta ao display: none. */
 .card-serie[hidden] {
 	display: none;
 }
@@ -530,19 +512,14 @@ body {
 .card-serie:hover {
 	background: var(--cor-card-hover);
 	border-color: var(--cor-borda-forte);
-	/* background-color primeiro, de propósito: a verificação de T6 conta as
-	   linhas de transição que começam pela cor da borda e espera 1. */
-	transition: background-color 0.2s ease, border-color 0.2s ease;
+	transform: translateY(-3px);
 }
 
-/* position: relative é o que ancora o badge sobre a mídia, sem tirar a
-   imagem do fluxo do card. */
 .midia-serie {
 	position: relative;
+	background: var(--cor-fundo-secundario);
 }
 
-/* display: block mata o gap da linha de base que sobraria da imagem inline,
-   e apareceria como uma fenda abaixo da mídia. */
 .cartaz-serie {
 	display: block;
 	width: 100%;
@@ -563,8 +540,6 @@ body {
 	letter-spacing: 0.4px;
 }
 
-/* As três faixas fecham a escala de três degraus do dourado: a cor escurece
-   quando a compatibilidade cai, o que é coerente com o RF07. */
 .badge-alta {
 	background: var(--cor-dourado-claro);
 }
@@ -581,13 +556,13 @@ body {
 	display: flex;
 	flex-direction: column;
 	gap: 9px;
-	padding: 16px;
 	min-width: 0;
+	padding: 16px;
 }
 
 .titulo-serie {
 	color: var(--cor-texto);
-	font-size: 18px;
+	font-size: 19px;
 	font-weight: 400;
 }
 
@@ -601,12 +576,12 @@ body {
 }
 
 .nota-serie {
-	color: var(--cor-dourado);
+	color: var(--cor-dourado-claro);
 }
 
 .sinopse-serie {
 	color: var(--cor-texto-muted);
-	line-height: 1.5;
+	line-height: 1.6;
 }
 
 .status-serie,
@@ -618,48 +593,45 @@ body {
 .link-serie {
 	color: var(--cor-dourado);
 	font-size: 14px;
+	text-decoration: none;
 }
 
+.link-serie:hover {
+	color: var(--cor-dourado-claro);
+	text-decoration: underline;
+}
+
+.link-serie:focus-visible {
+	outline: 2px solid var(--cor-dourado);
+	outline-offset: 3px;
+}
+
+/* =========================
+   RODAPÉ
+   ========================= */
+
 footer {
-	padding: 24px 5%;
+	padding: 28px 5%;
 	border-top: 1px solid var(--cor-borda);
+	background: #070707;
 	color: var(--cor-texto-muted);
 	text-align: center;
 }
 
-@media (max-width: 768px) {
-	.barra-navegacao {
-		height: auto;
-		min-height: 64px;
-		padding: 16px 5%;
-		flex-wrap: wrap;
-		gap: 14px;
-	}
-
-	.marca {
-		margin-right: 20px;
-		font-size: 22px;
-	}
-
-	.links-navegacao {
-		gap: 18px;
-		flex-wrap: wrap;
-	}
-
-	.acoes-navegacao {
-		gap: 8px;
-	}
-
-	.links-navegacao a {
-		font-size: 14px;
-	}
-}
+/* =========================
+   TABLET / DESKTOP
+   ========================= */
 
 @media (min-width: 769px) {
+	.barra-navegacao {
+		min-height: 72px;
+		padding: 0 5%;
+	}
+
 	.secao-login,
 	.secao-perfil,
 	.secao-resultados {
-		padding: 64px 8%;
+		padding: 72px 8%;
 	}
 
 	.cartao-login,
@@ -690,9 +662,7 @@ footer {
 	.resultados {
 		flex-direction: row;
 		flex-wrap: wrap;
-		/* Grade de 3 colunas: 3 × (33.333% − 14px) = 99.999% − 42px, e
-		   2 gaps × 21px = 42px. O resíduo de 0.001% não quebra o wrap. */
-		gap: 21px;
+		gap: 20px;
 	}
 
 	.card-serie {
@@ -700,9 +670,74 @@ footer {
 	}
 }
 
+/* =========================
+   CELULARES
+   ========================= */
+
+@media (max-width: 768px) {
+	.barra-navegacao {
+		min-height: 64px;
+		padding: 14px 5%;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+
+	.marca {
+		margin-right: 20px;
+		font-size: 22px;
+	}
+
+	.links-navegacao {
+		gap: 18px;
+		flex-wrap: wrap;
+	}
+
+	.links-navegacao a {
+		font-size: 14px;
+	}
+
+	.acoes-navegacao {
+		gap: 7px;
+	}
+
+	.capa {
+		height: clamp(240px, 62vw, 430px);
+	}
+
+	.secao-login,
+	.secao-perfil,
+	.secao-resultados {
+		padding: 42px 5%;
+	}
+}
+
 @media (max-width: 560px) {
-	/* O cartaz não tem mais tamanho fixo: é a mídia que ocupa a largura
-	   inteira do card. O recuo do conteúdo é que precisa ceder espaço. */
+	.marca {
+		font-size: 20px;
+	}
+
+	.links-navegacao {
+		width: 100%;
+		order: 3;
+	}
+
+	.acoes-navegacao {
+		margin-left: auto;
+	}
+
+	.capa {
+		height: 300px;
+	}
+
+	.cartao-login,
+	.cartao-perfil {
+		padding: 22px 17px;
+	}
+
+	.cabecalho-resultados h2 {
+		font-size: 25px;
+	}
+
 	.conteudo-serie {
 		padding: 14px;
 	}
