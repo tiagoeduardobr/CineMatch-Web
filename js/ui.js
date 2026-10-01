@@ -252,20 +252,20 @@ export const PLACEHOLDER_UI = {
 //   - O DESENHO DESTA ETAPA, em comentário, é o que a função deve escrever:
 //       const card = document.createElement("article");
 //       card.className = "card-serie";
-// 
+//
 //       const titulo = document.createElement("h3");
 //       titulo.textContent = resultado.titulo;
 //       card.appendChild(titulo);
-// 
+//
 //       const percentual = document.createElement("p");
 //       percentual.textContent = `Compatibilidade: ${resultado.percentual}%`;
 //       card.appendChild(percentual);
-// 
+//
 //       const badge = document.createElement("span");
 //       badge.classList.add("badge");
 //       badge.textContent = resultado.classificacao;
 //       card.appendChild(badge);
-// 
+//
 //       document.querySelector("#resultados").appendChild(card);
 //     A classe da faixa — badge-alta, badge-media ou badge-baixa — entra em uma
 //     classList.add logo depois da de "badge", e é a classificação que decide
