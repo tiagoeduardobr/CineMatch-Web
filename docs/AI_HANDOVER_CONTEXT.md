@@ -211,10 +211,22 @@ Depois disso o `dev` marcou a task como concluída no `docs/KANBAN.md` (linha 12
 
 O pedido era criar um arquivo com dois itens: `TODO_FIX_01` (colocar `value` de gênero em inglês) e `TODO_FIX_02` (remover os 2 `!important`). **Ao verificar, ambos já estavam conformes:**
 
+**Registro da sessão do Lucas (30/09) — a sincronização do quadro na linha local:**
+
+| Mudança | Detalhe |
+| --- | --- |
+| `M1-T05` voltou de *Em Andamento* para *A Fazer* | estava com timestamp desde 26/09 mas com **implementação zero**; o bloco de proveniência foi removido, porque task em *A Fazer* não o leva. Derrubou o WIP de 3 para 2 |
+| 4 tasks tiveram a nota `*Progresso:*` reescrita **sem número de linha**, por decisão e não por esquecimento | `M1-T02`, `M1-T04`, `M1-T12` e `M1-T16`; as outras **3** — `M1-T05`, `M1-T17` e `M1-T18` — ainda citam linha, e é a regra das Convenções técnicas que registra esse alcance |
+| 2 tasks ganharam nota `*Bloqueio:*`, que faltava | `M1-T18` e `M1-T21` |
+| Rastreabilidade | RF02 passou a `Em Andamento / A Fazer`; Critério 4 passou a `A Fazer` — as duas tasks de cada um caíram na mesma coluna |
+| Riscos | risco 10 revisado; **risco 11 criado** para a `M1-T12` atrasada em relação ao próprio código |
+
 - Os `value` **já eram** em inglês — `Drama`, `Comedy`, `Action`, `Science-Fiction`, `Horror`, `Romance`, `Fantasy`, `Adventure`, `Thriller`, `Documentary` (tabela em 1.2).
 - As 2 ocorrências de `!important` estavam **dentro do comentário de cabeçalho do CSS**, nas linhas 49 e 54, explicando por que a regra não é usada. **Zero em código** — medido com `[regex]::Replace($css, '/\*[\s\S]*?\*/', '')`.
 
 O usuário decidiu: só marcar a `M1-T05` concluída, apagar os comentários da task nos `.js` e **ignorar a criação do arquivo**. Isso está registrado aqui e não em `BACKLOG_FIX.md`, porque o arquivo não existe. A lição está em 4.9.
+
+**Registro da sessão do Lucas (30/09):** uma divergência menor que vale registrar, e que a correção da `M1-T21` naquela versão expôs: a nota de progresso daquela task citava "**26 commits** no `HEAD`" e agora cita **53**. O número antigo estava defasado desde o commit `4a89b5d` — o `HEAD` já contava **48** commits quando este texto foi escrito, e chega a **53** com os 5 commits do design system descritos na seção 8. **O número na nota é um instantâneo, não uma constante: meça antes de citar.**
 
 ### 3.3 AJU-001 e AJU-002: duas referências defasadas no quadro
 
@@ -234,6 +246,35 @@ A Rastreabilidade do RF02 também passou a `Em Andamento / Concluído` (`docs/KA
 ### 3.5 O relatório do subagente foi conferido com comandos de leitura
 
 Depois de o `git-commit` reportar sucesso, o estado foi confirmado independentemente: `git rev-parse --short` nas quatro branches, `git ls-remote --heads origin` e `git status --porcelain`. **Desta vez o relatório bateu com o estado real** — diferente da sessão anterior, em que um subagente fabricou relatório. A lição está em 4.10.
+
+### 3.5 O design system do front-end, e as contagens que ele corrigiu
+
+A `M1-T24` nasceu nesta versão: **Design system do front-end**. O ID estava livre porque `M1-T00` a `M1-T23` já estavam ocupados, e a task é **sem nota** — é bônus de interface, nasce fora do escopo do briefing, e por isso não entra nem na tabela de RF nem na de critérios notados. Incluí-la não altera a soma de 10,00 pontos. O total do quadro subiu de 24 para **25** tasks (2 *Concluído* + 2 *Em Andamento* + 21 *A Fazer*), e é por isso que a tabela da seção 8 deste arquivo passou a dizer `M1-T05` a `M1-T24` e quantidade 21.
+
+**A paleta.** Os 13 tokens `--cine-*` viraram 13 tokens `--cor-*`: **10 hexadecimais e 3 em `rgba()`**. Os três `rgba()` estão lá porque são exatamente os três que precisam de alfa — CSS não aplica alfa a um hex — e são `--cor-borda` (0.28), `--cor-borda-forte` (0.55) e `--cor-sombra` (0.55). **Atenção a este número, porque ele já circulou errado:** o `0.28` que aparece no plano é o `box-shadow` antigo de `.cartao-login, .cartao-perfil`, que foi substituído por `var(--cor-sombra)`; **o alfa do token é 0.55, não 0.28**. Fora do `:root` restaram 6 literais `rgba()`, e todos os seis estão documentados no cabeçalho da folha com o motivo de cada um.
+
+**O card vertical.** `.cartao-filme` e `.cartaz-filme` viraram `.card-serie` e `.cartaz-serie`, e o `<div>` do template virou `<article>`. O card deixou de ser linha com cartaz à esquerda: a mídia ocupa a largura inteira e o conteúdo vem abaixo. No desktop a grade passou de **2 para 3 colunas** — `gap: 21px` com `flex: 1 1 calc(33.333% - 14px)`, porque 3 × (33.333% − 14px) = 99.999% − 42px e 2 gaps × 21px = 42px, o que fecha em 99.999% e não quebra o `flex-wrap`. **A ordem das media queries na folha é deliberada: 768 → 769 → 560.** O `max-width: 768px` é o ajuste do tablet, o `min-width: 769px` é o desktop, e o `max-width: 560px` é o ajuste do celular e vem por último de propósito, para estreitar a regra que vence.
+
+**O contrato CSS ↔ JavaScript, e por que é contrato e não estado.** Duas classes existem na folha e **nenhum elemento do `index.html` as usa**, por escolha e não por esquecimento: `.genero--selecionado` e `.links-navegacao .ativo`. A primeira é o estado marcado da cápsula de gênero — o checkbox é filho do `<label>`, o CSS não sobe do filho para o pai, e a pseudo-classe que resolveria isso está fora do escopo do Módulo 01, daí vir a classe. A segunda é o item ativo da navbar, e o `index.html` não traz `aria-current` nem a classe `.ativo` em elemento nenhum. As duas ficam **disponíveis e sem efeito visível**, esperando o JavaScript do parceiro aplicar e remover. **A degradação sem JavaScript é segura:** o checkbox continua marcando e desmarcando, e o formulário continua sendo preenchido.
+
+**As divergências medidas entre o mapeamento recebido e o arquivo real.** Um `task-planner` entregou uma estrutura com três erros factuais — tabela de mapeamento com variáveis inexistentes, inventário de hex inexistente e mapeamento mecânico que invertia a hierarquia de texto. Os três foram medidos contra o arquivo antes de virar plano, e **o medido venceu em todos os casos**. As divergências que são contagem de uso de token:
+
+| Dado recebido | Medido em `develop` | Efeito |
+| --- | --- | --- |
+| `--cine-bg`: 5 usos | **2** — `body` e `.capa` | contagem corrigida no mapeamento |
+| `--cine-panel`: 4 usos | **2** — `.cartao-login, .cartao-perfil` e `.cartao-filme` | idem |
+| `--cine-line`: 9 usos | **6** | idem |
+| `--cine-gold`: 15 usos | **13** | `--cor-dourado` ficou com 15, não 17 |
+| `--cine-line-nav`: 3 usos | **1** — só o `border-bottom` da navbar | **piora** o risco da inversão de hierarquia |
+
+Duas outras afirmações recebidas caíram por medição: "hoje só a navbar tem `:focus-visible`" era **falso** — o de campos e botões já existia, e o que faltava era `:focus` puro e `transition: border-color`; e a grade de 3 colunas no desktop não existia, eram **2 colunas** com `flex: 1 1 calc(50% - 8px)`. A mudança para 3 é decisão de design, não refactor.
+
+**A inversão de borda de 0.22 → 0.55, que é o preço de seguir o mapeamento pedido.** O mapeamento manda `--cine-line-nav` (alfa **0.22**) virar `--cor-borda-forte` (alfa **0.55**). Com a contagem real, esse token tem **um único consumidor** — o `border-bottom` da navbar — e o efeito é o oposto do que três usos amorteceriam: a **única borda da página** passaria de discreta para a mais forte do design system, enquanto cards e campos ficam em 0.28. O plano **segue o mapeamento pedido**, registra a inversão na nota de progresso da `M1-T24` e deixa a reversão para um único token como ajuste de uma linha. **No arquivo final, o que a medição encontra:** `.resultados` em `flex-direction: column` na regra base, `.card-serie` como card vertical, e o corte para linha dentro de `@media (min-width: 769px)`.
+
+**O risco 11 foi reescrito por seletor, e a regra ficou mais larga.** A versão anterior do risco citava número de linha, e o número de linha já errou três vezes seguidas neste quadro. A regra das Convenções técnicas passou a valer para **toda** nota ou descrição do quadro que cite um arquivo — as notas `*Progresso:*` das linhas de task e também a prosa das seções, como Riscos e a Cobertura de RF — e vale **a partir de agora**, sem reescrever de forma retroativa as notas já escritas que ainda citam linha. As **4 tasks** cuja nota foi reescrita na T7 estão listadas na tabela da seção 3.2 acima; as outras **3** — `M1-T05`, `M1-T17` e `M1-T18` — ainda citam linha, e é essa regra que registra o alcance em vez de fingir que não sobrou nenhuma.
+
+**A contagem ingênua de checkbox continua dando números errados, e o número mudou de 56 para 57.** `Select-String -Path docs\KANBAN.md -Pattern '\- \[x\]'` continua devolvendo **5** e `'-Pattern '\- \[ \]'` agora devolve **57** — era 56 antes desta versão. A causa é a linha nova da `M1-T24`, que é uma task a mais. **Continue contando por coluna, nunca por substituição ingenua**: o `- [x]` = 3 real (2 tasks + 1 item do checklist) e o `- [ ]` = 55 real (21 *A Fazer* + 2 *Em Andamento* + 9 *Backlog* + 23 do checklist), dos quais 2 de cada número estão na legenda, nas linhas 32 e 33 e 42 e 43.
+
 
 ---
 
@@ -450,27 +491,27 @@ O WIP atual é **2** tasks em *Em Andamento* (`M1-T03` e `M1-T04`) — dentro do
 
 ## 8. Estado das tasks
 
-Conferido no `docs/KANBAN.md` **por coluna**, e não por checkbox — ver a ressalva logo abaixo.
+Conferido no `docs/KANBAN.md` em 30/09/2026, **por coluna**, e não por checkbox — ver a ressalva logo abaixo.
 
 | Coluna | Tasks | Quantidade |
 | --- | --- | --- |
 | Concluído | `M1-T00`, `M1-T01`, `M1-T05` | 3 |
 | Em Andamento | `M1-T03`, `M1-T04` | 2 |
-| A Fazer | `M1-T02`, e `M1-T06` a `M1-T23` | 19 |
+| A Fazer | `M1-T02`, e `M1-T06` a `M1-T24` | 20 |
 | Backlog | 9 itens de bônus, sem ID — não contam nota | 9 |
 
-Total: **24 tarefas** (`M1-T00` a `M1-T23`) + **9 itens de Backlog**. Bate com o metadado do próprio quadro, na linha 17. A soma 3 + 2 + 19 = 24 fecha.
+Total: **25 tarefas** (`M1-T00` a `M1-T24`) + **9 itens de Backlog**. Bate com os metadados do próprio quadro, na linha 17. A soma 3 + 2 + 20 = 25 fecha.
 
-A mudança em relação ao snapshot anterior: `M1-T05` saiu de *A Fazer* para *Concluído*, então *Concluído* foi de 2 para 3 e *A Fazer* foi de 20 para 19.
+A mudança em relação ao snapshot anterior: `M1-T05` saiu de *A Fazer* para *Concluído* (sessão do Tiago, de 29/09, trazida de volta pelo merge com o remoto), *Concluído* foi de 2 para 3, e a `M1-T24` entrou em *A Fazer* na sessão do Lucas (30/09).
 
 ### A contagem de checkbox ingênua dá dois números errados
 
-`Select-String -SimpleMatch -Pattern '- [x]'` em `docs/KANBAN.md` devolve **6** ocorrências, e `- [ ]` devolve **55**. **Os dois estão errados**, porque as ocorrências não são só de task:
+`Select-String -SimpleMatch -Pattern '- [x]'` em `docs/KANBAN.md` devolve **6** ocorrências, e `- [ ]` devolve **56**. **Os dois estão errados**, porque as ocorrências não são só de task:
 
-- Das **6** ocorrências de `- [x]`, **2 estão na legenda** — linhas 33 e 43. Das 4 restantes, **3 são tasks** (`M1-T00` na 125, `M1-T01` na 126, `M1-T05` na 127) e **1 é o item do checklist** "Criei o quadro Kanban", na 211.
-- Das **55** ocorrências de `- [ ]`, **2 também estão na legenda** — linhas 32 e 42. As 53 restantes são 19 de *A Fazer* + 2 de *Em Andamento* + 9 de *Backlog* + 23 do checklist.
+- Das **6** ocorrências de `- [x]`, **2 estão na legenda** — linhas 33 e 43. Das 4 restantes, **3 são tasks** (`M1-T00`, `M1-T01` e `M1-T05`, na coluna *Concluído*) e **1 é o item do checklist** "Criei o quadro Kanban", no *Checklist final de entrega*.
+- Das **56** ocorrências de `- [ ]`, **2 também estão na legenda** — linhas 32 e 42. As 54 restantes são 20 de *A Fazer* + 2 de *Em Andamento* + 9 de *Backlog* + 23 do checklist.
 
-Os números reais de checkbox são **`- [x]` = 4** e **`- [ ]` = 53**. A conta fecha: a contagem ingênua soma 61, a real soma 57, e a diferença são exatamente as **4** ocorrências de legenda. **Nunca conte checkbox com substituição ingenua neste quadro: conte por coluna.**
+Os números reais de checkbox são **`- [x]` = 4** e **`- [ ]` = 54**. A conta fecha: a contagem ingênua soma 62, a real soma 58, e a diferença são exatamente as **4** ocorrências de legenda que o `Select-String` não distingue de uma task. **Nunca conte checkbox com substituição ingenua neste quadro: conte por coluna.**
 
 O checklist final de entrega tem **24 itens, dos quais 23 estão pendentes** — só "Criei o quadro Kanban" está marcado. Os itens zerados são os três mais pesados: **vídeo de até 7 minutos** (peso 1,50), **quadro Kanban publicado com link** e **os três links no AVA**.
 
@@ -496,8 +537,6 @@ Verificados **nesta máquina**, `C:\Users\Tiago\Desktop\Estudos_Tiago\CineMatch-
 - `cspell.json` é configuração do Code Spell Checker, não faz parte da aplicação. Não entra em nenhum RF.
 - **O modelo não lê PDF.** Para extrair, use `pypdf` 6.15.0 a partir de um script gravado — viável nesta máquina.
 
----
-
 ## 10. Próximos passos sugeridos
 
 1. **Subir o `live-server` e abrir a página no navegador. Este é o próximo passo de verdade** (problema 7.4), e é a pendência que há mais sessões bloqueando o projeto. `node_modules` já está instalado, então o passo é curto: `npm start`, abrir a página, exercitar o formulário do `M1-T05` (submeter vazio, idade inválida, nenhum gênero, e depois o caminho feliz), olhar os três botões da navbar e os dois botões de login, e conferir na aba Network que os três `.js` voltam como `text/javascript`. **Não abra via `file://`.** Enquanto isso não acontecer, nenhuma outra task de lógica deve ser marcada como concluída.
@@ -512,5 +551,6 @@ Verificados **nesta máquina**, `C:\Users\Tiago\Desktop\Estudos_Tiago\CineMatch-
 5. **Confirmar o tamanho do squad** (problema 7.8) — se ainda são 2 pessoas ativas. Disso dependem o limite de WIP e a meta de commits: **5 no individual, 8 no squad**.
 6. **Rodar `git fetch` antes do próximo push**, e comparar `git rev-parse origin/<branch>` com `git ls-remote --heads origin`. As branches estão sincronizadas agora, mas isso **não** prova que o servidor não tenha commits que o disco não vê. **Push é decisão do usuário**: nunca faça push sem pedido explícito, e nunca force push neste repositório, nem com `--force` nem com `--force-with-lease`.
 7. **Abrir a Seção 5.2 do PDF** e conferir a estrutura de pastas com os olhos, antes de apresentá-la como exigência do professor (problema 7.6).
+
 8. **Decidir o `.gitattributes` para `*.json`** — decisão do usuário, ainda não tomada (problema 7.5).
 9. **Não perder de vista o prazo:** os três entregáveis mais pesados — vídeo de até 7 minutos (peso 1,50), quadro Kanban publicado com link e os três links no AVA — estão zerados, e o `main` ainda está em `e47b81d`.
