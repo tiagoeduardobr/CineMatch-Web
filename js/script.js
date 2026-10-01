@@ -13,16 +13,27 @@
  * A página só funciona servida por `npm start` (live-server): módulos ES não
  * carregam via file://, por causa do CORS. O live-server é instalado na M1-T18.
  */
-import { PLACEHOLDER_UI } from "./ui.js";
+import { PLACEHOLDER_UI, exibirMensagemDeErro } from "./ui.js";
 import { PLACEHOLDER_MODELO } from "./modelo.js";
 
-// Confirmação de que o grafo de módulos carregou. Este arquivo também é lido
-// pelo Node na verificação (`node script.js`), então ele não pode tocar em
-// `document`, `window` nem `localStorage` aqui em cima.
-console.log("CineMatch Web: bootstrap carregado.", {
-  ui: PLACEHOLDER_UI,
-  modelo: PLACEHOLDER_MODELO,
-});
+// Os dois `import` acima continuam apontando para os placeholders, e por isso
+// nenhum dos dois nomes aparece no corpo do arquivo: PLACEHOLDER_MODELO sai
+// na M1-T09, quando as classes entrarem em modelo.js, e PLACEHOLDER_UI sai na
+// M1-T11, quando o renderizarCard entrar em ui.js. Um import que ainda não é
+// usado não quebra o módulo — o grafo carrega igual — e é o estado
+// intermediário que o bloco M1-T17, no fim deste arquivo, descreve.
+//
+// NÃO HÁ LINHA DE CONSOLE NESTE ARQUIVO, e isso é decisão, não esquecimento:
+// o professor não quer código de console no material entregue. O que a linha de
+// bootstrap fazia — provar que os três módulos carregaram — continua verificável
+// sem ela, na aba Network e no Console do DevTools, que é onde qualquer erro
+// de módulo aparece sozinho.
+//
+// Este arquivo também é lido pelo Node na verificação (`node js/script.js`), e
+// é por isso que a execução tem de parar antes de tocar em `document`,
+// `window` e `localStorage`. O guard `typeof document !== "undefined"` no fim
+// do arquivo é o que separa o navegador do Node, e ele não é um detalhe: sem
+// ele, `node js/script.js` quebra com ReferenceError.
 
 // ────────────────────────────────────────────────────────────────────────────
 // ESBOÇO COMENTADO DA LÓGICA — MAPA DE TRABALHO, NÃO CÓDIGO
@@ -64,10 +75,11 @@ console.log("CineMatch Web: bootstrap carregado.", {
  *     #idade          campo de idade, com min="1" e required
  *     name="genero"   atributo comum a todos os checkboxes de gênero
  *     #resultados     onde os cards de recomendação são anexados
- *     #botao-trocar-perfil   A DEFINIR COM O LUCAS. Esse id não existe no
- *                     exemplo do briefing, e inventar um id só de um dos
- *                     lados quebra o botão. Combinar antes de codificar o
- *                     bloco M1-T06.
+ *     #botao-trocar-perfil   o <button type="button"> que reabre o formulário.
+ *                     Esse id NÃO está no exemplo do briefing: foi combinado
+ *                     entre as duas pessoas e já está escrito no index.html,
+ *                     dentro de .cartao-perfil e logo acima do #form-perfil.
+ *                     É o botão que o bloco M1-T06, mais abaixo, escuta.
  *
  * REGRAS DESTE MÓDULO (AGENTS.md, seções 2 e 2.1)
  *   Permitido: HTML5 semântico, CSS3 com Flexbox, JavaScript com módulos ES
@@ -79,16 +91,232 @@ console.log("CineMatch Web: bootstrap carregado.", {
  *   não vista em aula e !important.
  *   Sem perguntar antes de usar: ?. , Object.assign, structuredClone,
  *   AbortController, IntersectionObserver, ResizeObserver, debounce,
- *   throttle, <template>, localStorage.removeItem, padStart e o namespace
- *   Intl. (localeCompare com "pt-BR" NÃO é esse namespace e está liberado).
+ *   throttle, <template>, padStart e o namespace Intl. (localeCompare com
+ *   "pt-BR" NÃO é esse namespace e está liberado). O método que apaga UMA
+ *   chave saiu da lista porque foi ensinado; o clear, que apaga todas, não.
  *   ?? apareceu uma vez em cinematch_antigo/cinematch.js:211 e não foi
  *   ensinado: não replique.
  *   Três estados da chamada à API, sempre: carregando, vazio e erro.
  */
 
+// ────────────────────────────────────────────────────────────────────────────
+// M1-T06 · RF03 · PERSISTIR O PERFIL NO localStorage
+// ────────────────────────────────────────────────────────────────────────────
+/**
+ * O QUE ESTE TRECHO FAZ
+ *   Grava o perfil quando o formulário é enviado, recupera o perfil gravado
+ *   quando a página abre de novo, pula o formulário para quem já tem perfil e
+ *   devolve o formulário para o botão "Trocar perfil".
+ *
+ * POR QUE ESTE TRECHO EXISTE
+ *   O RF03 pede que o perfil sobreviva ao recarregamento. O localStorage é o
+ *   único armazenamento que o Módulo 01 autorizou (AGENTS.md, seção 2): sem
+ *   ele, cada F5 joga o perfil fora e o formulário reaparece toda vez.
+ *
+ * REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
+ *   semana-11/ceu-aberto/script.js — a FORMA do setItem(chave, valor) e do
+ *   getItem(...). Duas diferenças em relação a esse arquivo, e as duas são
+ *   deliberadas: o try/catch exigido pela seção 7 do briefing não aparece lá
+ *   e foi acrescentado aqui; e o padrão do getItem virou `if`, porque o que a
+ *   função devolve na ausência de perfil é null, e não a string que um
+ *   `|| padrão` devolveria.
+ *
+ * POR QUE ESTA PARTE MORA AQUI E NÃO NO ui.js
+ *   A divisão do AGENTS.md, seção 3, manda que tudo que toca a tela vá para
+ *   ui.js, e o esboço da M1-T06 em js/ui.js atribui ao Lucas a função de
+ *   reabrir o formulário. Ela ainda não foi escrita, e o RF03 precisa existir
+ *   antes dela. Escrever no DOM a partir deste arquivo é uma dívida
+ *   temporária, assumida aqui e registrada como pendência no docs/KANBAN.md.
+ *
+ * TRECHO DO BRIEFING (docs/BRIEFING.md, RF03, pág. 6)
+ *   localStorage.setItem('cinematchPerfil', JSON.stringify(usuario));
+ *   const perfilSalvo = localStorage.getItem('cinematchPerfil');
+ *   if (perfilSalvo) {
+ *     const usuario = JSON.parse(perfilSalvo);
+ *     // pula o formulário e mostra o catálogo direto
+ *   }
+ *
+ * CONFORMIDADE
+ *   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado
+ *     como referência. A forma final é sua, e você precisa saber explicar cada
+ *     linha.
+ *   - Um registro de confirmação é o que o RF04 do briefing pedia para
+ *     comprovar a chamada de rede. O professor afastou esse registro do código
+ *     entregue, e a entrega substitui essa evidência por esta: o resultado
+ *     aparece na tela, em #resultados-status, e a falha de armazenamento
+ *     também. O conflito está registrado como risco 12 no docs/KANBAN.md.
+ */
+
+// A chave do registro é uma constante e não um texto repetido: o nome é o
+// contrato entre quem grava e quem lê, e dois literais que divergem quebram o
+// perfil sem erro nenhum, porque o getItem só devolve null. `const` porque o
+// valor não muda depois de declarado, e o escopo de módulo já impede que ele
+// vire um global — que é exatamente o que o RF11 proíbe para o contador.
+const CHAVE_PERFIL = "cinematchPerfil";
+
+/**
+ * Grava o perfil e devolve se conseguiu.
+ *
+ * POR QUE O try/catch: o modo de falha real do localStorage não é erro de
+ * sintaxe, é cota excedida ou storage limpo pelo navegador — risco 3 do
+ * quadro. Nesses casos o setItem lança exceção, e uma exceção sem tratamento
+ * dentro do evento submit corta o resto do fluxo: a pessoa preencheu o
+ * formulário, não viu erro nenhum e ficou sem resposta. Então a falha da
+ * persistência vira aviso na tela e o app segue funcionando, só deixa de
+ * lembrar do perfil na próxima visita. Isso é o que o risco 3 pede: seguir
+ * sem persistência, em vez de quebrar.
+ *
+ * POR QUE DEVOLVE booleano: quem chama precisa saber se pode prometer que o
+ * perfil ficou guardado, e um objeto truthy não distingue "gravado" de "não
+ * gravado".
+ */
+function salvarPerfil(usuario) {
+  try {
+    localStorage.setItem(CHAVE_PERFIL, JSON.stringify(usuario));
+    return true;
+  } catch (erro) {
+    // `erro` não é repassado para a tela: quem lê a mensagem é a pessoa, e o
+    // que ela lê é português e sem stack trace.
+    return false;
+  }
+}
+
+/**
+ * Lê o perfil gravado e devolve o objeto, ou null quando não há perfil.
+ *
+ * O `if (!perfilSalvo)` é o mesmo mecanismo do `getItem(...) || padrão` da
+ * semana 11, escrito com if: o getItem devolve null na primeira visita, e o
+ * null e a string vazia são os dois falsy, então um teste só cobre os dois
+ * casos. Não é `perfilSalvo === null` de propósito: a string vazia ainda pode
+ * estar na chave de quem usou a versão anterior deste arquivo, que sobrescrevia
+ * com "", e ela também precisa contar como "sem perfil".
+ *
+ * O try/catch cobre dois lançamentos, não um: o getItem lança quando o
+ * storage está bloqueado, e o JSON.parse lança quando o conteúdo da chave não
+ * é JSON — o que acontece se alguém editar a chave à mão no DevTools ou se uma
+ * versão anterior do app tiver gravado outro formato. Nos dois casos o
+ * tratamento é o mesmo, e é o mais seguro: tratar como visita sem perfil.
+ */
+function lerPerfilSalvo() {
+  try {
+    const perfilSalvo = localStorage.getItem(CHAVE_PERFIL);
+
+    if (!perfilSalvo) {
+      return null;
+    }
+
+    return JSON.parse(perfilSalvo);
+  } catch (erro) {
+    return null;
+  }
+}
+
+/**
+ * Apaga o registro do perfil, tirando a chave do `localStorage`.
+ *
+ * POR QUE ESTE MÉTODO E NÃO SOBRESCREVER COM "": quando este bloco foi
+ * escrito, o AGENTS.md 2.1 punha o método que apaga uma chave na lista do
+ * que não pode ser usado sem perguntar, e a informação estava errada — ele
+ * foi ensinado. A solução da época era `setItem(CHAVE_PERFIL, "")`, e ela
+ * resolvia pelo avesso: apagava o conteúdo e deixava a chave, e um registro
+ * vazio na origem é um estado que a aplicação nunca pediu para ter. Com
+ * removeItem a frase diz o que quer dizer — "esta chave não existe mais" —
+ * e o getItem volta a devolver null, que é o contrato da primeira visita:
+ * o efeito para quem lê é o mesmo, e agora é pela API, não por truque.
+ *
+ * POR QUE O try/catch: o mesmo do salvarPerfil — cota excedida ou storage
+ * bloqueado lançam exceção, e sem tratamento o clique ficaria sem resposta.
+ */
+function limparPerfilSalvo() {
+  try {
+    localStorage.removeItem(CHAVE_PERFIL);
+    return true;
+  } catch (erro) {
+    return false;
+  }
+}
+
+/**
+ * Troca a tela para o lado do catálogo: esconde o formulário e escreve a
+ * mensagem com o nome da pessoa.
+ *
+ * O que é escondido é o FORMULÁRIO, e não a .secao-perfil inteira. A seção
+ * contém o botão "Trocar perfil", e esconder a seção junto esconderia o botão
+ * junto — o RF03 pede os dois, e um anula o outro.
+ *
+ * O `hidden` é atributo nativo do HTML, e a propriedade dele no DOM: atribuir
+ * true põe o atributo e false tira. Ele resolve o "esconder" sem classe de CSS
+ * e sem !important.
+ *
+ * `aviso` entra no fim da frase e quase sempre é "": ele só recebe texto
+ * quando a gravação do perfil falhou. É a forma de levar à tela o que o catch
+ * já devolveu por booleano.
+ */
+function mostrarResultados(usuario, aviso) {
+  const formPerfil = document.querySelector("#form-perfil");
+  const statusResultados = document.querySelector("#resultados-status");
+
+  formPerfil.hidden = true;
+
+  // Template literal, e não concatenação com `+`: a crase é a forma de
+  // interpolar valor neste projeto. Mas a crase NÃO é a defesa contra XSS:
+  // `${}` não escapa nada, e trocar `+` por crase não mudaria nada nessa
+  // frente. A defesa é o DESTINO do valor, e o destino aqui é o textContent
+  // lá embaixo: escreve o nome como texto e nunca o interpreta como
+  // marcação. É o mesmo caminho que a M1-T11 aplica nos cards, e aqui o dado
+  // é o nome que quem preencheu o formulário digitou.
+  const saudacao = `Olá, ${usuario.nome}! Suas recomendações serão carregadas em seguida.`;
+
+  statusResultados.textContent = `${saudacao}${aviso}`;
+}
+
+/**
+ * Devolve o formulário para a tela, tirando o `hidden` e escribiendo a mensagem
+ * que o chamador quiser.
+ *
+ * Os campos NÃO são limpos aqui. O motivo é duplo: limpar exigiria uma API de
+ * formulário que não está no que foi ensinado, e o comportamento útil é
+ * editável — quem está trocando de perfil vê o que já tinha preenchido e muda
+ * o que quiser. O envio seguinte sobrescreve o registro, então não sobra
+ * perfil antigo misturado com o novo.
+ */
+function mostrarFormulario(mensagem) {
+  const formPerfil = document.querySelector("#form-perfil");
+  const statusResultados = document.querySelector("#resultados-status");
+
+  formPerfil.hidden = false;
+  statusResultados.textContent = mensagem;
+}
+
 function iniciarFormulario() {
   const formPerfil = document.querySelector("#form-perfil");
   const statusResultados = document.querySelector("#resultados-status");
+  const botaoTrocarPerfil = document.querySelector("#botao-trocar-perfil");
+
+  botaoTrocarPerfil.addEventListener("click", function () {
+    // `preventDefault` não cabe aqui e o motivo é o tipo do botão: ele é
+    // type="button" no index.html, e não type="submit", então ele não submete
+    // nada e não recarrega a página. O que ele NÃO pode fazer é recarregar —
+    // o registro do localStorage sobrevive ao recarregamento, mas um
+    // recarregamento que caia em file:// derruba os import por CORS e deixa o
+    // index.html sem nenhum JavaScript (risco 2 do quadro).
+    const registroFoiLimpo = limparPerfilSalvo();
+
+    if (registroFoiLimpo) {
+      mostrarFormulario(
+        "Preencha o formulário de novo para receber outras recomendações."
+      );
+    } else {
+      // Mesma regra do risco 3 no caminho inverso: a falha do storage é
+      // avisada e o formulário abre de qualquer forma. O aviso precisa dizer a
+      // consequência, que é o que importa: o perfil velho pode voltar a pular
+      // o formulário na próxima visita. A frase abaixo é uma crase sem `${}`:
+      // não entra valor nenhum nela, e o texto inteiro fica em uma linha só.
+      mostrarFormulario(
+        `Preencha o formulário de novo. Não conseguimos atualizar o registro deste navegador, então ele pode abrir sozinho na próxima visita.`
+      );
+    }
+  });
 
   formPerfil.addEventListener("submit", function (evento) {
     evento.preventDefault();
@@ -103,8 +331,6 @@ function iniciarFormulario() {
       idade: idade,
       generosFavoritos: generosFavoritos,
     };
-
-    console.log("Usuário capturado:", usuario);
 
     const erros = [];
 
@@ -137,113 +363,242 @@ function iniciarFormulario() {
       return;
     }
 
-    statusResultados.textContent =
-      "Perfil recebido. Suas recomendações serão carregadas em seguida.";
+    const persistiu = salvarPerfil(usuario);
+    let aviso = "";
 
-    console.log("Perfil validado com sucesso:", usuario);
+    if (!persistiu) {
+      // O espaço inicial é proposital: o aviso entra no fim da saudação e
+      // também no fim das frases de sucesso e de erro de buscarCatalogo, já
+      // que a mesma task de evento apaga tudo que estava no elemento. O
+      // espaço no início + o ponto no fim é o que garante a junção limpa
+      // nos dois destinos, sem espaço duplo e sem frase colada.
+      aviso =
+        ` Não foi possível salvar o perfil neste navegador, então ele não será lembrado na próxima visita.`;
+    }
+
+    mostrarResultados(usuario, aviso);
+
+    // Chamada sem `await` (fire-and-forget), e só neste ponto: a validação já
+    // passou, o perfil já foi resolvido e o caminho de erros — que tem
+    // `return` — nunca chega aqui. Buscar catálogo sem perfil válido não tem
+    // para quem recomendar. Não sobra rejeição pendurada porque o catch
+    // interno de buscarCatalogo nunca relança. O `aviso` vai junto: sem
+    // repassá-lo, a função sobrescreveria a saudação e o recado de storage
+    // na mesma task de evento, antes de qualquer paint.
+    buscarCatalogo(aviso);
   });
 }
 
-if (typeof document !== "undefined") {
-  iniciarFormulario();
+// ────────────────────────────────────────────────────────────────────────────
+// M1-T07 · RF04 · BUSCAR CATÁLOGO REAL VIA FETCH
+// ────────────────────────────────────────────────────────────────────────────
+/**
+ * O QUE ESTE TRECHO FAZ
+ *   Busca o catálogo real na TVMaze com fetch GET, escreve na tela os três
+ *   momentos da chamada — carregando antes da rede, sucesso com a contagem e
+ *   erro amigável quando algo falha — e guarda a resposta bruta em
+ *   catalogoBruto, que a M1-T08 vai tratar.
+ *
+ * POR QUE ESTE TRECHO EXISTE
+ *   O catálogo fictício da semana 6 estava no código e nunca falhava. Uma
+ *   chamada de rede falha de verdade: a internet cai, a API sai do ar, a
+ *   resposta vem com formato inesperado. Sem tratar isso, a página trava ou
+ *   fica em branco sem explicação nenhuma para a pessoa — é o que o RF04
+ *   (pág. 6) descreve e é o risco 4 do quadro. Este bloco fecha a coluna do
+ *   Critério 13: try/catch + response.ok + estados da chamada.
+ *
+ * POR QUE FICA ANTES DO GUARD `typeof document !== "undefined"`
+ *   Ordem de avaliação do módulo. O guard roda no carregamento e, com perfil
+ *   salvo, chama buscarCatalogo já na primeira execução; se URL_CATALOGO e
+ *   catalogoBruto fossem declaradas DEPOIS dele, essa chamada cairia em
+ *   temporal dead zone — a função em si o hoisting resolve, a constante não.
+ *   Declarar tudo antes do guard é o que elimina a corrida entre a
+ *   inicialização e as declarações.
+ *
+ * POR QUE AS DUAS CHAMADAS NÃO LEVAM `await`
+ *   Fire-and-forget: o guard e o handler submit continuam síncronos, e o
+ *   catch interno de buscarCatalogo nunca relança, então não sobra rejeição
+ *   sem tratamento. As duas chamadas também só existem onde há perfil
+ *   válido — é a mesma razão de existir do bloco: sem perfil não há para
+ *   quem recomendar.
+ *
+ * POR QUE NÃO HÁ CONSOLE, NEM ATRASO E NEM AS FERRAMENTAS FORA DA SEÇÃO 2.1
+ *   O professor afastou o registro no console do código entregue (risco 12):
+ *   a resposta bruta da TVMaze se confere na aba Network do DevTools, e o
+ *   erro de rede aparece na tela, por exibirMensagemDeErro. O atraso
+ *   proposital do RF12 é da M1-T15 e vai na EXIBIÇÃO: somado dentro desta
+ *   função, ele atrasaria também o estado de erro e mascararia justamente a
+ *   falha que este bloco existe para mostrar (risco 4). AbortController,
+ *   encadeamento opcional `?.`, `??`, Object.assign, axios e POST/PUT/DELETE
+ *   estão fora do que a seção 2.1 libera sem perguntar: a chamada é um fetch
+ *   GET puro, de leitura.
+ *
+ * REFERÊNCIA ENSINADA (AGENTS.md, seção 2.1)
+ *   semana-11/ceu-aberto-api/script.js — a forma do try/catch com
+ *   response.ok === false e throw new Error. O repositório das semanas não
+ *   está clonado nesta máquina: é referência remota, citada como exemplo — a
+ *   forma final deste bloco é escrita daqui, linha a linha.
+ *
+ * TRECHO DO BRIEFING (docs/BRIEFING.md, RF04, pág. 6 e 7)
+ *   pág. 6: "O array fictício do CineMatch JS nunca falhava — ele estava
+ *   sempre ali, no código. [...] Sem tratar isso, a página trava ou fica em
+ *   branco sem explicação nenhuma pra pessoa usuária."
+ *   pág. 7, a forma pedida:
+ *   async function buscarCatalogo() {
+ *     const resposta = await fetch('https://api.tvmaze.com/shows?page=0');
+ *     ...
+ *   }
+ *
+ * CONFORMIDADE
+ *   - Citar, não copiar: o trecho acima é o exemplo do professor, comentado
+ *     como referência. A forma final é sua, e você precisa saber explicar
+ *     cada linha.
+ *   - Os TRÊS estados da chamada, sempre: carregando (antes do fetch), erro
+ *     (no catch) e sucesso com contagem (no fim do try). O estado VAZIO é da
+ *     M1-T08: aqui uma lista vazia legítima passa crua, porque decidir o que
+ *     sobrevive de genres e rating é o RF05.
+ *   - `const` por padrão — URL_CATALOGO é contrato num lugar só, da mesma
+ *     razão da CHAVE_PERFIL; `let` só em catalogoBruto, que muda a cada
+ *     busca. Toda interpolação é template literal com ${}, e a defesa contra
+ *     XSS é o destino do valor (textContent), nunca a crase.
+ *   - `catch (erro)` ignora o erro, no mesmo padrão do salvarPerfil: à tela
+ *     vai a frase amigável, em português — nunca erro.message nem stack
+ *     trace. A causa continua acessível na aba Network.
+ */
+
+// A URL do catálogo é constante pela mesma razão da chave do perfil: o
+// contrato fica escrito uma vez só, e uma troca de página é uma edição, não
+// dois literais para manter em sincronia. `const` porque o valor não muda
+// depois de declarado, e o escopo de módulo já impede que ele vire global.
+const URL_CATALOGO = "https://api.tvmaze.com/shows?page=0";
+
+// `let` porque este é o único valor do bloco que muda: a cada chamada de
+// buscarCatalogo o catálogo novo sobrescreve o anterior, e é essa a tarefa
+// da variável — a M1-T08 vai ler justamente o que ficou guardado aqui. O
+// array começa vazio para a leitura nunca estourar se algo consumir a
+// variável antes de a rede responder.
+let catalogoBruto = [];
+
+/**
+ * Busca o catálogo real e leva o resultado da chamada para a tela.
+ *
+ * A ordem interna é a do RF04: carregando, depois a rede, depois o corpo, e
+ * qualquer passo que falhe cai no mesmo catch. `response.ok` é conferido
+ * ANTES de ler o corpo, porque status 200 não garante corpo útil — e uma
+ * resposta de erro ainda tem corpo (HTML de página de erro, por exemplo),
+ * que seria lido como se fosse o catálogo.
+ *
+ * O corpo é lido com `await resposta.json()` DENTRO do try de propósito:
+ * json() lança em corpo que não é JSON, e essa exceção precisa cair no
+ * mesmo lugar das demais, com a mesma mensagem, sem um catch à parte.
+ *
+ * O que NÃO faz: não filtra genres nem rating, não trata o catálogo vazio e
+ * não escreve no console — os três são de depois: RF05 na M1-T08, estado
+ * vazio na M1-T08 e a evidência na aba Network (risco 12).
+ *
+ * POR QUE O PARÂMETRO `aviso` EXISTE E É REPASSADO A CADA ESTADO
+ *   O aviso de falha de persistência da M1-T06 ("Não foi possível salvar o
+ *   perfil…", risco 3 do quadro) é escrito em `#resultados-status` pelo
+ *   submit ANTES desta função ser chamada — e esta função, na linha do
+ *   carregando, sobrescreve o MESMO elemento na mesma task de evento, antes
+ *   de qualquer paint acontecer. Sem repassar o aviso aqui, ele seria
+ *   substituído no mesmo tick em que foi escrito e NUNCA apareceria na
+ *   tela: é exatamente a regressão apontada no code-review da Task 3, que
+ *   derrubaria o "avisando a pessoa usuária na tela" da M1-T06. Por isso o
+ *   aviso entra de novo na frase de sucesso e na frase de erro, e por isso
+ *   o estado de carregando NÃO o leva: o texto do carregando é o literal do
+ *   briefing (RF12) e não pode ser alterado.
+ */
+async function buscarCatalogo(aviso) {
+  const statusResultados = document.querySelector("#resultados-status");
+
+  // ESTADO 1 — carregando, escrito ANTES do fetch. É o texto do briefing, e
+  // pedir o estado antes da chamada é o que distingue "rede lenta" de
+  // "página parada": sem esta linha, os dois parecem a mesma coisa na tela.
+  statusResultados.textContent = "Buscando as melhores séries pra você...";
+
+  try {
+    // Fetch GET puro, sem axios e sem escrita em servidor: o Módulo 01 só
+    // autoriza leitura. Rede indisponível lança aqui, dentro do try, e cai no
+    // catch — não é um caminho de erro à parte, é o mesmo.
+    const resposta = await fetch(URL_CATALOGO);
+
+    // response.ok ANTES de ler o corpo, e na forma da referência ensinada:
+    // `ok === false` (e não um `!ok` implícito) deixa a intenção legível. O
+    // throw pula direto para o catch, sem else nenhum — e é por isso que o
+    // corpo só é lido quando a resposta é boa.
+    if (resposta.ok === false) {
+      throw new Error(`A TVMaze respondeu com status ${resposta.status}.`);
+    }
+
+    // json() também lança, e como está DENTRO do try cai no mesmo catch do
+    // erro de rede, com a mesma frase: para quem está na tela, corpo que não
+    // é JSON e rede fora não são problemas diferentes.
+    const corpo = await resposta.json();
+
+    // Guarda de formato, também lançada para o mesmo catch. Usa
+    // `length === undefined` e não Array.isArray: o método não aparece no
+    // material clonado e está fora do que a seção 2.1 libera sem perguntar.
+    // Uma lista vazia LEGÍTIMA passa daqui sem virar erro — tratar o vazio é
+    // a M1-T08, e fazer aqui descartaria o corpo cru que ela precisa ler.
+    if (corpo === null || corpo.length === undefined) {
+      throw new Error("A resposta da TVMaze não veio como lista de séries.");
+    }
+
+    // A resposta bruta fica guardada SEM filtro nenhum: genres e rating
+    // incompletos são reais na TVMaze, e decidir o que sobrevive é o
+    // trabalho do RF05 (M1-T08), não desta chamada.
+    catalogoBruto = corpo;
+
+    // ESTADO 2 — sucesso. Sobrescreve o carregando no MESMO elemento, então
+    // o carregando não fica preso na tela nem exige código de limpeza, e a
+    // regra "os estados não podem ficar na tela ao mesmo tempo" se resolve
+    // pelo alvo comum. A contagem é a prova visível de que a chamada
+    // funcionou — é ela que substitui o registro no console que o briefing
+    // pedia (risco 12). O `${aviso}` reentra aqui porque o carregando da
+    // linha acima apagou a saudação com o recado de storage: repassar o
+    // aviso é o que faz ele sobreviver ao estado de carregando e chegar ao
+    // paint. Ele já vem com espaço no início e ponto no fim, então a junção
+    // com a frase acima não gera espaço duplo nem palavra colada — e com ""
+    // (guard) não muda nada.
+    statusResultados.textContent =
+      `Catálogo carregado: ${catalogoBruto.length} séries disponíveis.${aviso}`;
+  } catch (erro) {
+    // ESTADO 3 — erro. `erro` é ignorado, no mesmo padrão do salvarPerfil:
+    // quem lê a mensagem é a pessoa, e o que ela lê é português, sem
+    // erro.message e sem stack trace — a causa continua acessível na aba
+    // Network. Aqui também não entra atraso nenhum: adiar a frase faria a
+    // página parecer travada com o erro já conhecido, que é o efeito
+    // contrário do que o RF04 pede. O `${aviso}` reentra pelo mesmo motivo
+    // do estado de sucesso: o carregando apagou o recado de persistência,
+    // e sem repassá-lo aqui ele nunca chegaria ao paint. Junta sem espaço
+    // duplo porque o aviso já começa com um espaço e a frase anterior
+    // termina com ponto; com "" (guard), não muda nada.
+    exibirMensagemDeErro(
+      `Não foi possível carregar as séries agora. Verifique sua conexão com a internet e tente novamente.${aviso}`
+    );
+  }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// TODO M1-T06 · RF03 · Persistir perfil no localStorage
-// ────────────────────────────────────────────────────────────────────────────
-// ETAPA 2 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T05
-// DONO DESTA ETAPA: Tiago.
-// O QUE FAZER AQUI
-//   - Ao enviar o formulário, salvar com
-//     localStorage.setItem('cinematchPerfil', JSON.stringify(usuario)).
-//   - Na volta para a página, ler com localStorage.getItem e abrir com
-//     JSON.parse. Tratar o null da primeira visita ANTES de usar: quem entra
-//     pela primeira vez não tem nada salvo, e o getItem devolve null.
-//   - Com perfil salvo, PULAR o formulário e ir direto ao catálogo.
-//   - Ligar o botão "Trocar perfil" para reabrir o formulário na tela. A
-//     parte de mostrar o formulário é do Lucas, em js/ui.js (mesma M1-T06).
-// POR QUE ESTE TRECHO EXISTE
-//   O RF03 pede que o perfil sobreviva ao recarregamento. O localStorage é o
-//   único armazenamento que o Módulo 01 autorizou: sem ele, cada F5 joga o
-//   perfil fora e o formulário reaparece toda vez.
-// REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
-//   semana-11/ceu-aberto/script.js — a FORMA de setItem e de
-//   getItem(...) || padrão. Atenção: o try/catch exigido pela seção 7 do
-//   briefing NÃO aparece nesse arquivo e precisa ser acrescentado aqui.
-// TRECHO DO BRIEFING (docs/BRIEFING.md, RF03, pág. 6)
-//   localStorage.setItem('cinematchPerfil', JSON.stringify(usuario));
-//   const perfilSalvo = localStorage.getItem('cinematchPerfil');
-//   if (perfilSalvo) {
-//     const usuario = JSON.parse(perfilSalvo);
-//     // pula o formulário e mostra o catálogo direto
-//   }
-// CONFORMIDADE
-//   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
-//     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - Envolva a LEITURA e a ESCRITA em try/catch. O modo de falha real não é
-//     exceção de sintaxe: é cota excedida ou storage limpo pelo navegador
-//     (risco 3 do quadro). Se a persistência falhar, siga sem ela e avise na
-//     tela — o app funciona igual, só deixa de lembrar do perfil.
-//   - QUESTÃO ABERTA (decisão do Tiago; este esboço não resolve): o botão
-//     precisa "limpar o registro", e localStorage.removeItem NÃO foi ensinado
-//     (AGENTS.md 2.1) — não usar sem perguntar. Três caminhos, todos só com o
-//     que foi ensinado: (a) reapresentar o formulário sem mexer no registro,
-//     sabendo que a próxima visita pula o formulário de novo porque o perfil
-//     continua salvo; (b) sobrescrever a chave com '' e tratar string vazia
-//     como "sem perfil"; (c) sobrescrever com JSON.stringify(null) e tratar o
-//     null devolvido pelo JSON.parse como "sem perfil". Escolher um e
-//     explicar a escolha no README da M1-T20.
-//   - O id do botão "Trocar perfil" é a definir com o Lucas: ver o contrato
-//     de ids no cabeçalho de região.
-// ────────────────────────────────────────────────────────────────────────────
+if (typeof document !== "undefined") {
+  const perfilSalvo = lerPerfilSalvo();
 
-// ────────────────────────────────────────────────────────────────────────────
-// TODO M1-T07 · RF04 · Buscar catálogo real via fetch
-// ────────────────────────────────────────────────────────────────────────────
-// ETAPA 3 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T01, M1-T06
-// DONO DESTA ETAPA: Tiago.
-// O QUE FAZER AQUI
-//   - Declarar `async function buscarCatalogo()` no topo do módulo e chamar
-//     depois que o perfil estiver resolvido (M1-T05 e M1-T06).
-//   - Dentro de try/catch, `await fetch('https://api.tvmaze.com/shows?page=0')`.
-//   - Validar response.ok ANTES de ler o corpo, e lançar um Error descrevendo o
-//     problema quando a resposta não for ok.
-//   - Registrar o resultado BRUTO no console ANTES de tratar qualquer coisa:
-//     é o que o RF04 pede e o que permite conferir a API no DevTools.
-//   - No catch, chamar exibirMensagemDeErro (do Lucas, em js/ui.js): a página
-//     nunca pode ficar travada nem branca sem explicação.
-//   - Antes do fetch, pedir o estado de carregando, "Buscando as melhores
-//     séries pra você...". É a M1-T15, etapa 7 de js/ui.js.
-// POR QUE ESTE TRECHO EXISTE
-//   O catálogo fictício da semana 6 estava no código e nunca falhava. Uma
-//   chamada de rede falha: a internet cai, a API sai do ar, a resposta vem
-//   vazia. Sem tratar isso a página trava sem mensagem nenhuma.
-// REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
-//   semana-11/ceu-aberto-api/script.js — a forma do fetch com try/catch,
-//   response.ok === false e throw new Error.
-// TRECHO DO BRIEFING (docs/BRIEFING.md, RF04, pág. 6 e 7)
-//   pág. 6: "O array fictício do CineMatch JS nunca falhava — ele estava
-//   sempre ali, no código. [...] Sem tratar isso, a página trava ou fica em
-//   branco sem explicação nenhuma pra pessoa usuária."
-//   pág. 7:
-//   async function buscarCatalogo() {
-//     const resposta = await fetch('https://api.tvmaze.com/shows?page=0');
-//     ...
-//   }
-// CONFORMIDADE
-//   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
-//     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - response.ok tem que ser validado: resposta 200 não garante corpo útil.
-//   - Os TRÊS estados da chamada, sempre: carregando, vazio e erro. O estado
-//     de carregando entra antes do fetch; o de erro, no catch; o de vazio é
-//     da M1-T08.
-//   - O setTimeout do RF12 (M1-T15) fica na EXIBIÇÃO, na etapa 7 de
-//     js/ui.js, e NUNCA dentro do fetch: dentro dele o atraso se somaria à
-//     latência da rede e mascararia justamente o estado de erro que este
-//     bloco precisa mostrar.
-//   - Sem usar sem perguntar: AbortController, encadeamento opcional e
-//     Object.assign.
-// ────────────────────────────────────────────────────────────────────────────
+  if (perfilSalvo) {
+    mostrarResultados(perfilSalvo, "");
+
+    // Chamada sem `await`, na sequência da saudação: o guard segue síncrono
+    // e o catch interno nunca relança. Só existe chamada quando o perfil já
+    // está resolvido — no `else` não há para quem recomendar, e por isso o
+    // caminho do formulário aberto não busca catálogo. O argumento é "" de
+    // propósito: aqui não há aviso de persistência a sobreviver, porque o
+    // perfil veio do próprio localStorage.
+    buscarCatalogo("");
+  } else {
+    mostrarFormulario("Preencha o formulário para receber recomendações.");
+  }
+
+  iniciarFormulario();
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // TODO M1-T08 · RF05 · Tratar o catálogo com métodos de array
@@ -327,9 +682,10 @@ if (typeof document !== "undefined") {
 // CONFORMIDADE
 //   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
 //     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - Pisar no PLACEHOLDER_MODELO quebra o grafo de módulos, porque o
-//     console.log de bootstrap (linhas 22 a 25) ainda o referencia. Ver o
-//     bloco M1-T17, que é onde isso está registrado por inteiro.
+//   - Pisar no PLACEHOLDER_MODELO agora não quebra nada por si só, porque a
+//     linha de bootstrap que o referenciava saiu no fim da M1-T06: o único
+//     lugar que ainda cita o nome é o `import` do topo. Apagar o nome daqui
+//     e de lá no mesmo passo é o que fecha. Ver o bloco M1-T17.
 //   - A subclasse precisa ACRESCENTAR comportamento, não só repetir o da
 //   mãe: o Critério 7 pede classe, construtor, atributos, método, this e
 //   herança. Uma Serie que não ganha nada da Conteudo tem herança escrita
@@ -520,11 +876,13 @@ if (typeof document !== "undefined") {
 //   import { Conteudo, Serie } from './modelo.js';
 //   import { renderizarCard, exibirMensagemDeErro } from './ui.js';
 // CONFORMIDADE
-//   - O console.log de bootstrap das linhas 22 a 25 PERMANECE, e ele
-//     referencia PLACEHOLDER_UI e PLACEHOLDER_MODELO. Consequência prática:
-//     cada vez que um dos placeholders sair, no mesmo commit, esse console.log
-//     tem de ser ajustado para o export novo. Sem isso, o import some e o
-//     grafo inteiro quebra — e o erro aparece longe da linha que causou.
+//   - A linha de bootstrap que referenciava os dois placeholders foi removida
+//     no fim da M1-T06, porque o professor não quer código de console no
+//     material entregue. Consequência prática: cada vez que um dos
+//     placeholders sair, o `import` correspondente do topo deste arquivo tem de
+//     ser ajustado no mesmo passo, porque é ele — e só ele — que ainda cita o
+//     nome. Sem isso o import vira specifier sem export, e o erro aparece longe
+//     da linha que causou.
 //   - Caminho relativo e com extensão explícita: './ui.js', não './ui'. O
 //     navegador não procura extensão sozinho.
 //   - Citar, não copiar: os nomes dos exports acima são os do exemplo do
