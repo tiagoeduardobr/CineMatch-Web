@@ -128,42 +128,66 @@ export const PLACEHOLDER_UI = {
 // ────────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────────
-// TODO M1-T07 · RF04 · Buscar catálogo real via fetch
+// M1-T07 · RF04 · BUSCAR CATÁLOGO REAL VIA FETCH
 // ────────────────────────────────────────────────────────────────────────────
-// ETAPA 2 DE 9 · BRANCH: feature/cinematch-web-interface · DEPENDE DE: M1-T07 (lógica, js/script.js)
-// DONO DESTA ETAPA: Lucas.
-// O QUE FAZER AQUI
-//   - Escrever exibirMensagemDeErro(texto), que recebe a frase e a mostra na
-//     tela. O nome é mesmo do exemplo de import do RF14 (pág. 9): o Tiago
-//     já chama por esse nome no catch da M1-T07, e mudar aqui quebra o
-//     contrato entre os dois arquivos.
-//   - A frase que entra é uma escolha sua, dentro do que o briefing exige:
-//     o mínimo é dizer que a busca falhou e o que a pessoa pode fazer.
-//   - Limpar o estado de carregando antes de mostrar o erro: os dois estados
-//     não podem ficar na tela ao mesmo tempo.
-// POR QUE ESTE TRECHO EXISTE
-//   O fetch é do script.js, mas quem vê a falha é a pessoa usuária, e quem
-//   escreve na tela é este módulo. O RF04 diz: se a busca falhar, mostrar
-//   mensagem de erro em vez de deixar a página quebrada ou o formulário sem
-//   resposta. Deixar isso só no console não conta.
-// REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
-//   semana-11/ceu-aberto-api/script.js — a forma do tratamento de erro, mas
-//   vista do lado da tela: o que ocorreu no catch do script.js chega aqui
-//   como texto exibido.
-// TRECHO DO BRIEFING (docs/BRIEFING.md, RF04, pág. 7)
-//   "Não precisa ser sofisticado — o mínimo é: se a busca falhar, mostrar uma
-//   mensagem de erro na tela em vez de deixar a página quebrada ou o
-//   formulário sem resposta nenhuma."
-// CONFORMIDADE
-//   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
-//     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - Erro de API é o estado "erro" do trio (carregando, vazio, erro). O
-//     "vazio" é da M1-T08 e o "carregando" é da M1-T15: são três mensagens
-//     diferentes para três causas diferentes, e nenhuma delas é a mesma
-//     função com texto trocado ao acaso.
-//   - A mensagem não pode despejar o erro cru do fetch na tela. Dizer o que
-//     aconteceu, em português, sem stack trace.
-// ────────────────────────────────────────────────────────────────────────────
+/**
+ * O QUE ESTE TRECHO FAZ
+ *   Recebe uma frase pronta e a escreve em #resultados-status, o role="status"
+ *   com aria-live="polite" do index.html, para a pessoa ver o resultado da
+ *   busca de catálogo na própria tela.
+ *
+ * POR QUE ESTE TRECHO EXISTE
+ *   RF04 pág. 7 do briefing: "se a busca falhar, mostrar uma mensagem de erro
+ *   na tela em vez de deixar a página quebrada ou o formulário sem resposta
+ *   nenhuma". O fetch mora no js/script.js, mas quem vê a falha é a pessoa
+ *   usuária, e quem escreve na tela é este módulo — a regra do cabeçalho do
+ *   arquivo: tudo aqui toca a tela e nada calcula. Deixar a falha só no
+ *   console não conta como entrega.
+ *
+ * POR QUE textContent E NÃO innerHTML
+ *   O destino do valor é a defesa contra XSS (AGENTS.md §7): textContent
+ *   escreve o valor como texto e nunca o interpreta como marcação, enquanto
+ *   innerHTML interpretaria o que quer que chegasse. A crase não muda nada
+ *   nessa frente — ${} não escapa, não sanitiza e não neutraliza —, então a
+ *   proteção está no destino do valor, não na sintaxe da string.
+ *
+ * POR QUE SOBRESCREVER #resultados-status LIMPA O CARREGANDO SEM CÓDIGO EXTRA
+ *   Porque os dois estados escrevem no MESMO elemento: a frase de erro
+ *   substitui a de carregando por consequência, sem nenhuma instrução extra
+ *   apagando a anterior. É a regra que o esboço desta etapa cobrava — "os dois
+ *   estados não podem ficar na tela ao mesmo tempo" — resolvida pelo alvo
+ *   comum, não por código de limpeza.
+ *
+ * POR QUE A FRASE CHEGA PRONTA DE FORA
+ *   Este módulo só toca a tela: quem compõe o texto é o catch do js/script.js,
+ *   que é quem sabe o que falhou (rede, resposta.ok, corpo inesperado). Aqui
+ *   não se decide mensagem nem causa — só se escreve o que foi recebido, e é
+ *   isso que mantém o cálculo e o fluxo fora deste arquivo.
+ *
+ * O QUE NÃO FAZ
+ *   Não despeja `erro` cru: a função recebe português, sem stack trace. A
+ *   pilha de erros fica para a aba Network e o Console do DevTools, que é onde
+ *   o risco 12 do quadro manda conferir a resposta bruta da TVMaze — no código
+ *   entregue não entra console.log nem o erro cru do fetch na tela.
+ *
+ * TRECHO DO BRIEFING (docs/BRIEFING.md, RF04, pág. 7)
+ *   "Não precisa ser sofisticado — o mínimo é: se a busca falhar, mostrar uma
+ *   mensagem de erro na tela em vez de deixar a página quebrada ou o
+ *   formulário sem resposta nenhuma."
+ *
+ * CONFORMIDADE
+ *   - Citar, não copiar: o exemplo acima é do professor, comentado como
+ *     referência. A forma final é sua, e você precisa saber explicar cada
+ *     linha.
+ *   - Erro de API é o estado "erro" do trio (carregando, vazio, erro). O
+ *     "vazio" é da M1-T08 e o "carregando" é da M1-T15: três mensagens
+ *     diferentes para três causas diferentes, e nenhuma delas é a mesma
+ *     função com texto trocado ao acaso.
+ */
+export function exibirMensagemDeErro(texto) {
+  const statusResultados = document.querySelector("#resultados-status");
+  statusResultados.textContent = texto;
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // TODO M1-T08 · RF05 · Tratar o catálogo com métodos de array
