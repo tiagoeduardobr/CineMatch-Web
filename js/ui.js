@@ -190,35 +190,74 @@ export function exibirMensagemDeErro(texto) {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// TODO M1-T08 · RF05 · Tratar o catálogo com métodos de array
+// M1-T08 · RF05 · TRATAR O CATÁLOGO COM MÉTODOS DE ARRAY
 // ────────────────────────────────────────────────────────────────────────────
-// ETAPA 3 DE 9 · BRANCH: feature/cinematch-web-interface · DEPENDE DE: M1-T08 (lógica, js/script.js)
-// DONO DESTA ETAPA: Lucas.
-// O QUE FAZER AQUI
-//   - Escrever a mensagem de catálogo vazio. O texto é o do professor:
-//     "Não encontramos recomendações agora".
-//   - Ela entra quando o array tratado na M1-T08 chega com zero itens, e só
-//     essa hora. Uma grade de cards vazia sem texto é o que o briefing diz
-//     para não fazer.
-// POR QUE ESTE TRECHO EXISTE
-//   O filtro do RF05 pode eliminar tudo em uma página: nem toda série da
-//   TVMaze tem gênero ou nota preenchidos. O risco 5 do quadro trata isso. O
-//   caminho feliz e o caminho sem resultado precisam de telas diferentes.
-// REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
-//   — (o briefing não traz exemplo de código para este RF; a referência é a
-//   forma dos outros blocos de mensagem deste mesmo arquivo)
-// TRECHO DO BRIEFING (docs/BRIEFING.md, RF05, pág. 7)
-//   "E se o catálogo chegar vazio (porque o RF04 caiu no catch, ou porque o
-//   filtro não sobrou nada)? Trate esse caso também — uma mensagem simples
-//   como 'Não encontramos recomendações agora' é melhor do que renderizar
-//   uma grade de cards vazia sem explicação."
-// CONFORMIDADE
-//   - A frase é do professor e a intenção é citá-la, não copiá-la: o texto
-//     exibido pode ser esse, e a decisão de estilo é sua.
-//   - Esta mensagem NÃO substitui a de erro da M1-T07. Catálogo vazio é
-//     sucesso com zero resultado; API fora do ar é falha. Tratar as duas com
-//     a mesma frase perde o requisito dos três estados.
-// ────────────────────────────────────────────────────────────────────────────
+/**
+ * O QUE ESTE TRECHO FAZ
+ *   Escreve a frase do estado vazio em #resultados-status quando o array de
+ *   catálogo tratado na M1-T08 chega com zero itens: "Não encontramos
+ *   recomendações agora.", com o recado opcional de falha de persistência
+ *   anexado quando existe. É a terceira face do trio (carregando, vazio,
+ *   erro) que a seção 7 do AGENTS.md manda sempre tratar.
+ *
+ * POR QUE A FRASE É ESSA
+ *   É a frase do professor, RF05 pág. 7: catálogo vazio é melhor explicado
+ *   do que renderizar uma grade de cards vazia sem explicação — o esboço que
+ *   este bloco consumiu trazia a citação e dizia que "a decisão de estilo é
+ *   sua". O ponto final é exatamente essa decisão de estilo: ele deixa a
+ *   frase autônoma e prepara a junção com o aviso logo abaixo.
+ *
+ * POR QUE É UMA FUNÇÃO SEPARADA DE exibirMensagemDeErro
+ *   Três estados, três causas, três mensagens. Catálogo vazio é SUCESSO com
+ *   zero resultado: o fetch respondeu, o corpo chegou inteiro, só o filtro é
+ *   que não deixou nada de pé. API fora do ar, resposta.ok falso ou corpo
+ *   inesperado são FALHA — a causa da exibirMensagemDeErro da M1-T07. Reusar
+ *   aquela função com texto trocado perderia o requisito dos três estados,
+ *   que é justamente o que o esboço da etapa 3 proibia.
+ *
+ * POR QUE aviso ENTRA AQUI
+ *   Invariante da M1-T07: o estado de carregando apaga o recado de
+ *   localStorage, então todo destino que sobrescreve #resultados-status
+ *   precisa repassar o aviso, senão ele morre antes do paint. Com
+ *   aviso === "" a frase-base fica intacta. A frase-base termina em ponto
+ *   final e o aviso começa com espaço: a junção limpa é a mesma aritmética
+ *   das frases de sucesso e de erro.
+ *
+ * POR QUE textContent E NÃO innerHTML
+ *   O destino do valor é a defesa contra XSS (AGENTS.md §7): textContent
+ *   escreve o valor como texto e nunca o interpreta como marcação, enquanto
+ *   innerHTML interpretaria o que quer que chegasse. A frase aqui é fixa —
+ *   ninguém digita nada neste caminho —, mas o hábito é o mesmo de sempre, e
+ *   a crase não muda nada nessa frente: ${} não escapa nem sanitiza.
+ *
+ * POR QUE O ALVO É O MESMO #resultados-status DAS OUTRAS MENSAGENS
+ *   Porque sobrescrever limpa o carregando sem código extra: os três estados
+ *   escrevem no MESMO elemento (o p com role="status" do index.html), então a
+ *   frase anterior some por consequência, sem nenhuma instrução de limpeza —
+ *   pelo mesmo mecanismo do sucesso e do erro.
+ *
+ * CONTRATO DE NOME
+ *   exibirMensagemDeCatalogoVazio é o nome que o js/script.js importa e o
+ *   que a lista de exports da M1-T17 espera ("a mensagem de catálogo
+ *   vazio"). Trocar o nome exige trocar os dois lados do módulo.
+ *
+ * TRECHO DO BRIEFING (docs/BRIEFING.md, RF05, pág. 7)
+ *   "E se o catálogo chegar vazio (porque o RF04 caiu no catch, ou porque o
+ *   filtro não sobrou nada)? Trate esse caso também — uma mensagem simples
+ *   como 'Não encontramos recomendações agora' é melhor do que renderizar
+ *   uma grade de cards vazia sem explicação."
+ *
+ * CONFORMIDADE
+ *   - Citar, não copiar: a frase é a do professor e este bloco a reproduz
+ *     com o ponto final da decisão de estilo; você precisa saber explicar
+ *     cada linha.
+ *   - Uma grade de cards vazia sem texto é o que o risco 5 do quadro trata:
+ *     o vazio é estado da tela, não silêncio.
+ */
+export function exibirMensagemDeCatalogoVazio(aviso) {
+  const statusResultados = document.querySelector("#resultados-status");
+  statusResultados.textContent = `Não encontramos recomendações agora.${aviso}`;
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // TODO M1-T11 · RF08 · Renderizar os cards no DOM

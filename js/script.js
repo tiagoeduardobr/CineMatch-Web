@@ -13,7 +13,7 @@
  * A página só funciona servida por `npm start` (live-server): módulos ES não
  * carregam via file://, por causa do CORS. O live-server é instalado na M1-T18.
  */
-import { PLACEHOLDER_UI, exibirMensagemDeErro } from "./ui.js";
+import { PLACEHOLDER_UI, exibirMensagemDeErro, exibirMensagemDeCatalogoVazio } from "./ui.js";
 import { PLACEHOLDER_MODELO } from "./modelo.js";
 
 // Os dois `import` acima continuam apontando para os placeholders, e por isso
@@ -368,10 +368,11 @@ function iniciarFormulario() {
 
     if (!persistiu) {
       // O espaço inicial é proposital: o aviso entra no fim da saudação e
-      // também no fim das frases de sucesso e de erro de buscarCatalogo, já
-      // que a mesma task de evento apaga tudo que estava no elemento. O
+      // também no fim das frases dos TRÊS destinos de buscarCatalogo —
+      // sucesso, erro e vazio (exibirMensagemDeCatalogoVazio, da M1-T08) —,
+      // já que a mesma task de evento apaga tudo que estava no elemento. O
       // espaço no início + o ponto no fim é o que garante a junção limpa
-      // nos dois destinos, sem espaço duplo e sem frase colada.
+      // nos três destinos, sem espaço duplo e sem frase colada.
       aviso =
         ` Não foi possível salvar o perfil neste navegador, então ele não será lembrado na próxima visita.`;
     }
@@ -492,9 +493,14 @@ let catalogoBruto = [];
  * json() lança em corpo que não é JSON, e essa exceção precisa cair no
  * mesmo lugar das demais, com a mesma mensagem, sem um catch à parte.
  *
- * O que NÃO faz: não filtra genres nem rating, não trata o catálogo vazio e
- * não escreve no console — os três são de depois: RF05 na M1-T08, estado
- * vazio na M1-T08 e a evidência na aba Network (risco 12).
+ * O que NÃO faz: não escreve no console — a evidência da chamada continua
+ * sendo a aba Network do DevTools (risco 12). Filtrar genres e rating e
+ * tratar o catálogo vazio a função DELEGA: ela chama tratarCatalogo, da
+ * região M1-T08 declarada logo abaixo, dentro do próprio try, e escreve o
+ * estado vazio por exibirMensagemDeCatalogoVazio quando o tratamento vem
+ * zerado. A lista vazia legítima continua passando crua pelo guard de
+ * formato — decidir o que sobrevive de genres e rating é o RF05, e é a
+ * tratarCatalogo que essa decisão foi delegada.
  *
  * POR QUE O PARÂMETRO `aviso` EXISTE E É REPASSADO A CADA ESTADO
  *   O aviso de falha de persistência da M1-T06 ("Não foi possível salvar o
@@ -505,7 +511,8 @@ let catalogoBruto = [];
  *   substituído no mesmo tick em que foi escrito e NUNCA apareceria na
  *   tela: é exatamente a regressão apontada no code-review da Task 3, que
  *   derrubaria o "avisando a pessoa usuária na tela" da M1-T06. Por isso o
- *   aviso entra de novo na frase de sucesso e na frase de erro, e por isso
+ *   aviso entra de novo na frase de sucesso, na frase de erro e na frase do
+ *   estado vazio (M1-T08), e por isso
  *   o estado de carregando NÃO o leva: o texto do carregando é o literal do
  *   briefing (RF12) e não pode ser alterado.
  */
@@ -550,19 +557,42 @@ async function buscarCatalogo(aviso) {
     // trabalho do RF05 (M1-T08), não desta chamada.
     catalogoBruto = corpo;
 
-    // ESTADO 2 — sucesso. Sobrescreve o carregando no MESMO elemento, então
-    // o carregando não fica preso na tela nem exige código de limpeza, e a
-    // regra "os estados não podem ficar na tela ao mesmo tempo" se resolve
-    // pelo alvo comum. A contagem é a prova visível de que a chamada
-    // funcionou — é ela que substitui o registro no console que o briefing
-    // pedia (risco 12). O `${aviso}` reentra aqui porque o carregando da
-    // linha acima apagou a saudação com o recado de storage: repassar o
-    // aviso é o que faz ele sobreviver ao estado de carregando e chegar ao
-    // paint. Ele já vem com espaço no início e ponto no fim, então a junção
-    // com a frase acima não gera espaço duplo nem palavra colada — e com ""
-    // (guard) não muda nada.
-    statusResultados.textContent =
-      `Catálogo carregado: ${catalogoBruto.length} séries disponíveis.${aviso}`;
+    // O tratamento roda AQUI, dentro do try, e não fora dele: se
+    // tratarCatalogo lançar por qualquer motivo — dado novo da API com
+    // formato inesperado, por exemplo —, a exceção cai no catch abaixo e
+    // vira o estado de erro amigável, nunca uma página quebrada. É a mesma
+    // proteção do `await resposta.json()` e do guard de formato, que também
+    // lançam para o mesmo lugar.
+    catalogoTratado = tratarCatalogo(catalogoBruto);
+
+    // ESTADO 2 — sucesso, agora com a bifurcação do RF05. Continua
+    // sobrescrevendo o carregando no MESMO elemento, então ele não fica
+    // preso na tela nem exige código de limpeza, e a regra "os estados não
+    // podem ficar na tela ao mesmo tempo" se resolve pelo alvo comum. Quando
+    // o tratamento não deixa nada de pé, quem fala é o estado VAZIO —
+    // exibirMensagemDeCatalogoVazio, da M1-T08, com a frase do professor;
+    // caso contrário, a frase de sucesso mostra OS DOIS números, o bruto que
+    // veio da API e o tratado que segue adiante (240 → 8 medidos), que é a
+    // evidência na tela do RF05 no lugar do registro de console que o
+    // briefing pedia (risco 12). Dizer só "240 séries disponíveis" seria
+    // enganoso: são 8 que fluem para a M1-T09. O `${aviso}` reentra nos
+    // DOIS ramos desta bifurcação (vazio e sucesso); o terceiro destino, o
+    // erro, é o catch abaixo. O carregando apagou a saudação com o recado
+    // de storage na mesma task de evento: sem repassar, o aviso morreria
+    // antes do paint. O carregando CONTINUA sem o aviso, porque o texto
+    // dele é o literal do briefing (RF12) e não pode ser alterado. O aviso
+    // já vem com espaço no início e as frases terminam em ponto, então a
+    // junção não gera espaço duplo nem palavra colada; com "" (guard),
+    // nada muda.
+    if (catalogoTratado.length === 0) {
+      // Não é falha da chamada: o fetch respondeu, o corpo chegou inteiro,
+      // só o filtro do RF05 não deixou nada de pé. Por isso a frase é a do
+      // professor e não a de erro — três causas, três mensagens.
+      exibirMensagemDeCatalogoVazio(aviso);
+    } else {
+      statusResultados.textContent =
+        `Catálogo carregado: ${catalogoBruto.length} séries disponíveis, ${catalogoTratado.length} depois do tratamento.${aviso}`;
+    }
   } catch (erro) {
     // ESTADO 3 — erro. `erro` é ignorado, no mesmo padrão do salvarPerfil:
     // quem lê a mensagem é a pessoa, e o que ela lê é português, sem
@@ -578,6 +608,158 @@ async function buscarCatalogo(aviso) {
       `Não foi possível carregar as séries agora. Verifique sua conexão com a internet e tente novamente.${aviso}`
     );
   }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// M1-T08 · RF05 · TRATAR O CATÁLOGO COM MÉTODOS DE ARRAY
+// ────────────────────────────────────────────────────────────────────────────
+/**
+ * O QUE ESTE TRECHO FAZ
+ *   Toma o catálogo bruto que a M1-T07 guardou em catalogoBruto e devolve o
+ *   array de no máximo 8 objetos { id, titulo, tipo, generos, duracaoMinutos }
+ *   que a M1-T09 instancia. A cadeia filter → sort → slice → map é a do
+ *   briefing e é ela que fecha o Critério 6 (utilização de métodos de array),
+ *   mede a linha da M1-T08 no Critério 4 e ativa o estado vazio do trio da
+ *   seção 7: quando o filtro não sobra nada, a tela explica em vez de deixar
+ *   uma grade vazia sem explicação (risco 5 do quadro).
+ *
+ * POR QUE FICA ANTES DO GUARD `typeof document !== "undefined"`
+ *   Ordem de avaliação do módulo, o mesmo argumento da M1-T07: o guard roda
+ *   no carregamento e, com perfil salvo, chama buscarCatalogo já na primeira
+ *   execução — e buscarCatalogo grava em catalogoTratado. Se a `let` fosse
+ *   declarada DEPOIS do guard, essa chamada cairia em temporal dead zone e
+ *   daria ReferenceError. A função, o hoisting resolve; a variável, não.
+ *
+ * POR QUE tratarCatalogo É PURA
+ *   Sem document, sem fetch e sem escrita em #resultados: recebe um array e
+ *   devolve outro. Decidir o estado da tela e escrever no DOM são papéis
+ *   separados — a §3 do AGENTS.md manda dados no script.js e tela no ui.js,
+ *   e é por isso que a frase do estado vazio mora em
+ *   exibirMensagemDeCatalogoVazio, em js/ui.js. A pureza é também o que
+ *   permite chamá-la dentro do try de buscarCatalogo: se ela lançar por
+ *   qualquer motivo, o catch vira estado de erro amigável, nunca página
+ *   quebrada.
+ *
+ * POR QUE `let` SÓ EM catalogoTratado E `const` NO RESTO
+ *   `const` é o padrão do projeto: o valor não muda depois de declarado, e o
+ *   escopo de módulo já impede que ele vire global. `let` fica em
+ *   catalogoTratado porque é o único valor desta região que muda — a cada
+ *   chamada de buscarCatalogo o resultado daquela busca sobrescreve o
+ *   anterior. O `[]` inicial é para a leitura nunca estourar se algo consumir
+ *   a variável antes de a rede responder, a mesma razão do `let
+ *   catalogoBruto` da M1-T07. Toda interpolação de valor é template literal.
+ *
+ * POR QUE NÃO HÁ CONSOLE, ATRASO NEM AS APIs FORA DA SEÇÃO 2.1
+ *   - console.log: o professor afastou o registro no console do código
+ *     entregue (risco 12). A evidência do RF05 virou a própria mensagem de
+ *     sucesso, que agora mostra os dois números — bruto e tratado.
+ *   - setTimeout: o atraso proposital do RF12 é da M1-T15 e vai na
+ *     EXIBIÇÃO, nunca no tratamento dos dados; dentro de um fetch ele
+ *     mascararia justamente o estado de erro (risco 4).
+ *   - ??, ?. e Object.assign não foram ensinados (§2.1), e Array.isArray não
+ *     aparece no material: quem checa lista usa `length === undefined`, como
+ *     o próprio buscarCatalogo já faz. O null do runtime é repassado como
+ *     está, sem valor inventado — detalhe no JSDoc da função.
+ *   - innerHTML: este bloco não escreve na tela, então não há destino nenhum
+ *     aqui; quando houver, a defesa contra XSS é o DESTINO do valor
+ *     (textContent), nunca a crase. Comentários que citam a proibição, como
+ *     estes, são permitidos.
+ *
+ * REFERÊNCIA ENSINADA (AGENTS.md, seção 2.1)
+ *   cinematch_antigo/cinematch.js — map (linhas 293 e 476), filter (297,
+ *   429 e 477), sort com desempate por localeCompare("pt-BR") (438-448) e
+ *   slice (256). Aqui o sort é numérico por nota, na ordem literal do
+ *   briefing; localeCompare continua liberado, mas ordena TÍTULO, não nota —
+ *   seria desempate opcional, sem efeito no top-8 medido.
+ *
+ * TRECHO DO BRIEFING (docs/BRIEFING.md, RF05, pág. 7)
+ *   const catalogo = dados
+ *     .filter(serie => serie.genres.length > 0 && serie.rating.average)
+ *     .sort((a, b) => b.rating.average - a.rating.average)
+ *     .slice(0, 8)
+ *     .map(serie => ({ id: serie.id, titulo: serie.name, tipo: "Série", ... }));
+ *   "E se o catálogo chegar vazio [...] uma mensagem simples como 'Não
+ *   encontramos recomendações agora' é melhor do que renderizar uma grade de
+ *   cards vazia sem explicação."
+ *
+ * CONFORMIDADE
+ *   - Citar, não copiar: a cadeia acima é o exemplo do professor, comentada
+ *     como referência. A forma final é a que está escrita aqui, e cada linha
+ *     precisa ser explicável.
+ *   - `aviso` entra nos destinos vazio e sucesso e NUNCA no carregando: o
+ *     texto do carregando é literal do briefing (RF12) e não pode mudar,
+ *     enquanto todo destino que sobrescreve #resultados-status tem de
+ *     repassar o recado de persistência para que ele chegue ao paint.
+ *   - Sem `!important`, sem CSS Grid e sem escrita em servidor: este bloco é
+ *     só dados, e a stack é a do Módulo 01.
+ */
+
+// `let` porque este é o segundo valor do módulo que muda: a cada chamada de
+// buscarCatalogo o tratamento daquela busca sobrescreve o anterior, e é essa
+// a tarefa da variável — a M1-T09 instancia Serie a partir dela e a M1-T10
+// consome a lista. O array começa vazio para a leitura nunca estourar se
+// algo consumir a variável antes de a rede responder, mesma razão do
+// catalogoBruto.
+let catalogoTratado = [];
+
+/**
+ * Devolve o catálogo bruto tratado: filtrado, ordenado por nota, cortado nos
+ * 8 primeiros e convertido na forma { id, titulo, tipo, generos,
+ * duracaoMinutos } que a M1-T09 instancia.
+ *
+ * POR QUE A ORDEM É filter → sort → slice → map E NÃO QUALQUER OUTRA
+ *   É a ordem literal do briefing, e a única que entrega o que a frase
+ *   promete:
+ *   - filter primeiro: descarta o que não tem gênero nem nota, que é dado
+ *     incompleto real da TVMaze — medido nos 240 itens: 5 sem gênero e 4 com
+ *     rating.average null. Sem esse filtro, o sort compararia undefined
+ *     contra número e a ordenação sairia no achismo.
+ *   - sort DEPOIS do filter, e não antes: só faz sentido ordenar o que
+ *     sobrou. O sort é MUTÁVEL — ele reordena o array que recebe —, mas aqui
+ *     isso não atinge catalogoBruto: `filter` devolve um array NOVO, então o
+ *     sort reordena a cópia que a própria cadeia acabou de criar, nunca o
+ *     array que o fetch devolveu. É por isso que não há cópia extra com [...]
+ *     nem um slice() antes de ordenar: seria código a mais para um risco que
+ *     a cadeia já elimina.
+ *   - slice(0, 8) DEPOIS do sort: recortar antes pegaria os 8 primeiros em
+ *     ordem de chegada da API, ordenaria só esses oito e o top-8 sairia
+ *     errado. Primeiro ordena-se tudo, depois corta-se o topo.
+ *   - map por último: é o único método que escreve a forma nova, e só o que
+ *     passou pelos três passos anteriores chega a ele.
+ *
+ * POR QUE tipo É O LITERAL "SÉRIE" E NÃO serie.type
+ *   O campo type da TVMaze é outra taxonomia, em inglês — medido nos 240
+ *   itens: Scripted 212, Animation 14, Reality 10, Talk Show 3, Documentary
+ *   1. `tipo: serie.type` mandaria "Scripted" para um modelo que só conhece
+ *   "Filme"/"Série" e quebraria a semântica do projeto anterior. O literal é
+ *   também o que o exemplo do professor escreve no briefing e o que o
+ *   contrato da M1-T09 espera: cinematch_antigo/class.js:20 faz
+ *   `super(titulo, "Série", generos, duracaoMinutos)` e a linha 40 decide
+ *   por `conteudo.tipo === "Série"`.
+ *
+ * POR QUE duracaoMinutos RECEBE serie.runtime COM O null REPASSADO
+ *   `runtime` é o campo de minutos da TVMaze e o exemplo do professor já
+ *   escreve `duracaoMinutos: serie.runtime`. Ele pode vir null — medido em
+ *   11 dos 240 itens, embora nenhum do top-8 esteja nulo hoje —, e repassar o
+ *   null como está é honesto: inventar 0 seria mentir sobre a duração de uma
+ *   série. `??` resolveria na sintaxe, mas não foi ensinado (AGENTS.md §2.1:
+ *   só apareceu em cinematch_antigo/cinematch.js:211 e não deve ser
+ *   replicado). Nenhum consumidor atual lê o campo; se um dia exibirem
+ *   duração, quem exibe trata o null com if-else ou ternário, ambos
+ *   ensinados no RF07.
+ */
+function tratarCatalogo(bruto) {
+  return bruto
+    .filter((serie) => serie.genres.length > 0 && serie.rating.average)
+    .sort((a, b) => b.rating.average - a.rating.average)
+    .slice(0, 8)
+    .map((serie) => ({
+      id: serie.id,
+      titulo: serie.name,
+      tipo: "Série",
+      generos: serie.genres,
+      duracaoMinutos: serie.runtime,
+    }));
 }
 
 if (typeof document !== "undefined") {
@@ -599,59 +781,6 @@ if (typeof document !== "undefined") {
 
   iniciarFormulario();
 }
-
-// ────────────────────────────────────────────────────────────────────────────
-// TODO M1-T08 · RF05 · Tratar o catálogo com métodos de array
-// ────────────────────────────────────────────────────────────────────────────
-// ETAPA 4 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T07
-// DONO DESTA ETAPA: Tiago.
-// O QUE FAZER AQUI
-//   - Encadear filter, sort, slice e map até chegar no array tratado de
-//     { id, titulo, tipo, generos, duracaoMinutos }.
-//   - O filtro exige as duas defesas: genres.length > 0 e rating.average.
-//     Nem toda série da TVMaze tem gênero ou nota preenchidos, e usar um
-//     undefined como número quebra a comparação do sort.
-//   - O slice limita a 8 itens. O Módulo 01 pede slice e não dá nota
-//     própria a ele: ele entra porque já estava no roteiro da semana 6.
-//   - Tratar o catálogo vazio com a mensagem do professor. É o estado vazio
-//     do trio, e o texto é o que o Lucas escreve na tela (mesma M1-T08, em
-//     js/ui.js, etapa 3).
-// POR QUE ESTE TRECHO EXISTE
-//   A API devolve o JSON cru, com nomes em inglês, campos que às vezes não
-//   existem e nenhuma ordem. O RF05 existe para transformar isso em um
-//   array com a forma do projeto anterior, que o cálculo da M1-T10 consome.
-// REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
-//   cinematch_antigo/cinematch.js — map, filter, find e sort, com
-//   localeCompare("pt-BR") para ordenar título em português. O localeCompare
-//   está liberado e NÃO é o namespace Intl. O sort por afinidade do projeto
-//   da semana 6, em recomendarProximoGenero (linhas 438-448), é o exemplo
-//   mais próximo do que o sort vai fazer aqui.
-// TRECHO DO BRIEFING (docs/BRIEFING.md, RF05, pág. 7; o bloco inteiro, com as
-// duas linhas elididas aqui, está em docs/BRIEFING.md:227-239)
-//   const catalogo = dados
-//     .filter(serie => serie.genres.length > 0 && serie.rating.average)
-//     .sort((a, b) => b.rating.average - a.rating.average)
-//     .slice(0, 8)
-//     .map(serie => ({
-//         id: serie.id,
-//         titulo: serie.name,
-//         tipo: "Série",
-//         ...
-//     }));
-//   "E se o catálogo chegar vazio [...] uma mensagem simples como 'Não
-//   encontramos recomendações agora' é melhor do que renderizar uma grade de
-//   cards vazia sem explicação."
-// CONFORMIDADE
-//   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
-//     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - sort é MUTÁVEL: ele reordena o array que recebe. Faça slice antes de
-//     sort, ou copie com [...] antes de ordenar, para não mexer no array que
-//     o fetch devolveu.
-//   - ?? apareceu uma vez em cinematch_antigo/cinematch.js:211 e NÃO foi
-//     ensinado: não replicar. O valor padrão da nota entra por if-else.
-//   - Backlog, sem nota: dá para buscar mais de uma página, com ?page=1, e
-//     também para deixar um filtro por gênero na tela. "Depois", não agora.
-// ────────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────────
 // TODO M1-T09 · RF06 · Adaptar as classes Conteudo e Serie
