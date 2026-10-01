@@ -49,6 +49,30 @@ body {
 	line-height: 1.5;
 }
 
+/* O skip link fica fora da tela e só entra nela quando recebe foco:
+   navegação por teclado o revela antes da navbar, e o clique leva ao
+   #conteudo-principal. Fora do foco ele não ocupa espaço visível. */
+.skip-link {
+	position: absolute;
+	top: -48px;
+	left: 8px;
+	padding: 10px 16px;
+	background: var(--cor-dourado);
+	color: var(--cor-fundo);
+	border-radius: 8px;
+	text-decoration: none;
+	transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+	top: 8px;
+}
+
+.skip-link:focus-visible {
+	outline: 2px solid var(--cor-fundo);
+	outline-offset: 2px;
+}
+
 /* =========================
    NAVBAR
    ========================= */
