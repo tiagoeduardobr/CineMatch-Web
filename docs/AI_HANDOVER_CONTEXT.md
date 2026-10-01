@@ -183,7 +183,7 @@ O único arquivo versionado na sessão. O que mudou em `docs/KANBAN.md`:
 | Mudança | Detalhe |
 | --- | --- |
 | `M1-T05` voltou de *Em Andamento* para *A Fazer* | estava com timestamp desde 26/09 mas com **implementação zero**; o bloco de proveniência foi removido, porque task em *A Fazer* não o leva. Derrubou o WIP de 3 para 2 |
-| 4 tasks tiveram a nota `*Progresso:*` reescrita **sem número de linha**, por decisão e não por esquecimento | `M1-T02`, `M1-T04`, `M1-T12` e `M1-T16`; as outras 4 da lista acima ainda citam linha, e é a regra das Convenções técnicas que registra esse alcance |
+| 4 tasks tiveram a nota `*Progresso:*` reescrita **sem número de linha**, por decisão e não por esquecimento | `M1-T02`, `M1-T04`, `M1-T12` e `M1-T16`; as outras **3** — `M1-T05`, `M1-T17` e `M1-T18` — ainda citam linha, e é a regra das Convenções técnicas que registra esse alcance |
 | 2 tasks ganharam nota `*Bloqueio:*`, que faltava | `M1-T18` e `M1-T21` |
 | Rastreabilidade | RF02 passou a `Em Andamento / A Fazer`; Critério 4 passou a `A Fazer` — as duas tasks de cada um caíram na mesma coluna |
 | Riscos | risco 10 revisado; **risco 11 criado** para a `M1-T12` atrasada em relação ao próprio código |
@@ -224,7 +224,7 @@ Duas outras afirmações recebidas caíram por medição: "hoje só a navbar tem
 
 **A inversão de borda de 0.22 → 0.55, que é o preço de seguir o mapeamento pedido.** O mapeamento manda `--cine-line-nav` (alfa **0.22**) virar `--cor-borda-forte` (alfa **0.55**). Com a contagem real, esse token tem **um único consumidor** — o `border-bottom` da navbar — e o efeito é o oposto do que três usos amorteceriam: a **única borda da página** passaria de discreta para a mais forte do design system, enquanto cards e campos ficam em 0.28. O plano **segue o mapeamento pedido**, registra a inversão na nota de progresso da `M1-T24` e deixa a reversão para um único token como ajuste de uma linha. **No arquivo final, o que a medição encontra:** `.resultados` em `flex-direction: column` na regra base, `.card-serie` como card vertical, e o corte para linha dentro de `@media (min-width: 769px)`.
 
-**O risco 11 foi reescrito por seletor, e a regra ficou mais larga.** A versão anterior do risco citava número de linha, e o número de linha já errou três vezes seguidas neste quadro. A regra das Convenções técnicas passou a valer para **toda** nota ou descrição do quadro que cite um arquivo — as notas `*Progresso:*` das linhas de task e também a prosa das seções, como Riscos e a Cobertura de RF — e vale **a partir de agora**, sem reescrever de forma retroativa as notas já escritas que ainda citam linha. As **4 tasks** cuja nota foi reescrita na T7 estão listadas na tabela da seção 3.2 acima; as outras 4 da mesma lista ainda citam linha, e é essa regra que registra o alcance em vez de fingir que não sobrou nenhuma.
+**O risco 11 foi reescrito por seletor, e a regra ficou mais larga.** A versão anterior do risco citava número de linha, e o número de linha já errou três vezes seguidas neste quadro. A regra das Convenções técnicas passou a valer para **toda** nota ou descrição do quadro que cite um arquivo — as notas `*Progresso:*` das linhas de task e também a prosa das seções, como Riscos e a Cobertura de RF — e vale **a partir de agora**, sem reescrever de forma retroativa as notas já escritas que ainda citam linha. As **4 tasks** cuja nota foi reescrita na T7 estão listadas na tabela da seção 3.2 acima; as outras **3** — `M1-T05`, `M1-T17` e `M1-T18` — ainda citam linha, e é essa regra que registra o alcance em vez de fingir que não sobrou nenhuma.
 
 **A contagem ingênua de checkbox continua dando números errados, e o número mudou de 56 para 57.** `Select-String -Path docs\KANBAN.md -Pattern '\- \[x\]'` continua devolvendo **5** e `'-Pattern '\- \[ \]'` agora devolve **57** — era 56 antes desta versão. A causa é a linha nova da `M1-T24`, que é uma task a mais. **Continue contando por coluna, nunca por substituição ingenua**: o `- [x]` = 3 real (2 tasks + 1 item do checklist) e o `- [ ]` = 55 real (21 *A Fazer* + 2 *Em Andamento* + 9 *Backlog* + 23 do checklist), dos quais 2 de cada número estão na legenda, nas linhas 32 e 33 e 42 e 43.
 
@@ -417,7 +417,7 @@ O que **continua aberto:** o `docs/KANBAN.md` marca `M1-T03` e `M1-T04` como "po
 
 ## 8. Estado das tasks
 
-Conferido no `docs/KANBAN.md` em 29/09/2026, **por coluna**, e não por checkbox — ver a ressalva logo abaixo.
+Conferido no `docs/KANBAN.md` em 30/09/2026, **por coluna**, e não por checkbox — ver a ressalva logo abaixo.
 
 | Coluna | Tasks | Quantidade |
 | --- | --- | --- |
@@ -430,14 +430,14 @@ Total: **25 tarefas** (`M1-T00` a `M1-T24`) + **9 itens de Backlog**. Bate com o
 
 ### A contagem de checkbox ingênua dá dois números errados
 
-`Select-String -Path docs\KANBAN.md -Pattern '\- \[x\]'` devolve **5**, e `-Pattern '\- \[ \]'` devolve **56**. **Os dois estão errados.** As ocorrências não são só de task:
+`Select-String -Path docs\KANBAN.md -Pattern '\- \[x\]'` devolve **5**, e `-Pattern '\- \[ \]'` devolve **57**. **Os dois estão errados.** As ocorrências não são só de task:
 
-- Das **5** ocorrências de `- [x]`, **2 estão na legenda** — linhas 33 e 43, que descrevem a notação em prosa. Das 3 restantes, 2 são tasks (`M1-T00`, na linha 126, e `M1-T01`, na linha 127) e **1 é o item do checklist** "Criei o quadro Kanban", na linha 211.
-- Das **56** ocorrências de `- [ ]`, **2 também estão na legenda** — linhas 32 e 42, pela mesma razão. As 54 restantes são 20 de *A Fazer* + 2 de *Em Andamento* + 9 de *Backlog* + 23 do checklist.
+- Das **5** ocorrências de `- [x]`, **2 estão na legenda** — linhas 33 e 43, que descrevem a notação em prosa. Das 3 restantes, 2 são tasks (`M1-T00` e `M1-T01`, na coluna *Concluído*) e **1 é o item do checklist** "Criei o quadro Kanban", no *Checklist final de entrega*.
+- Das **57** ocorrências de `- [ ]`, **2 também estão na legenda** — linhas 32 e 42, pela mesma razão. As 55 restantes são 21 de *A Fazer* + 2 de *Em Andamento* + 9 de *Backlog* + 23 do checklist.
 
-Os números reais de checkbox são **`- [x]` = 3** e **`- [ ]` = 54**. A conta fecha: a contagem ingênua soma 61, a real soma 57, e a diferença são exatamente as **4** ocorrências de legenda que o `Select-String` não distingue de uma task. **Nunca conte checkbox com substituição ingenua neste quadro: conte por coluna.**
+Os números reais de checkbox são **`- [x]` = 3** e **`- [ ]` = 55**. A conta fecha: a contagem ingênua soma 62, a real soma 58, e a diferença são exatamente as **4** ocorrências de legenda que o `Select-String` não distingue de uma task. **Nunca conte checkbox com substituição ingenua neste quadro: conte por coluna.**
 
-> **Este é exatamente o número que a versão de 28/09 já registrava** — o que confirma que **ele não tinha erro**. O que mudou entre 28/09 e 29/09 foi **só a distribuição entre colunas**: *A Fazer* foi de 19 para 20 (a `M1-T05` voltou), *Em Andamento* foi de 3 para 2. O total de 24 não se moveu.
+> **Este é exatamente o número que a versão de 28/09 já registrava** — o que confirma que **ele não tinha erro**. O que mudou entre 28/09 e 29/09 foi **só a distribuição entre colunas**: *A Fazer* foi de 19 para 20 (a `M1-T05` voltou), *Em Andamento* foi de 3 para 2, e o total de 24 não se moveu. **O que mudou em 30/09 foi o total, não a distribuição:** ele foi de 24 para **25** porque a `M1-T24` entrou como task a mais em *A Fazer*, e a soma 2 + 2 + 21 = 25 volta a fechar.
 
 O checklist final de entrega do `KANBAN.md` tem **24 itens, dos quais 23 estão pendentes** — só "Criei o quadro Kanban" está marcado. Os itens de entrega ainda zerados são os três mais pesados do projeto: **vídeo de até 7 minutos** (peso 1,50), **quadro Kanban publicado com link** e **os três links no AVA**.
 
