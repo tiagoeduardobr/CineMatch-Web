@@ -77,7 +77,8 @@ export const PLACEHOLDER_UI = {
  *   não vista em aula e !important.
  *   Sem perguntar antes de usar: ?. , Object.assign, structuredClone,
  *   AbortController, IntersectionObserver, ResizeObserver, debounce,
- *   throttle, <template>, localStorage.removeItem, padStart e o namespace
+ *   throttle, <template>, o método que apaga uma chave do localStorage,
+ *   padStart e o namespace
  *   Intl. (localeCompare com "pt-BR" NÃO é esse namespace e está liberado).
  *   ?? apareceu uma vez em cinematch_antigo/cinematch.js:211 e não foi
  *   ensinado: não replique.
@@ -436,8 +437,8 @@ export const PLACEHOLDER_UI = {
 // POR QUE ESTE TRECHO EXISTE
 //   O RF14 é o que amarra os três arquivos. Sem esta conferência, um nome
 //   exportado que não bate com o import só falha em tempo de execução, e o
-//   erro aparece longe da linha que causou — a mesma armadilha do
-//   console.log de bootstrap, lá no script.js.
+//   erro aparece longe da linha que causou — a mesma armadilha da linha de
+//   bootstrap que o script.js teve até o fim da M1-T06.
 // REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
 //   semana-12/modulos/ — o slug.js da pasta faz export e o index.js faz
 //   import do que foi exportado. O README.md da pasta é o "antes", com

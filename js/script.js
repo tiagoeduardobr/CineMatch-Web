@@ -16,13 +16,24 @@
 import { PLACEHOLDER_UI } from "./ui.js";
 import { PLACEHOLDER_MODELO } from "./modelo.js";
 
-// Confirmação de que o grafo de módulos carregou. Este arquivo também é lido
-// pelo Node na verificação (`node script.js`), então ele não pode tocar em
-// `document`, `window` nem `localStorage` aqui em cima.
-console.log("CineMatch Web: bootstrap carregado.", {
-  ui: PLACEHOLDER_UI,
-  modelo: PLACEHOLDER_MODELO,
-});
+// Os dois `import` acima continuam apontando para os placeholders, e por isso
+// nenhum dos dois nomes aparece no corpo do arquivo: PLACEHOLDER_MODELO sai
+// na M1-T09, quando as classes entrarem em modelo.js, e PLACEHOLDER_UI sai na
+// M1-T11, quando o renderizarCard entrar em ui.js. Um import que ainda não é
+// usado não quebra o módulo — o grafo carrega igual — e é o estado
+// intermediário que o bloco M1-T17, no fim deste arquivo, descreve.
+//
+// NÃO HÁ LINHA DE CONSOLE NESTE ARQUIVO, e isso é decisão, não esquecimento:
+// o professor não quer código de console no material entregue. O que a linha de
+// bootstrap fazia — provar que os três módulos carregaram — continua verificável
+// sem ela, na aba Network e no Console do DevTools, que é onde qualquer erro
+// de módulo aparece sozinho.
+//
+// Este arquivo também é lido pelo Node na verificação (`node js/script.js`), e
+// é por isso que a execução tem de parar antes de tocar em `document`,
+// `window` e `localStorage`. O guard `typeof document !== "undefined"` no fim
+// do arquivo é o que separa o navegador do Node, e ele não é um detalhe: sem
+// ele, `node js/script.js` quebra com ReferenceError.
 
 // ────────────────────────────────────────────────────────────────────────────
 // ESBOÇO COMENTADO DA LÓGICA — MAPA DE TRABALHO, NÃO CÓDIGO
@@ -64,10 +75,11 @@ console.log("CineMatch Web: bootstrap carregado.", {
  *     #idade          campo de idade, com min="1" e required
  *     name="genero"   atributo comum a todos os checkboxes de gênero
  *     #resultados     onde os cards de recomendação são anexados
- *     #botao-trocar-perfil   A DEFINIR COM O LUCAS. Esse id não existe no
- *                     exemplo do briefing, e inventar um id só de um dos
- *                     lados quebra o botão. Combinar antes de codificar o
- *                     bloco M1-T06.
+ *     #botao-trocar-perfil   o <button type="button"> que reabre o formulário.
+ *                     Esse id NÃO está no exemplo do briefing: foi combinado
+ *                     entre as duas pessoas e já está escrito no index.html,
+ *                     dentro de .cartao-perfil e logo acima do #form-perfil.
+ *                     É o botão que o bloco M1-T06, mais abaixo, escuta.
  *
  * REGRAS DESTE MÓDULO (AGENTS.md, seções 2 e 2.1)
  *   Permitido: HTML5 semântico, CSS3 com Flexbox, JavaScript com módulos ES
@@ -79,16 +91,232 @@ console.log("CineMatch Web: bootstrap carregado.", {
  *   não vista em aula e !important.
  *   Sem perguntar antes de usar: ?. , Object.assign, structuredClone,
  *   AbortController, IntersectionObserver, ResizeObserver, debounce,
- *   throttle, <template>, localStorage.removeItem, padStart e o namespace
+ *   throttle, <template>, o método que apaga uma chave do localStorage,
+ *   padStart e o namespace
  *   Intl. (localeCompare com "pt-BR" NÃO é esse namespace e está liberado).
  *   ?? apareceu uma vez em cinematch_antigo/cinematch.js:211 e não foi
  *   ensinado: não replique.
  *   Três estados da chamada à API, sempre: carregando, vazio e erro.
  */
 
+// ────────────────────────────────────────────────────────────────────────────
+// M1-T06 · RF03 · PERSISTIR O PERFIL NO localStorage
+// ────────────────────────────────────────────────────────────────────────────
+/**
+ * O QUE ESTE TRECHO FAZ
+ *   Grava o perfil quando o formulário é enviado, recupera o perfil gravado
+ *   quando a página abre de novo, pula o formulário para quem já tem perfil e
+ *   devolve o formulário para o botão "Trocar perfil".
+ *
+ * POR QUE ESTE TRECHO EXISTE
+ *   O RF03 pede que o perfil sobreviva ao recarregamento. O localStorage é o
+ *   único armazenamento que o Módulo 01 autorizou (AGENTS.md, seção 2): sem
+ *   ele, cada F5 joga o perfil fora e o formulário reaparece toda vez.
+ *
+ * REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
+ *   semana-11/ceu-aberto/script.js — a FORMA do setItem(chave, valor) e do
+ *   getItem(...). Duas diferenças em relação a esse arquivo, e as duas são
+ *   deliberadas: o try/catch exigido pela seção 7 do briefing não aparece lá
+ *   e foi acrescentado aqui; e o padrão do getItem virou `if`, porque o que a
+ *   função devolve na ausência de perfil é null, e não a string que um
+ *   `|| padrão` devolveria.
+ *
+ * POR QUE ESTA PARTE MORA AQUI E NÃO NO ui.js
+ *   A divisão do AGENTS.md, seção 3, manda que tudo que toca a tela vá para
+ *   ui.js, e o esboço da M1-T06 em js/ui.js atribui ao Lucas a função de
+ *   reabrir o formulário. Ela ainda não foi escrita, e o RF03 precisa existir
+ *   antes dela. Escrever no DOM a partir deste arquivo é uma dívida
+ *   temporária, assumida aqui e registrada como pendência no docs/KANBAN.md.
+ *
+ * TRECHO DO BRIEFING (docs/BRIEFING.md, RF03, pág. 6)
+ *   localStorage.setItem('cinematchPerfil', JSON.stringify(usuario));
+ *   const perfilSalvo = localStorage.getItem('cinematchPerfil');
+ *   if (perfilSalvo) {
+ *     const usuario = JSON.parse(perfilSalvo);
+ *     // pula o formulário e mostra o catálogo direto
+ *   }
+ *
+ * CONFORMIDADE
+ *   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado
+ *     como referência. A forma final é sua, e você precisa saber explicar cada
+ *     linha.
+ *   - Um registro de confirmação é o que o RF04 do briefing pedia para
+ *     comprovar a chamada de rede. O professor afastou esse registro do código
+ *     entregue, e a entrega substitui essa evidência por esta: o resultado
+ *     aparece na tela, em #resultados-status, e a falha de armazenamento
+ *     também. O conflito está registrado como risco 12 no docs/KANBAN.md.
+ */
+
+// A chave do registro é uma constante e não um texto repetido: o nome é o
+// contrato entre quem grava e quem lê, e dois literais que divergem quebram o
+// perfil sem erro nenhum, porque o getItem só devolve null. `const` porque o
+// valor não muda depois de declarado, e o escopo de módulo já impede que ele
+// vire um global — que é exatamente o que o RF11 proíbe para o contador.
+const CHAVE_PERFIL = "cinematchPerfil";
+
+/**
+ * Grava o perfil e devolve se conseguiu.
+ *
+ * POR QUE O try/catch: o modo de falha real do localStorage não é erro de
+ * sintaxe, é cota excedida ou storage limpo pelo navegador — risco 3 do
+ * quadro. Nesses casos o setItem lança exceção, e uma exceção sem tratamento
+ * dentro do evento submit corta o resto do fluxo: a pessoa preencheu o
+ * formulário, não viu erro nenhum e ficou sem resposta. Então a falha da
+ * persistência vira aviso na tela e o app segue funcionando, só deixa de
+ * lembrar do perfil na próxima visita. Isso é o que o risco 3 pede: seguir
+ * sem persistência, em vez de quebrar.
+ *
+ * POR QUE DEVOLVE booleano: quem chama precisa saber se pode prometer que o
+ * perfil ficou guardado, e um objeto truthy não distingue "gravado" de "não
+ * gravado".
+ */
+function salvarPerfil(usuario) {
+  try {
+    localStorage.setItem(CHAVE_PERFIL, JSON.stringify(usuario));
+    return true;
+  } catch (erro) {
+    // `erro` não é repassado para a tela: quem lê a mensagem é a pessoa, e o
+    // que ela lê é português e sem stack trace.
+    return false;
+  }
+}
+
+/**
+ * Lê o perfil gravado e devolve o objeto, ou null quando não há perfil.
+ *
+ * O `if (!perfilSalvo)` é o mesmo mecanismo do `getItem(...) || padrão` da
+ * semana 11, escrito com if. O getItem devolve null na primeira visita, e o
+ * null e a string vazia são os dois falsy — então um só teste cobre os dois
+ * casos. Não é `perfilSalvo === null` de propósito: a string vazia é
+ * exatamente o que o "Trocar perfil" deixa na chave (ver limparPerfilSalvo)
+ * e ela também precisa contar como "sem perfil".
+ *
+ * O try/catch cobre dois lançamentos, não um: o getItem lança quando o
+ * storage está bloqueado, e o JSON.parse lança quando o conteúdo da chave não
+ * é JSON — o que acontece se alguém editar a chave à mão no DevTools ou se uma
+ * versão anterior do app tiver gravado outro formato. Nos dois casos o
+ * tratamento é o mesmo, e é o mais seguro: tratar como visita sem perfil.
+ */
+function lerPerfilSalvo() {
+  try {
+    const perfilSalvo = localStorage.getItem(CHAVE_PERFIL);
+
+    if (!perfilSalvo) {
+      return null;
+    }
+
+    return JSON.parse(perfilSalvo);
+  } catch (erro) {
+    return null;
+  }
+}
+
+/**
+ * "Limpa" o registro sobrescrevendo a chave com string vazia.
+ *
+ * POR QUE NÃO o método que apaga uma chave do `localStorage`: ele não foi
+ * ensinado (AGENTS.md 2.1) e está na lista do que não pode ser usado sem
+ * perguntar. A alternativa usa só a função da semana 11 — setItem é a mesma
+ * coisa que grava, e o efeito, do ponto de vista de quem lê, é o mesmo: a
+ * chave volta a não ter perfil. E o motivo de a string vazia bastar está no
+ * `if (!perfilSalvo)` do lerPerfilSalvo: "" é falsy, exatamente como o null da
+ * primeira visita, então a próxima leitura cai no mesmo caminho.
+ *
+ * Isto não apaga a chave: ela continua no storage, com "" como valor. É a
+ * diferença real entre esta escolha e o apagamento da chave, e ela é inofensiva
+ * porque nada mais lê essa chave — o consumo do código é idêntico ao de uma
+ * chave que nunca tivesse sido criada.
+ */
+function limparPerfilSalvo() {
+  try {
+    localStorage.setItem(CHAVE_PERFIL, "");
+    return true;
+  } catch (erro) {
+    return false;
+  }
+}
+
+/**
+ * Troca a tela para o lado do catálogo: esconde o formulário e escreve a
+ * mensagem com o nome da pessoa.
+ *
+ * O que é escondido é o FORMULÁRIO, e não a .secao-perfil inteira. A seção
+ * contém o botão "Trocar perfil", e esconder a seção junto esconderia o botão
+ * junto — o RF03 pede os dois, e um anula o outro.
+ *
+ * O `hidden` é atributo nativo do HTML, e a propriedade dele no DOM: atribuir
+ * true põe o atributo e false tira. Ele resolve o "esconder" sem classe de CSS
+ * e sem !important.
+ *
+ * `aviso` entra no fim da frase e quase sempre é "": ele só recebe texto
+ * quando a gravação do perfil falhou. É a forma de levar à tela o que o catch
+ * já devolveu por booleano.
+ */
+function mostrarResultados(usuario, aviso) {
+  const formPerfil = document.querySelector("#form-perfil");
+  const statusResultados = document.querySelector("#resultados-status");
+
+  formPerfil.hidden = true;
+
+  // Concatenação com `+` e não template literal: o nome entra como texto
+  // puro e a saída vai por textContent, que nunca interpreta marcação. É a
+  // mesma defesa contra XSS que a M1-T11 vai aplicar nos cards, e o motivo de
+  // o nome digitado por pessoa usuária não poder passar por innerHTML.
+  const saudacao =
+    "Olá, " +
+    usuario.nome +
+    "! Suas recomendações serão carregadas em seguida.";
+
+  statusResultados.textContent = saudacao + aviso;
+}
+
+/**
+ * Devolve o formulário para a tela, tirando o `hidden` e escribiendo a mensagem
+ * que o chamador quiser.
+ *
+ * Os campos NÃO são limpos aqui. O motivo é duplo: limpar exigiria uma API de
+ * formulário que não está no que foi ensinado, e o comportamento útil é
+ * editável — quem está trocando de perfil vê o que já tinha preenchido e muda
+ * o que quiser. O envio seguinte sobrescreve o registro, então não sobra
+ * perfil antigo misturado com o novo.
+ */
+function mostrarFormulario(mensagem) {
+  const formPerfil = document.querySelector("#form-perfil");
+  const statusResultados = document.querySelector("#resultados-status");
+
+  formPerfil.hidden = false;
+  statusResultados.textContent = mensagem;
+}
+
 function iniciarFormulario() {
   const formPerfil = document.querySelector("#form-perfil");
   const statusResultados = document.querySelector("#resultados-status");
+  const botaoTrocarPerfil = document.querySelector("#botao-trocar-perfil");
+
+  botaoTrocarPerfil.addEventListener("click", function () {
+    // `preventDefault` não cabe aqui e o motivo é o tipo do botão: ele é
+    // type="button" no index.html, e não type="submit", então ele não submete
+    // nada e não recarrega a página. O que ele NÃO pode fazer é recarregar —
+    // o registro do localStorage sobrevive ao recarregamento, mas um
+    // recarregamento que caia em file:// derruba os import por CORS e deixa o
+    // index.html sem nenhum JavaScript (risco 2 do quadro).
+    const registroFoiLimpo = limparPerfilSalvo();
+
+    if (registroFoiLimpo) {
+      mostrarFormulario(
+        "Preencha o formulário de novo para receber outras recomendações."
+      );
+    } else {
+      // Mesma regra do risco 3 no caminho inverso: a falha do storage é
+      // avisada e o formulário abre de qualquer forma. O aviso precisa dizer a
+      // consequência, que é o que importa: o perfil velho pode voltar a pular
+      // o formulário na próxima visita.
+      mostrarFormulario(
+        "Preencha o formulário de novo. Não conseguimos atualizar o registro " +
+          "deste navegador, então ele pode abrir sozinho na próxima visita."
+      );
+    }
+  });
 
   formPerfil.addEventListener("submit", function (evento) {
     evento.preventDefault();
@@ -103,8 +331,6 @@ function iniciarFormulario() {
       idade: idade,
       generosFavoritos: generosFavoritos,
     };
-
-    console.log("Usuário capturado:", usuario);
 
     const erros = [];
 
@@ -137,65 +363,30 @@ function iniciarFormulario() {
       return;
     }
 
-    statusResultados.textContent =
-      "Perfil recebido. Suas recomendações serão carregadas em seguida.";
+    const persistiu = salvarPerfil(usuario);
+    let aviso = "";
 
-    console.log("Perfil validado com sucesso:", usuario);
+    if (!persistiu) {
+      aviso =
+        " Não foi possível salvar o perfil neste navegador, então ele não " +
+        "será lembrado na próxima visita.";
+    }
+
+    mostrarResultados(usuario, aviso);
   });
 }
 
 if (typeof document !== "undefined") {
+  const perfilSalvo = lerPerfilSalvo();
+
+  if (perfilSalvo) {
+    mostrarResultados(perfilSalvo, "");
+  } else {
+    mostrarFormulario("Preencha o formulário para receber recomendações.");
+  }
+
   iniciarFormulario();
 }
-
-// ────────────────────────────────────────────────────────────────────────────
-// TODO M1-T06 · RF03 · Persistir perfil no localStorage
-// ────────────────────────────────────────────────────────────────────────────
-// ETAPA 2 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T05
-// DONO DESTA ETAPA: Tiago.
-// O QUE FAZER AQUI
-//   - Ao enviar o formulário, salvar com
-//     localStorage.setItem('cinematchPerfil', JSON.stringify(usuario)).
-//   - Na volta para a página, ler com localStorage.getItem e abrir com
-//     JSON.parse. Tratar o null da primeira visita ANTES de usar: quem entra
-//     pela primeira vez não tem nada salvo, e o getItem devolve null.
-//   - Com perfil salvo, PULAR o formulário e ir direto ao catálogo.
-//   - Ligar o botão "Trocar perfil" para reabrir o formulário na tela. A
-//     parte de mostrar o formulário é do Lucas, em js/ui.js (mesma M1-T06).
-// POR QUE ESTE TRECHO EXISTE
-//   O RF03 pede que o perfil sobreviva ao recarregamento. O localStorage é o
-//   único armazenamento que o Módulo 01 autorizou: sem ele, cada F5 joga o
-//   perfil fora e o formulário reaparece toda vez.
-// REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
-//   semana-11/ceu-aberto/script.js — a FORMA de setItem e de
-//   getItem(...) || padrão. Atenção: o try/catch exigido pela seção 7 do
-//   briefing NÃO aparece nesse arquivo e precisa ser acrescentado aqui.
-// TRECHO DO BRIEFING (docs/BRIEFING.md, RF03, pág. 6)
-//   localStorage.setItem('cinematchPerfil', JSON.stringify(usuario));
-//   const perfilSalvo = localStorage.getItem('cinematchPerfil');
-//   if (perfilSalvo) {
-//     const usuario = JSON.parse(perfilSalvo);
-//     // pula o formulário e mostra o catálogo direto
-//   }
-// CONFORMIDADE
-//   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
-//     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - Envolva a LEITURA e a ESCRITA em try/catch. O modo de falha real não é
-//     exceção de sintaxe: é cota excedida ou storage limpo pelo navegador
-//     (risco 3 do quadro). Se a persistência falhar, siga sem ela e avise na
-//     tela — o app funciona igual, só deixa de lembrar do perfil.
-//   - QUESTÃO ABERTA (decisão do Tiago; este esboço não resolve): o botão
-//     precisa "limpar o registro", e localStorage.removeItem NÃO foi ensinado
-//     (AGENTS.md 2.1) — não usar sem perguntar. Três caminhos, todos só com o
-//     que foi ensinado: (a) reapresentar o formulário sem mexer no registro,
-//     sabendo que a próxima visita pula o formulário de novo porque o perfil
-//     continua salvo; (b) sobrescrever a chave com '' e tratar string vazia
-//     como "sem perfil"; (c) sobrescrever com JSON.stringify(null) e tratar o
-//     null devolvido pelo JSON.parse como "sem perfil". Escolher um e
-//     explicar a escolha no README da M1-T20.
-//   - O id do botão "Trocar perfil" é a definir com o Lucas: ver o contrato
-//     de ids no cabeçalho de região.
-// ────────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────────
 // TODO M1-T07 · RF04 · Buscar catálogo real via fetch
@@ -327,9 +518,10 @@ if (typeof document !== "undefined") {
 // CONFORMIDADE
 //   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
 //     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - Pisar no PLACEHOLDER_MODELO quebra o grafo de módulos, porque o
-//     console.log de bootstrap (linhas 22 a 25) ainda o referencia. Ver o
-//     bloco M1-T17, que é onde isso está registrado por inteiro.
+//   - Pisar no PLACEHOLDER_MODELO agora não quebra nada por si só, porque a
+//     linha de bootstrap que o referenciava saiu no fim da M1-T06: o único
+//     lugar que ainda cita o nome é o `import` do topo. Apagar o nome daqui
+//     e de lá no mesmo passo é o que fecha. Ver o bloco M1-T17.
 //   - A subclasse precisa ACRESCENTAR comportamento, não só repetir o da
 //   mãe: o Critério 7 pede classe, construtor, atributos, método, this e
 //   herança. Uma Serie que não ganha nada da Conteudo tem herança escrita
@@ -520,11 +712,13 @@ if (typeof document !== "undefined") {
 //   import { Conteudo, Serie } from './modelo.js';
 //   import { renderizarCard, exibirMensagemDeErro } from './ui.js';
 // CONFORMIDADE
-//   - O console.log de bootstrap das linhas 22 a 25 PERMANECE, e ele
-//     referencia PLACEHOLDER_UI e PLACEHOLDER_MODELO. Consequência prática:
-//     cada vez que um dos placeholders sair, no mesmo commit, esse console.log
-//     tem de ser ajustado para o export novo. Sem isso, o import some e o
-//     grafo inteiro quebra — e o erro aparece longe da linha que causou.
+//   - A linha de bootstrap que referenciava os dois placeholders foi removida
+//     no fim da M1-T06, porque o professor não quer código de console no
+//     material entregue. Consequência prática: cada vez que um dos
+//     placeholders sair, o `import` correspondente do topo deste arquivo tem de
+//     ser ajustado no mesmo passo, porque é ele — e só ele — que ainda cita o
+//     nome. Sem isso o import vira specifier sem export, e o erro aparece longe
+//     da linha que causou.
 //   - Caminho relativo e com extensão explícita: './ui.js', não './ui'. O
 //     navegador não procura extensão sozinho.
 //   - Citar, não copiar: os nomes dos exports acima são os do exemplo do

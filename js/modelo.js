@@ -65,7 +65,8 @@ export const PLACEHOLDER_MODELO = {
  *   não vista em aula e !important.
  *   Sem perguntar antes de usar: ?. , Object.assign, structuredClone,
  *   AbortController, IntersectionObserver, ResizeObserver, debounce,
- *   throttle, <template>, localStorage.removeItem, padStart e o namespace
+ *   throttle, <template>, o método que apaga uma chave do localStorage,
+ *   padStart e o namespace
  *   Intl. (localeCompare com "pt-BR" NÃO é esse namespace e está liberado).
  *   ?? apareceu uma vez em cinematch_antigo/cinematch.js:211 e não foi
  *   ensinado: não replique.
@@ -122,9 +123,10 @@ export const PLACEHOLDER_MODELO = {
 //   - Os nomesConteudo e Serie são contrato com o briefing, com o quadro e
 //     com o que o professor vai procurar no código. Não renomear.
 //   - A verificação é node --check neste arquivo e node js/script.js no
-//     fluxo: o console.log de bootstrap do script.js referencia
-//     PLACEHOLDER_MODELO, e por isso quebraria junto se este export sumisse
-//     sem ele ser ajustado.
+//     fluxo. A linha de bootstrap que o script.js usava para citar
+//     PLACEHOLDER_MODELO saiu no fim da M1-T06, então hoje o único lugar que
+//     ainda depende deste export existir é o `import` do topo de lá: se este
+//     nome sair daqui sem sair de lá, o grafo inteiro para de carregar.
 // ────────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────────
