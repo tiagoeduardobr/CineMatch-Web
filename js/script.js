@@ -13,13 +13,13 @@
  * A página só funciona servida por `npm start` (live-server): módulos ES não
  * carregam via file://, por causa do CORS. O live-server é instalado na M1-T18.
  */
-import { PLACEHOLDER_UI } from './ui.js';
-import { PLACEHOLDER_MODELO } from './modelo.js';
+import { PLACEHOLDER_UI } from "./ui.js";
+import { PLACEHOLDER_MODELO } from "./modelo.js";
 
 // Confirmação de que o grafo de módulos carregou. Este arquivo também é lido
 // pelo Node na verificação (`node script.js`), então ele não pode tocar em
 // `document`, `window` nem `localStorage` aqui em cima.
-console.log('CineMatch Web: bootstrap carregado.', {
+console.log("CineMatch Web: bootstrap carregado.", {
   ui: PLACEHOLDER_UI,
   modelo: PLACEHOLDER_MODELO,
 });
@@ -86,77 +86,67 @@ console.log('CineMatch Web: bootstrap carregado.', {
  *   Três estados da chamada à API, sempre: carregando, vazio e erro.
  */
 
-// ────────────────────────────────────────────────────────────────────────────
-// TODO M1-T05 · RF02 · Captura e validação do formulário
-// ────────────────────────────────────────────────────────────────────────────
-// ETAPA 1 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T03, M1-T04
-// DONO DESTA ETAPA: Tiago.
-// O QUE FAZER AQUI
-//   - Registrar o submit do #form-perfil com addEventListener e chamar
-//     preventDefault() PRIMEIRO: sem ele a página recarrega e o que a pessoa
-//     digitou desaparece antes de chegar no localStorage.
-//   - Montar o objeto `usuario` com { nome, idade, generosFavoritos }, o
-//     mesmo formato do projeto da semana 6.
-//   - Ler os checkboxes de gênero por name="genero" — quem agrupa é o
-//     atributo name, não o id — e guardar o resultado em um array.
-//   - Juntar os erros de validação em um array `erros` e mostrar na tela o que
-//     falta: nome vazio, idade fora de faixa, nenhum gênero marcado.
-//   - Confirmar com console.log que o objeto saiu como se espera.
-// POR QUE ESTE TRECHO EXISTE
-//   Na semana 6 o perfil vinha de prompt-sync, no terminal. No navegador não
-//   existe prompt: a única porta de entrada é o evento submit. Sem capturá-lo
-//   a página recarrega e o formulário inteiro se perde.
-// REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
-//   semana-09/exercicio-form/script.js — FormData, preventDefault(),
-//   getAll() para pegar vários valores que compartilham o mesmo name, e o
-//   array `erros` de validação. Copie a FORMA, não as linhas. O caminho é
-//   referência, não arquivo para abrir: só o cinematch_antigo/ está clonado
-//   nesta cópia de trabalho.
-// TRECHO DO BRIEFING (docs/BRIEFING.md, RF02, pág. 5; o bloco inteiro está em
-// docs/BRIEFING.md:167-184; a primeira reticência elide o campo de idade e o
-// fieldset com o legend, e a segunda o checkbox de Action e o comentário)
-//   <form id="form-perfil">
-//     <label for="nome">Nome</label>
-//     <input type="text" id="nome" required>
-//     ...   (6 linhas elididas: o campo de idade e o fieldset com o legend)
-//     <label><input type="checkbox" name="genero" value="Drama"> Drama</label>
-//     <label><input type="checkbox" name="genero" value="Comedy"> Comédia</label>
-//     ...   (2 linhas elididas: o checkbox de Action e o comentário)
-//   </fieldset>
-//   <button type="submit">Ver recomendações</button>
-// </form>
-//   e pág. 6: "A captura deve acontecer no evento submit, com
-//   preventDefault(), montando o mesmo tipo de objeto usuario do projeto
-//   anterior (nome, idade, generosFavoritos)."
-// CONFORMIDADE
-//   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
-//     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - O value dos checkbox fica EM INGLÊS, como no exemplo do professor:
-//     value="Comedy" com o rótulo visível "Comédia". É o value que será
-//     comparado com o que a API devolve, e a TVMaze devolve em inglês —
-//     conferido em 28/09/2026, https://api.tvmaze.com/shows/1 traz
-//     "genres":["Drama","Science-Fiction","Thriller"]. Se o value for
-//     "Comédia", a comparação nunca casa e TODA série sai com 0%, sem erro
-//     visível na tela. O Critério 5 pesa 1,00: esse é o erro mais caro do
-//     projeto.
-//   - Para comparar, use normalizarTexto() (cinematch_antigo/cinematch.js:284)
-//     só para caixa e acento. Ela NÃO traduz: "Comédia" continua "comédia".
-//     A padronizarGenero() da linha 261 existe no projeto da semana 6 porque
-//     o catálogo fictício era em português; aqui ela resolve o problema
-//     errado.
-//   - A lista de value e o id do botão vivem no index.html, que é da M1-T03,
-//     do Lucas: a decisão é dos dois. Não inventar um valor sem combinar.
-//   - QUESTÃO ABERTA (decisão do Tiago; este esboço não resolve): esta etapa
-//     precisa tocar `document`, e o `node js/script.js` é justamente a
-//     verificação que prova que o grafo de módulos carregou (risco 6 do plano).
-//     As duas coisas não convivem. As saídas são: (a) o querySelector e o
-//     addEventListener ficam dentro de uma função de inicialização, e o topo do
-//     módulo continua limpo — que é a convenção que o comentário de bootstrap
-//     da M1-T01, nas linhas 19 a 21 deste arquivo, já pressupõe; ou
-//     (b) a verificação passa a ser só `node --check`, e o console.log de
-//     bootstrap vira memória do que já foi conferido. Escolher uma muda o que
-//     esta etapa escreve, e escolher é do Tiago.
-// ────────────────────────────────────────────────────────────────────────────
+function iniciarFormulario() {
+  const formPerfil = document.querySelector("#form-perfil");
+  const statusResultados = document.querySelector("#resultados-status");
+
+  formPerfil.addEventListener("submit", function (evento) {
+    evento.preventDefault();
+
+    const formData = new FormData(formPerfil);
+    const nome = formData.get("nome");
+    const idade = Number(formData.get("idade"));
+    const generosFavoritos = formData.getAll("genero");
+
+    const usuario = {
+      nome: nome.trim(),
+      idade: idade,
+      generosFavoritos: generosFavoritos,
+    };
+
+    console.log("Usuário capturado:", usuario);
+
+    const erros = [];
+
+    if (usuario.nome === "") {
+      erros.push("Informe seu nome.");
+    }
+
+    if (Number.isNaN(usuario.idade) || usuario.idade < 1) {
+      erros.push("Informe uma idade válida.");
+    }
+
+    if (usuario.generosFavoritos.length === 0) {
+      erros.push("Selecione pelo menos um gênero favorito.");
+    }
+
+    statusResultados.textContent = "";
+
+    if (erros.length > 0) {
+      const mensagemErros = document.createElement("ul");
+      mensagemErros.setAttribute("role", "alert");
+      mensagemErros.setAttribute("aria-live", "assertive");
+
+      for (let i = 0; i < erros.length; i++) {
+        const itemErro = document.createElement("li");
+        itemErro.textContent = erros[i];
+        mensagemErros.appendChild(itemErro);
+      }
+
+      statusResultados.appendChild(mensagemErros);
+      return;
+    }
+
+    statusResultados.textContent =
+      "Perfil recebido. Suas recomendações serão carregadas em seguida.";
+
+    console.log("Perfil validado com sucesso:", usuario);
+  });
+}
+
+if (typeof document !== "undefined") {
+  iniciarFormulario();
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // TODO M1-T06 · RF03 · Persistir perfil no localStorage
@@ -340,7 +330,7 @@ console.log('CineMatch Web: bootstrap carregado.', {
 //   - Pisar no PLACEHOLDER_MODELO quebra o grafo de módulos, porque o
 //     console.log de bootstrap (linhas 22 a 25) ainda o referencia. Ver o
 //     bloco M1-T17, que é onde isso está registrado por inteiro.
-//   - A subclasse precisa ACESCENTAR comportamento, não só repetir o da
+//   - A subclasse precisa ACRESCENTAR comportamento, não só repetir o da
 //   mãe: o Critério 7 pede classe, construtor, atributos, método, this e
 //   herança. Uma Serie que não ganha nada da Conteudo tem herança escrita
 //   e sem função. Ver js/modelo.js, etapa 1.
@@ -369,7 +359,7 @@ console.log('CineMatch Web: bootstrap carregado.', {
 // POR QUE ESTE TRECHO EXISTE
 //   O cálculo sozinho não devolve nada visível. Alguém precisa percorrer o
 //   catálogo, chamar o método e juntar o que a tela precisa. É o papel do
-//   módulo de fluxo: orchestrar, sem saber detalhe de tela nem de fórmula.
+//   módulo de fluxo: orquestrar, sem saber detalhe de tela nem de fórmula.
 // REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
 //   cinematch_antigo/cinematch.js — três funções, com papéis distintos, e
 //   confundi-las é o erro mais caro deste bloco.
@@ -481,7 +471,7 @@ console.log('CineMatch Web: bootstrap carregado.', {
 //   - Nada de variável global para o total: o Critério 8 é sobre o escopo
 //     fechado, e um global entrega o número sem a mecânica.
 //   - Voltar a zero no carregamento da página é o esperado: o RF11 fala em
-//     "nesta sessão". Guardar o total no localStoragearia mudaria o
+//     "nesta sessão". Guardar o total no localStorage aria mudaria o
 //     significado e não foi pedido.
 // ────────────────────────────────────────────────────────────────────────────
 
