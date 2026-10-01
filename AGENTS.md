@@ -52,7 +52,7 @@ A semana 6 é o mini-projeto da linha de cima e a semana 13 é este projeto. Nen
 | RF | Referência |
 | --- | --- |
 | RF02 Formulário e validação | `semana-09/exercicio-form/script.js` — `FormData`, `preventDefault()`, `getAll()`, array `erros` |
-| RF03 `localStorage` | `semana-11/ceu-aberto/script.js` — `setItem(chave, valor)` e `getItem(...) \|\| padrão`. É a referência da **forma** da API; o `try/catch` exigido pela Seção 7 não aparece nesse arquivo |
+| RF03 `localStorage` | `semana-11/ceu-aberto/script.js` — `setItem(chave, valor)` e `getItem(...) \|\| padrão`. É a referência da **forma** da API; o `try/catch` exigido pela Seção 7 não aparece nesse arquivo e foi acrescentado em `js/script.js` pela `M1-T06`, nas funções `salvarPerfil()` e `lerPerfilSalvo()`. Os quatro métodos foram ensinados: `setItem` (salvar), `getItem` (ler), `removeItem` (remover **uma** chave) e `clear` (apagar **tudo**). Contrato do `getItem`: devolve **`null`** quando a chave não existe, **nunca `undefined`** |
 | RF04 `fetch` | `semana-11/ceu-aberto-api/script.js` — `try`/`catch`, `response.ok === false`, `throw new Error` |
 | RF05 Métodos de array | `cinematch_antigo/cinematch.js` — `map`, `filter`, `find` e `sort` com `localeCompare("pt-BR")` |
 | RF06 Herança e `this` | `cinematch_antigo/class.js` — `Serie extends Conteudo`, `super()`, `instanceof` |
@@ -69,11 +69,11 @@ RF01 e RF15 não têm linha própria. O RF01 tem exemplo em `semana-11/ceu-abert
 
 #### Não ensinado — não use sem perguntar
 
-Nenhum item abaixo aparece em nenhum dos dois repositórios. Se um deliverable exigir algum deles, pergunte antes de escrever: encadeamento opcional `?.`, `Object.assign`, `structuredClone`, `AbortController`, `IntersectionObserver` e `ResizeObserver`, *debounce*, *throttle*, `<template>`, `localStorage.removeItem`, `padStart` e `Intl.`.
+Nenhum item abaixo aparece em nenhum dos dois repositórios. Se um deliverable exigir algum deles, pergunte antes de escribir: encadeamento opcional `?.`, `Object.assign`, `structuredClone`, `AbortController`, `IntersectionObserver` e `ResizeObserver`, *debounce*, *throttle*, `<template>`, `padStart` e `Intl.`.
 
 Um caso fora da lista, para não confundir: `??` aparece **uma vez** em `cinematch_antigo/cinematch.js:211`, no cálculo do próximo id. Não foi ensinado e não deve ser replicado.
 
-Dois contrapontos, porque a lista é curta e pode ser lida ao contrário. `localeCompare` com `"pt-BR"` **não** é o namespace `Intl.` e está liberado — é o que o RF05 exige. E o `removeItem` é o caso prático: o botão "Trocar perfil" precisa apagar o perfil salvo e o método não foi ensinado. Resolva reapresentando o formulário, no padrão da semana 09, em vez de inventar a API.
+Um contraponto, porque a lista é curta e pode ser lida ao contrário. `localeCompare` com `"pt-BR"` **não** é o namespace `Intl.` e está liberado — é o que o RF05 exige.
 
 #### Conflitos entre o que foi ensinado e o que é permitido aqui
 
@@ -210,14 +210,26 @@ O diretório externo para trabalho temporário, como scripts e extrações, é `
 - **O console do PowerShell corrompe acentuação na saída**, e `Módulo` vira `M�dulo`. O arquivo em si está correto em UTF-8. **Não "conserte" acentuação que só está errada na tela do terminal** — isso corromperia o arquivo.
 - `Get-ChildItem`, `Get-Content` e `Set-Content` devem ser evitados em favor das ferramentas dedicadas de leitura, busca e escrita.
 
+### Template literals são obrigatórios (convenção de sintaxe)
+
+**Regra.** Toda string que interpola valor é escrita com **template literal** — crase com `${}` dentro. Concatenação com `+` não é usada em código novo: onde ela já existe, é caso para refatorar na próxima task que tocar o arquivo, e não para propagar.
+
+**Por que isso não viola a seção 2.1.** A regra do "material ensinado" proíbe escrever por analogia com boa prática genérica, e template literal poderia parecer exatamente isso — uma preferência de estilo que ninguém viu em aula. Não é. A técnica **foi ensinada**, e a prova está no mini-projeto da semana 6, `cinematch_antigo/cinematch.js`, que interpola com crase nas linhas **27, 29, 161, 332 a 336 e 370 a 373**. Sem essas linhas, a regra seria opinião; com elas, é citação. É isso que impede alguém de tratar a convenção como "boa prática genérica". Quem precisar conferir, abra o arquivo — não reescreva a regra de memória.
+
+**O caso atual já foi corrigido.** A convenção **já está aplicada** em `js/script.js`: medido em código, são **3 pontos** de interpolação com `${}` e **0** concatenações com `+`, as quatro que existiam tendo virado crase. A métrica não é a contagem crua: o próprio arquivo **comenta as duas sintaxes**, o que dá falso positivo, e por isso a contagem **remove os comentários antes de medir** — a receita está na lição **4.9** do `docs/AI_HANDOVER_CONTEXT.md`. O comentário que antes justificava a concatenação, perto da linha **261**, **foi reescrito** e hoje afirma o contrário do que afirmava: que a crase é a forma de interpolar valor neste projeto, e que a defesa contra XSS é o **destino** do valor, o `textContent`, não a crase — o aviso completo sobre isso é o blockquote logo abaixo. **Isso não revoga a convenção**, que continua valendo para código novo: a conformidade de hoje é consequência de uma task, não o motivo da regra, e o próximo `+` que aparecer é o mesmo caso que este era, refatorar na task que tocar o arquivo.
+
+> **Advertência — template literal NÃO é defesa contra XSS, e nunca deve ser apresentado como tal.** `${}` não escapa, não sanitiza e não neutraliza nada. Dado que vem da API ou que foi digitado por pessoa usuária **é XSS** quando é interpolado numa string que depois é atribuída a `innerHTML`; é esse o risco que a regra acima **não** cobre. Trocar `+` por crase **não muda nada** nessa frente, porque o dado interpolado continua indo para o mesmo lugar — a crase muda a sintaxe, não o destino do valor.
+>
+> A defesa real, e a única, é **`textContent` e `createElement`**: eles escrevem o dado como texto e nunca o interpretam como marcação. É isso que os cards de fato usam hoje — medido no repositório, `innerHTML` aparece **0 vezes em código** nos três módulos, e as únicas ocorrências estão em comentários e no esboço comentado de `js/ui.js`. Se `innerHTML` entrar em código executado, isso vira violação, mesmo dentro de uma crase.
+
 ### Gotchas técnicas do projeto
 
 - **Módulos ES não funcionam via `file://`.** Abrir o `index.html` por duplo clique dispara erro de CORS nos `import` e a página fica sem JavaScript. Sirva sempre com `npm start`, que roda o `live-server` na porta 8080. O botão "Trocar perfil" nunca deve recarregar via `file://`.
 - **TVMaze API:** `https://api.tvmaze.com/shows?page=0` responde com `Access-Control-Allow-Origin: *`, então o CORS não bloqueia — mas confirme na aba Network do DevTools. **Nunca** desabilite a segurança do navegador para "fazer funcionar".
 - **Nem toda série tem gênero ou nota preenchidos.** Sempre filtre antes de usar, verificando `genres.length > 0` e `rating.average`.
-- **`localStorage`:** a chave é `cinematchPerfil`. Trate o `null` da primeira visita. Envolva leitura e escrita em `try/catch`, porque o modo de falha real é **cota excedida ou storage limpo pelo navegador**, não exceção em `setItem`. Se a persistência falhar, siga sem ela e avise na tela.
+- **`localStorage`:** a chave é `cinematchPerfil`. Trate o `null` da primeira visita. `removeItem` **está disponível e foi ensinado**, então apagar o perfil salvo para o botão "Trocar perfil" é uso legítimo da API — apague a chave, não invente. `getItem` devolve **`null`** quando a chave não existe e **nunca `undefined`**: compare com `null` ou teste o valor, não com `=== undefined`. Envolva leitura e escrita em `try/catch`, porque o modo de falha real é **cota excedida ou storage limpo pelo navegador**, não exceção em `setItem`. Se a persistência falhar, siga sem ela e avise na tela. **`clear()` é proibido neste projeto:** ele apaga **todas** as chaves da origem, não só a do CineMatch, e destruiria o registro de qualquer outra aplicação servida no mesmo host — nunca chame, porque o efeito é indiscriminado.
 - **Trate os três estados da chamada:** carregando, vazio e erro. O `setTimeout` do RF12 vai na **exibição**, nunca dentro do `fetch`, onde mascararia o estado de erro.
-- **Escaping em template literals:** os cards são gerados com `innerHTML`. Se algum dado da API entrar interpolado, isso é XSS. Sanitize ou construa com `createElement` e `textContent`.
+- **Escaping e XSS:** a defesa é **`textContent` e `createElement`**, não a crase. Os cards são construídos com `createElement` e escritos com `textContent`, que põem o dado na tela como texto e nunca o interpretam como marcação — é o que o código faz hoje, com `innerHTML` em código aparecendo **0 vezes** nos três módulos. Template literal é a **sintaxe obrigatória por convenção** (veja a subseção acima) e **não é, sozinha, proteção nenhuma**: `${}` não escapa nada. Se um dado da API, ou digitado por pessoa usuária, for interpolado numa string que depois entra em `innerHTML`, isso é XSS mesmo dentro de crase.
 
 ---
 
@@ -305,5 +317,18 @@ Prazo: **05/10/2026 até 22h**, contado pela última atualização no repositór
 | cinematch_antigo/class.js, cinematch_antigo/cinematch.js, cinematch_antigo/catalogo.js | Entrega da semana 6 e base da lógica: classes, compatibilidade, closure, callback e setTimeout. Não editar; consultar conforme a seção 2.1 |
 | cspell.json | Dicionário de termos em pt-BR para o Code Spell Checker. Configuração de editor, não entra na aplicação |
 | `.opencode/plans/` | Planos de implementação, quando houver |
+
+### Resumo de convenções
+
+Índice rápido das regras cujo porquê está na seção correspondente deste arquivo.
+
+- Sem framework de JavaScript e sem CSS Grid: só HTML5, CSS3 com Flexbox e JavaScript puro.
+- Módulos ES nativos, com `import` e `export`, nunca `require` nem `module.exports`.
+- Template literal, com crase e `${}`, em toda string que interpola valor.
+- `const` por padrão; `let` somente quando o valor realmente muda.
+- Sem `console.log` no código entregue — o professor afastou esse requirement do briefing.
+- Sem `!important`: ajuste o seletor ou apague a regra.
+- `localStorage` sempre em `try/catch`, com `removeItem` liberado e `clear()` proibido.
+- Versione arquivo por nome explícito, com `git add <arquivo>`.
 
 > **Regra de precedência:** quando este arquivo, o `docs/KANBAN.md` e o PDF divergirem, o **PDF vence** — é o briefing do professor. Corrija os outros dois. Para o *como* escrever o código, a fonte de verdade é a seção 2.1.
