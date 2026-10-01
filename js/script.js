@@ -91,9 +91,9 @@ import { PLACEHOLDER_MODELO } from "./modelo.js";
  *   não vista em aula e !important.
  *   Sem perguntar antes de usar: ?. , Object.assign, structuredClone,
  *   AbortController, IntersectionObserver, ResizeObserver, debounce,
- *   throttle, <template>, o método que apaga uma chave do localStorage,
- *   padStart e o namespace
- *   Intl. (localeCompare com "pt-BR" NÃO é esse namespace e está liberado).
+ *   throttle, <template>, padStart e o namespace Intl. (localeCompare com
+ *   "pt-BR" NÃO é esse namespace e está liberado). O método que apaga UMA
+ *   chave saiu da lista porque foi ensinado; o clear, que apaga todas, não.
  *   ?? apareceu uma vez em cinematch_antigo/cinematch.js:211 e não foi
  *   ensinado: não replique.
  *   Três estados da chamada à API, sempre: carregando, vazio e erro.
@@ -185,11 +185,11 @@ function salvarPerfil(usuario) {
  * Lê o perfil gravado e devolve o objeto, ou null quando não há perfil.
  *
  * O `if (!perfilSalvo)` é o mesmo mecanismo do `getItem(...) || padrão` da
- * semana 11, escrito com if. O getItem devolve null na primeira visita, e o
- * null e a string vazia são os dois falsy — então um só teste cobre os dois
- * casos. Não é `perfilSalvo === null` de propósito: a string vazia é
- * exatamente o que o "Trocar perfil" deixa na chave (ver limparPerfilSalvo)
- * e ela também precisa contar como "sem perfil".
+ * semana 11, escrito com if: o getItem devolve null na primeira visita, e o
+ * null e a string vazia são os dois falsy, então um teste só cobre os dois
+ * casos. Não é `perfilSalvo === null` de propósito: a string vazia ainda pode
+ * estar na chave de quem usou a versão anterior deste arquivo, que sobrescrevia
+ * com "", e ela também precisa contar como "sem perfil".
  *
  * O try/catch cobre dois lançamentos, não um: o getItem lança quando o
  * storage está bloqueado, e o JSON.parse lança quando o conteúdo da chave não
@@ -212,24 +212,24 @@ function lerPerfilSalvo() {
 }
 
 /**
- * "Limpa" o registro sobrescrevendo a chave com string vazia.
+ * Apaga o registro do perfil, tirando a chave do `localStorage`.
  *
- * POR QUE NÃO o método que apaga uma chave do `localStorage`: ele não foi
- * ensinado (AGENTS.md 2.1) e está na lista do que não pode ser usado sem
- * perguntar. A alternativa usa só a função da semana 11 — setItem é a mesma
- * coisa que grava, e o efeito, do ponto de vista de quem lê, é o mesmo: a
- * chave volta a não ter perfil. E o motivo de a string vazia bastar está no
- * `if (!perfilSalvo)` do lerPerfilSalvo: "" é falsy, exatamente como o null da
- * primeira visita, então a próxima leitura cai no mesmo caminho.
+ * POR QUE ESTE MÉTODO E NÃO SOBRESCREVER COM "": quando este bloco foi
+ * escrito, o AGENTS.md 2.1 punha o método que apaga uma chave na lista do
+ * que não pode ser usado sem perguntar, e a informação estava errada — ele
+ * foi ensinado. A solução da época era `setItem(CHAVE_PERFIL, "")`, e ela
+ * resolvia pelo avesso: apagava o conteúdo e deixava a chave, e um registro
+ * vazio na origem é um estado que a aplicação nunca pediu para ter. Com
+ * removeItem a frase diz o que quer dizer — "esta chave não existe mais" —
+ * e o getItem volta a devolver null, que é o contrato da primeira visita:
+ * o efeito para quem lê é o mesmo, e agora é pela API, não por truque.
  *
- * Isto não apaga a chave: ela continua no storage, com "" como valor. É a
- * diferença real entre esta escolha e o apagamento da chave, e ela é inofensiva
- * porque nada mais lê essa chave — o consumo do código é idêntico ao de uma
- * chave que nunca tivesse sido criada.
+ * POR QUE O try/catch: o mesmo do salvarPerfil — cota excedida ou storage
+ * bloqueado lançam exceção, e sem tratamento o clique ficaria sem resposta.
  */
 function limparPerfilSalvo() {
   try {
-    localStorage.setItem(CHAVE_PERFIL, "");
+    localStorage.removeItem(CHAVE_PERFIL);
     return true;
   } catch (erro) {
     return false;
@@ -258,16 +258,16 @@ function mostrarResultados(usuario, aviso) {
 
   formPerfil.hidden = true;
 
-  // Concatenação com `+` e não template literal: o nome entra como texto
-  // puro e a saída vai por textContent, que nunca interpreta marcação. É a
-  // mesma defesa contra XSS que a M1-T11 vai aplicar nos cards, e o motivo de
-  // o nome digitado por pessoa usuária não poder passar por innerHTML.
-  const saudacao =
-    "Olá, " +
-    usuario.nome +
-    "! Suas recomendações serão carregadas em seguida.";
+  // Template literal, e não concatenação com `+`: a crase é a forma de
+  // interpolar valor neste projeto. Mas a crase NÃO é a defesa contra XSS:
+  // `${}` não escapa nada, e trocar `+` por crase não mudaria nada nessa
+  // frente. A defesa é o DESTINO do valor, e o destino aqui é o textContent
+  // lá embaixo: escreve o nome como texto e nunca o interpreta como
+  // marcação. É o mesmo caminho que a M1-T11 aplica nos cards, e aqui o dado
+  // é o nome que quem preencheu o formulário digitou.
+  const saudacao = `Olá, ${usuario.nome}! Suas recomendações serão carregadas em seguida.`;
 
-  statusResultados.textContent = saudacao + aviso;
+  statusResultados.textContent = `${saudacao}${aviso}`;
 }
 
 /**
@@ -310,10 +310,10 @@ function iniciarFormulario() {
       // Mesma regra do risco 3 no caminho inverso: a falha do storage é
       // avisada e o formulário abre de qualquer forma. O aviso precisa dizer a
       // consequência, que é o que importa: o perfil velho pode voltar a pular
-      // o formulário na próxima visita.
+      // o formulário na próxima visita. A frase abaixo é uma crase sem `${}`:
+      // não entra valor nenhum nela, e o texto inteiro fica em uma linha só.
       mostrarFormulario(
-        "Preencha o formulário de novo. Não conseguimos atualizar o registro " +
-          "deste navegador, então ele pode abrir sozinho na próxima visita."
+        `Preencha o formulário de novo. Não conseguimos atualizar o registro deste navegador, então ele pode abrir sozinho na próxima visita.`
       );
     }
   });
@@ -367,9 +367,9 @@ function iniciarFormulario() {
     let aviso = "";
 
     if (!persistiu) {
+      // O espaço inicial é proposital: o aviso entra no fim da saudação.
       aviso =
-        " Não foi possível salvar o perfil neste navegador, então ele não " +
-        "será lembrado na próxima visita.";
+        ` Não foi possível salvar o perfil neste navegador, então ele não será lembrado na próxima visita.`;
     }
 
     mostrarResultados(usuario, aviso);

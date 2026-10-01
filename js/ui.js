@@ -77,9 +77,9 @@ export const PLACEHOLDER_UI = {
  *   não vista em aula e !important.
  *   Sem perguntar antes de usar: ?. , Object.assign, structuredClone,
  *   AbortController, IntersectionObserver, ResizeObserver, debounce,
- *   throttle, <template>, o método que apaga uma chave do localStorage,
- *   padStart e o namespace
- *   Intl. (localeCompare com "pt-BR" NÃO é esse namespace e está liberado).
+ *   throttle, <template>, padStart e o namespace Intl. (localeCompare com
+ *   "pt-BR" NÃO é esse namespace e está liberado). O método que apaga UMA
+ *   chave saiu da lista porque foi ensinado; o clear, que apaga todas, não.
  *   ?? apareceu uma vez em cinematch_antigo/cinematch.js:211 e não foi
  *   ensinado: não replique.
  *   Três estados da chamada à API, sempre: carregando, vazio e erro.
@@ -208,7 +208,8 @@ export const PLACEHOLDER_UI = {
 //     com className ou classList, e anexar com appendChild em #resultados.
 //   - Mostrar o que o RF08 pede: título, gêneros em comum, gêneros não
 //     explorados, percentual de compatibilidade e a classificação.
-//   - Concatenar os gêneros em texto: .join(', ') numa lista, sem HTML.
+//   - Juntar os gêneros em texto com `.join(', ')`, e escrever com
+//     `textContent`: o RF08 pede dado na tela, e dado na tela é texto.
 //   - Onde o script.js chama: uma vez por item do array de resultados, que
 //     chega pronto da M1-T10 (o cálculo é de lá, não daqui).
 // POR QUE ESTE TRECHO EXISTE
@@ -234,14 +235,43 @@ export const PLACEHOLDER_UI = {
 // CONFORMIDADE
 //   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
 //     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - QUESTÃO ABERTA (decisão do Lucas; este esboço não resolve): o exemplo
-//     acima usa card.innerHTML com template literal, e o AGENTS.md, seção 7,
-//     alerta que dado da API interpolado ali é XSS. O dado é real: conferido
-//     em 28/09/2026, https://api.tvmaze.com/shows/1 devolveu summary com
-//     HTML dentro ("<p><b>Under the Dome</b> is the story of…"). Duas
-//     saídas: (a) createElement com textContent, que é a referência ensinada
-//     do RF08 e resolve; (b) innerHTML, sanitizando o que vem da API. Se for
-//     (b), explicar a escolha no vídeo do Critério 1.
+//   - QUESTÃO ABERTA DESTA ETAPA, FECHADA: o exemplo do professor acima monta o
+//     card com card.innerHTML e interpola o dado da API dentro da crase. Duas
+//     saídas existiam: (a) createElement com textContent, que é a referência
+//     ensinada do RF08; (b) innerHTML, sanitizando o que vem da API. Fica a
+//     (a), e a (b) está descartada: sanitizar exigiria uma API que não foi
+//     ensinada, e o RF08 não pede sanitize.
+//   - POR QUE, COM DADO REAL: o risco não é teórico. Conferido em 28/09/2026,
+//     https://api.tvmaze.com/shows/1 devolveu summary com HTML dentro
+//     ("<p><b>Under the Dome</b> is the story of…"). E a crase não salva
+//     nada disso: `${}` não escapa, e trocar `+` por crase não mudaria nada
+//     contra XSS. O que protege é o DESTINO do valor, e o destino seguro é o
+//     textContent. Então a marcação é montada com createElement e cada dado
+//     entra por textContent, e a crase aparece só onde o valor é lido, nunca
+//     dentro de uma tag.
+//   - O DESENHO DESTA ETAPA, em comentário, é o que a função deve escrever:
+//       const card = document.createElement("article");
+//       card.className = "card-serie";
+// 
+//       const titulo = document.createElement("h3");
+//       titulo.textContent = resultado.titulo;
+//       card.appendChild(titulo);
+// 
+//       const percentual = document.createElement("p");
+//       percentual.textContent = `Compatibilidade: ${resultado.percentual}%`;
+//       card.appendChild(percentual);
+// 
+//       const badge = document.createElement("span");
+//       badge.classList.add("badge");
+//       badge.textContent = resultado.classificacao;
+//       card.appendChild(badge);
+// 
+//       document.querySelector("#resultados").appendChild(card);
+//     A classe da faixa — badge-alta, badge-media ou badge-baixa — entra em uma
+//     classList.add logo depois da de "badge", e é a classificação que decide
+//     qual delas; ver a DECLARAÇÃO DE DESVIO abaixo. Ela não aparece desenhada
+//     aqui de propósito: o texto da classificação é da M1-T10, e desenhá-lo
+//     aqui seria inventar o contrato antes de ele existir.
 //   - CONTRATO DE NOMES COM O CSS (a dependência mais provável de
 //     retrabalho entre duas pessoas, e o Lucas é o dono dos dois lados):
 //     o card precisa destas classes, e a M1-T12 é quem as estiliza:
@@ -260,8 +290,10 @@ export const PLACEHOLDER_UI = {
 //     estilo não depende do texto exato que a classificação assumir. Fica
 //     declarado aqui para não virar parecer descumprimento do RF08 na
 //     revisão.
-//   - innerHTML apagando e recriando os cards a cada chamada faria a grade
-//     piscar. Limpar o container uma vez, no script.js, e depois anexar.
+//   - Como o card é montado com createElement e anexado com appendChild, a
+//     grade não pisca: cada card entra uma vez. Se algum dia for preciso
+//     re-renderizar, a limpeza é um remove() por filho — a mesma API do
+//     semana-08 —, e ela fica no script.js, uma vez, antes dos anexos.
 // ────────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────────
