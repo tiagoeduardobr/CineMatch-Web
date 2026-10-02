@@ -7,21 +7,23 @@
  *
  * Os `import` abaixo já apontam para os dois módulos irmãos, na mesma pasta, com
  * caminho relativo e extensão explícita — é assim que o navegador resolve módulos
- * ES. Os placeholders existem para que este arquivo carregue sem erro e saiam na
- * M1-T09 (modelo.js) e na M1-T11 (ui.js).
+ * ES. Os placeholders existiam para que este arquivo carregasse sem erro: o
+ * PLACEHOLDER_MODELO saiu na M1-T09 (modelo.js) e o PLACEHOLDER_UI sai na
+ * M1-T11 (ui.js).
  *
  * A página só funciona servida por `npm start` (live-server): módulos ES não
  * carregam via file://, por causa do CORS. O live-server é instalado na M1-T18.
  */
 import { PLACEHOLDER_UI, exibirMensagemDeErro, exibirMensagemDeCatalogoVazio } from "./ui.js";
-import { PLACEHOLDER_MODELO } from "./modelo.js";
+import { Conteudo, Serie } from "./modelo.js";
 
 // Os dois `import` acima continuam apontando para os placeholders, e por isso
-// nenhum dos dois nomes aparece no corpo do arquivo: PLACEHOLDER_MODELO sai
-// na M1-T09, quando as classes entrarem em modelo.js, e PLACEHOLDER_UI sai na
-// M1-T11, quando o renderizarCard entrar em ui.js. Um import que ainda não é
-// usado não quebra o módulo — o grafo carrega igual — e é o estado
-// intermediário que o bloco M1-T17, no fim deste arquivo, descreve.
+// nenhum dos dois nomes aparece no corpo do arquivo: JÁ FEITO NA M1-T09:
+// PLACEHOLDER_MODELO saiu no mesmo passo em que as classes entraram em
+// modelo.js, e PLACEHOLDER_UI sai na M1-T11, quando o renderizarCard entrar
+// em ui.js. Um import que ainda não é usado não quebra o módulo — o grafo
+// carrega igual — e é o estado intermediário que o bloco M1-T17, no fim
+// deste arquivo, descreve.
 //
 // NÃO HÁ LINHA DE CONSOLE NESTE ARQUIVO, e isso é decisão, não esquecimento:
 // o professor não quer código de console no material entregue. O que a linha de
@@ -617,7 +619,7 @@ async function buscarCatalogo(aviso) {
  * O QUE ESTE TRECHO FAZ
  *   Toma o catálogo bruto que a M1-T07 guardou em catalogoBruto e devolve o
  *   array de no máximo 8 objetos { id, titulo, tipo, generos, duracaoMinutos }
- *   que a M1-T09 instancia. A cadeia filter → sort → slice → map é a do
+ *   que a M1-T10 instancia. A cadeia filter → sort → slice → map é a do
  *   briefing e é ela que fecha o Critério 6 (utilização de métodos de array),
  *   mede a linha da M1-T08 no Critério 4 e ativa o estado vazio do trio da
  *   seção 7: quando o filtro não sobra nada, a tela explica em vez de deixar
@@ -696,8 +698,8 @@ async function buscarCatalogo(aviso) {
 
 // `let` porque este é o segundo valor do módulo que muda: a cada chamada de
 // buscarCatalogo o tratamento daquela busca sobrescreve o anterior, e é essa
-// a tarefa da variável — a M1-T09 instancia Serie a partir dela e a M1-T10
-// consome a lista. O array começa vazio para a leitura nunca estourar se
+// a tarefa da variável — a M1-T10 instancia Serie a partir dela e consome a
+// lista. O array começa vazio para a leitura nunca estourar se
 // algo consumir a variável antes de a rede responder, mesma razão do
 // catalogoBruto.
 let catalogoTratado = [];
@@ -705,7 +707,7 @@ let catalogoTratado = [];
 /**
  * Devolve o catálogo bruto tratado: filtrado, ordenado por nota, cortado nos
  * 8 primeiros e convertido na forma { id, titulo, tipo, generos,
- * duracaoMinutos } que a M1-T09 instancia.
+ * duracaoMinutos } que a M1-T10 instancia.
  *
  * POR QUE A ORDEM É filter → sort → slice → map E NÃO QUALQUER OUTRA
  *   É a ordem literal do briefing, e a única que entrega o que a frase
@@ -788,13 +790,16 @@ if (typeof document !== "undefined") {
 // ETAPA 5 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T08
 // DONO DESTA ETAPA: Tiago.
 // O QUE FAZER AQUI
-//   - Ampliar o import da linha 17 deste arquivo: hoje ele traz só
-//     PLACEHOLDER_MODELO, e passa a trazer as classes reais de ./modelo.js.
-//   - Instanciar uma Serie para cada item do catálogo tratado na M1-T08,
-//     passando o objeto já tratado. As classes são escritas em js/modelo.js,
-//     etapa 1 da M1-T09.
-//   - APAGAR PLACEHOLDER_MODELO de modelo.js e do import daqui, no mesmo
-//     passo. Ele é provisório e existia só para o grafo carregar.
+//   - JÁ FEITO NA M1-T09: Ampliar o import da linha 17 deste arquivo: ele
+//     trazia só PLACEHOLDER_MODELO e passou a trazer as classes reais de
+//     ./modelo.js.
+//   - Instanciar uma Serie para cada item do catálogo tratado na M1-T08.
+//     ESTE PASSO AINDA NÃO FOI FEITO: na M1-T09 saíram as classes e o import
+//     da linha 17. Nenhum `new Serie` existe nos três módulos ainda — a M1-T10
+//     instancia, percorrendo o catálogo tratado com map.
+//   - JÁ FEITO NA M1-T09: APAGAR PLACEHOLDER_MODELO de modelo.js e do import
+//     daqui, no mesmo passo. Ele era provisório e existia só para o grafo
+//     carregar.
 // POR QUE ESTE TRECHO EXISTE
 //   O RF06 é o reaproveitamento do que a semana 6 já fez. Adaptar é a palavra
 //   do briefing: as classes continuam sendo Conteudo e Serie, mas recebem os
@@ -811,10 +816,11 @@ if (typeof document !== "undefined") {
 // CONFORMIDADE
 //   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
 //     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - Pisar no PLACEHOLDER_MODELO agora não quebra nada por si só, porque a
-//     linha de bootstrap que o referenciava saiu no fim da M1-T06: o único
-//     lugar que ainda cita o nome é o `import` do topo. Apagar o nome daqui
-//     e de lá no mesmo passo é o que fecha. Ver o bloco M1-T17.
+//   - JÁ FEITO NA M1-T09: Pisar no PLACEHOLDER_MODELO agora não quebra nada
+//     por si só, porque a linha de bootstrap que o referenciava saiu no fim
+//     da M1-T06: o único lugar que ainda citava o nome era o `import` do
+//     topo. Apagar o nome daqui e de lá no mesmo passo foi o que fechou.
+//     Ver o bloco M1-T17.
 //   - A subclasse precisa ACRESCENTAR comportamento, não só repetir o da
 //   mãe: o Critério 7 pede classe, construtor, atributos, método, this e
 //   herança. Uma Serie que não ganha nada da Conteudo tem herança escrita
@@ -827,9 +833,10 @@ if (typeof document !== "undefined") {
 // ETAPA 6 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T09
 // DONO DESTA ETAPA: Tiago.
 // O QUE FAZER AQUI
-//   - Aqui é a ORQUESTRAÇÃO, não o cálculo. Percorrer com map as instâncias
-//     de Serie montadas na M1-T09 e chamar, em cada uma, o método de
-//     compatibilidade que a M1-T10 escreve em js/modelo.js (etapa 2).
+//   - Aqui é a ORQUESTRAÇÃO, não o cálculo. Percorrer com map o catálogo
+//     tratado, montando as instâncias de Serie que esta etapa precisa, e
+//     chamar, em cada uma, o método de compatibilidade que a M1-T10
+//     escreve em js/modelo.js (etapa 2).
 //     Onde esse cálculo mora — método da Serie em modelo.js, e não função
 //     pura aqui — é a Questão Aberta 2 do esboço, registrada como pergunta em
 //     js/modelo.js, etapa 2. As duas cabem no briefing, e a escolha é sua.
@@ -971,10 +978,10 @@ if (typeof document !== "undefined") {
 //   - Os DOIS import das linhas 16 e 17 PERMANECEM. Eles não saem: o RF14 é
 //     exatamente este arranjo, e trocar import por require (ou por script
 //     inline) desfaz o módulo.
-//   - O que muda é o que vem dentro dos dois: PLACEHOLDER_MODELO sai quando
-//     a M1-T09 escrever as classes de modelo.js, e PLACEHOLDER_UI sai quando
-//     a M1-T11 escrever o renderizarCard de ui.js. Cada placeholder sai na
-//     SUA task, não nesta.
+//   - O que muda é o que vem dentro dos dois: o PLACEHOLDER_MODELO já saiu na
+//     M1-T09, quando as classes entraram em modelo.js, e o PLACEHOLDER_UI sai
+//     na M1-T11, quando o renderizarCard entrar em ui.js. Cada um sai na SUA
+//     task, e não nesta.
 //   - Conferir que cada nome importado existe e é exportado no outro arquivo.
 //     Um nome que não bate falha em tempo de execução, sem aviso no console.
 //   - Conferir o index.html: um único script, type="module", apontando para

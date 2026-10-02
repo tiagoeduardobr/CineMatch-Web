@@ -357,6 +357,9 @@ export function exibirMensagemDeCatalogoVazio(aviso) {
 //     grade não pisca: cada card entra uma vez. Se algum dia for preciso
 //     re-renderizar, a limpeza é um remove() por filho — a mesma API do
 //     semana-08 —, e ela fica no script.js, uma vez, antes dos anexos.
+//   - Os returns de modelo.js só chegam à tela por textContent: template
+//     literal não escapa nada (AGENTS.md §7). Nunca interpolar dado em string
+//     atribuída a innerHTML.
 // ────────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────────

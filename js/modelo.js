@@ -2,15 +2,84 @@
  * CineMatch Web — módulo de classes.
  *
  * Responsabilidade (AGENTS.md, seção 3): definir as classes `Conteudo` e
- * `Serie`, com herança e uso de `this`. As classes entram na M1-T09 (RF06).
+ * `Serie`, com herança e uso de `this`. As classes entraram na M1-T09 (RF06).
  *
- * Esqueleto da tarefa M1-T01 (RF15 parcial): este export provisório existe para
- * que o `import` do script.js já resolva desde o primeiro dia. Nada aqui é
- * funcional ainda — a constante PLACEHOLDER_MODELO é apagada na M1-T09.
+ * JÁ FEITO NA M1-T09: as classes Conteudo e Serie entraram no lugar deste
+ * export provisório, que existia só para que o import do js/script.js
+ * resolvesse. O que está abaixo é funcional: construtor com atributos em
+ * this, e métodos que os leem.
  */
-export const PLACEHOLDER_MODELO = {
-  pronto: false,
-};
+/**
+ * Classe base Conteudo (RF06).
+ * Representa um item de catálogo com atributos comuns.
+ * Usa `this` para guardar e ler atributos no construtor e nos métodos.
+ * @param {string} titulo - Título do conteúdo.
+ * @param {string} tipo - Tipo do conteúdo (ex.: "Série").
+ * @param {string[]} generos - Lista de gêneros.
+ * @param {number|null} duracaoMinutos - Duração em minutos ou null.
+ */
+export class Conteudo {
+  constructor(titulo, tipo, generos, duracaoMinutos) {
+    this.titulo = titulo;
+    this.tipo = tipo;
+    this.generos = generos;
+    this.duracaoMinutos = duracaoMinutos;
+  }
+
+  /**
+   * Retorna resumo legível do conteúdo.
+   * Contrato M1-T08: `serie.runtime` pode vir como está (null/ausente).
+   * Tratamos null OU undefined para não gerar "undefined min".
+   * @returns {string}
+   */
+  exibirResumo() {
+    const semDuracao = this.duracaoMinutos === null || this.duracaoMinutos === undefined;
+    const duracao = semDuracao ? "N/D" : `${this.duracaoMinutos} min`;
+    return `${this.titulo} (${this.tipo}) — ${duracao}`;
+  }
+
+  /**
+   * Retorna gêneros separados por vírgula.
+   * @returns {string}
+   */
+  exibirGeneros() {
+    return `Gêneros: ${this.generos.join(", ")}`;
+  }
+}
+
+/**
+ * Classe Serie (RF06) — herda de Conteudo.
+ * Acrescenta o atributo `temporadas` e comportamento próprio.
+ * Chama `super(titulo, "Série", generos, duracaoMinutos)` — com generos
+ * normalizado para lista vazia quando ausente — antes de usar `this`
+ * (referência: cinematch_antigo/class.js:20).
+ * @param {string} titulo - Título da série.
+ * @param {string[]} generos - Lista de gêneros.
+ * @param {number|null} duracaoMinutos - Duração média ou null.
+ * @param {number|null|undefined} temporadas - Número de temporadas (opcional).
+ */
+export class Serie extends Conteudo {
+  constructor(titulo, generos, duracaoMinutos, temporadas) {
+    // Generos ausente viraria lista vazia: sem isto, o .join() em
+    // exibirGeneros() quebraria. A guarda fica na chamada do super, e não
+    // depois: super() já escreveu this.generos, e a referência da semana 6
+    // (cinematch_antigo/class.js:19-22) atribui o atributo uma vez só.
+    super(titulo, "Série", generos === undefined ? [] : generos, duracaoMinutos);
+    // Parâmetro opcional ausente: normaliza undefined -> null (não é regra getItem).
+    this.temporadas = temporadas === undefined ? null : temporadas;
+  }
+
+  /**
+   * Retorna informação de temporadas.
+   * Acrescenta comportamento à mãe (prova da herança). Usa `this.titulo` herdado.
+   * @returns {string}
+   */
+  exibirTemporadas() {
+    const semTemporadas = this.temporadas === null || this.temporadas === undefined;
+    const texto = semTemporadas ? "N/D" : this.temporadas;
+    return `${this.titulo} tem ${texto} temporada(s)`;
+  }
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // ESBOÇO COMENTADO DAS CLASSES — MAPA DE TRABALHO, NÃO CÓDIGO
@@ -42,11 +111,9 @@ export const PLACEHOLDER_MODELO = {
  *   M1-T10  o método que compara e classifica a compatibilidade
  *   M1-T17  a lista final de export e o nome que o script.js importa
  *
- * PLACEHOLDER_MODELO
- *   A constante da linha 11 PERMANECE e só sai na M1-T09, quando as classes
- *   reais entrarem. Ela está acima desta região de propósito: o export
- *   provisório e o esboço convivem, e o import do script.js precisa resolver
- *   desde o primeiro dia.
+ * PLACEHOLDER_MODELO — JÁ SAIU NA M1-T09, junto com o import do
+ *   js/script.js. Não existe mais nesta região. A nota fica porque a etapa
+ *   M1-T17 ainda remete a ela. Ver também js/script.js:19-21 e 791-792.
  *
  * SOBRE OS CAMINHOS semana-XX/
  *   A referência a exercício de aula (semana-12/, o exemplo de módulos ES)
@@ -88,8 +155,9 @@ export const PLACEHOLDER_MODELO = {
 //   - O que a Serie ganha que a Conteudo não tem: o RF06 fala em série, e o
 //     catálogo é de séries. Temporada e status de exibição são o que o
 //     projeto da semana 6 já guardava e são um gancho concreto de herança.
-//   - APAGAR PLACEHOLDER_MODELO, que está na linha 11 deste arquivo, e
-//     tirar o nome do import do js/script.js, no mesmo passo.
+//   - JÁ FEITO NA M1-T09: APAGAR PLACEHOLDER_MODELO, que estava na linha 11
+//     quando este esboço foi escrito, e tirar o nome do import do
+//     js/script.js, no mesmo passo.
 // POR QUE ESTE TRECHO EXISTE
 //   O RF06 é o reaproveitamento do que a semana 6 já fez, não a invenção de
 //   um modelo novo. Adaptar é a palavra do briefing: as duas classes
@@ -125,8 +193,8 @@ export const PLACEHOLDER_MODELO = {
 //   - A verificação é node --check neste arquivo e node js/script.js no
 //     fluxo. A linha de bootstrap que o script.js usava para citar
 //     PLACEHOLDER_MODELO saiu no fim da M1-T06, então hoje o único lugar que
-//     ainda depende deste export existir é o `import` do topo de lá: se este
-//     nome sair daqui sem sair de lá, o grafo inteiro para de carregar.
+//     ainda dependia deste export existir era o `import` do topo de lá: isso
+//     já foi resolvido na M1-T09.
 // ────────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────────
