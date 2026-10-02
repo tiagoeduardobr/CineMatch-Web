@@ -388,7 +388,7 @@ function iniciarFormulario() {
     // interno de buscarCatalogo nunca relança. O `aviso` vai junto: sem
     // repassá-lo, a função sobrescreveria a saudação e o recado de storage
     // na mesma task de evento, antes de qualquer paint.
-    buscarCatalogo(aviso);
+    buscarCatalogo(aviso, usuario.generosFavoritos);
   });
 }
 
@@ -517,8 +517,13 @@ let catalogoBruto = [];
  *   estado vazio (M1-T08), e por isso
  *   o estado de carregando NÃO o leva: o texto do carregando é o literal do
  *   briefing (RF12) e não pode ser alterado.
+ *
+ * @param {string[]} generosFavoritos - gêneros favoritos do perfil. Chegam por
+ *   parâmetro e não por estado de módulo: o perfil já vive em cinematchPerfil,
+ *   e um `let` a mais aqui seria uma segunda fonte da verdade que ficaria
+ *   velha depois do botão "Trocar perfil".
  */
-async function buscarCatalogo(aviso) {
+async function buscarCatalogo(aviso, generosFavoritos) {
   const statusResultados = document.querySelector("#resultados-status");
 
   // ESTADO 1 — carregando, escrito ANTES do fetch. É o texto do briefing, e
@@ -566,6 +571,15 @@ async function buscarCatalogo(aviso) {
     // proteção do `await resposta.json()` e do guard de formato, que também
     // lançam para o mesmo lugar.
     catalogoTratado = tratarCatalogo(catalogoBruto);
+
+    // A orquestração do RF07 roda AQUI, dentro do try, pelo mesmo motivo do
+    // tratamento acima: se uma série vier com formato inesperado, a exceção cai
+    // no catch e vira estado de erro, nunca página quebrada. Ela roda ANTES da
+    // bifurcação das mensagens, e é por isso que a frase de sucesso passa a ser a
+    // prova de que o cálculo rodou. E aqui não entra cópia da fórmula: os
+    // limiares vivem no método da Serie, em js/modelo.js, então mudam em um
+    // lugar só.
+    catalogoRecomendado = calcularCompatibilidades(generosFavoritos);
 
     // ESTADO 2 — sucesso, agora com a bifurcação do RF05. Continua
     // sobrescrevendo o carregando no MESMO elemento, então ele não fica
@@ -704,6 +718,9 @@ async function buscarCatalogo(aviso) {
 // catalogoBruto.
 let catalogoTratado = [];
 
+// `let` como as duas de cima: a M1-T11 vai percorrer este array para montar os cards; até lá, ninguém lê.
+let catalogoRecomendado = [];
+
 /**
  * Devolve o catálogo bruto tratado: filtrado, ordenado por nota, cortado nos
  * 8 primeiros e convertido na forma { id, titulo, tipo, generos,
@@ -764,6 +781,37 @@ function tratarCatalogo(bruto) {
     }));
 }
 
+/**
+ * Percorre o catálogo tratado, instancia uma `Serie` para cada item e monta o
+ * objeto que a tela vai consumir no card (RF07). Esta é a ORQUESTRAÇÃO; a
+ * fórmula e os limiares vivem no método `calcularCompatibilidade` da `Serie`,
+ * em `js/modelo.js`, e aqui não entra cópia deles.
+ *
+ * O `map` da M1-T08 já deixou o array com no máximo 8 itens, filtrado por
+ * `generos.length > 0` e ordenado por `rating.average` — esta função não
+ * reordena nem recorta: a ordem dos cards é a mesma que a M1-T08 gravou.
+ *
+ * @param {string[]} generosFavoritos - valores dos checkboxes, em inglês
+ * @returns {Array<{ titulo: string, generosEmComum: string[], generosNaoExplorados: string[], percentual: string, classificacao: string }>}
+ */
+function calcularCompatibilidades(generosFavoritos) {
+  return catalogoTratado.map((item) => {
+    const serie = new Serie(item.titulo, item.generos, item.duracaoMinutos);
+    const compatibilidade = serie.calcularCompatibilidade(generosFavoritos);
+
+    // O objeto do card tem os cinco campos que o RF08 lê
+    // (docs/BRIEFING.md:257) e nenhum outro: o `id` da M1-T08 não é copiado
+    // porque ninguém o consome.
+    return {
+      titulo: item.titulo,
+      generosEmComum: compatibilidade.generosEmComum,
+      generosNaoExplorados: compatibilidade.generosNaoExplorados,
+      percentual: compatibilidade.percentual,
+      classificacao: compatibilidade.classificacao,
+    };
+  });
+}
+
 if (typeof document !== "undefined") {
   const perfilSalvo = lerPerfilSalvo();
 
@@ -773,10 +821,11 @@ if (typeof document !== "undefined") {
     // Chamada sem `await`, na sequência da saudação: o guard segue síncrono
     // e o catch interno nunca relança. Só existe chamada quando o perfil já
     // está resolvido — no `else` não há para quem recomendar, e por isso o
-    // caminho do formulário aberto não busca catálogo. O argumento é "" de
-    // propósito: aqui não há aviso de persistência a sobreviver, porque o
-    // perfil veio do próprio localStorage.
-    buscarCatalogo("");
+    // caminho do formulário aberto não busca catálogo. O primeiro argumento é ""
+    // de propósito: aqui não há aviso de persistência a sobreviver, porque o
+    // perfil veio do próprio localStorage; o segundo são os gêneros favoritos,
+    // lidos do mesmo perfil salvo.
+    buscarCatalogo("", perfilSalvo.generosFavoritos);
   } else {
     mostrarFormulario("Preencha o formulário para receber recomendações.");
   }
@@ -790,13 +839,14 @@ if (typeof document !== "undefined") {
 // ETAPA 5 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T08
 // DONO DESTA ETAPA: Tiago.
 // O QUE FAZER AQUI
-//   - JÁ FEITO NA M1-T09: Ampliar o import da linha 17 deste arquivo: ele
+//   - JÁ FEITO NA M1-T09: Ampliar o import da linha 18 deste arquivo: ele
 //     trazia só PLACEHOLDER_MODELO e passou a trazer as classes reais de
 //     ./modelo.js.
-//   - Instanciar uma Serie para cada item do catálogo tratado na M1-T08.
-//     ESTE PASSO AINDA NÃO FOI FEITO: na M1-T09 saíram as classes e o import
-//     da linha 17. Nenhum `new Serie` existe nos três módulos ainda — a M1-T10
-//     instancia, percorrendo o catálogo tratado com map.
+//   - JÁ FEITO NA M1-T10: instanciar uma Serie para cada item do catálogo
+//     tratado na M1-T08. Acontece dentro de calcularCompatibilidades(), que
+//     percorre com map e chama o método calcularCompatibilidade() da Serie
+//     (js/modelo.js, etapa 2). O bullet fica aqui porque este bloco é
+//     referenciado pelo bloco M1-T17.
 //   - JÁ FEITO NA M1-T09: APAGAR PLACEHOLDER_MODELO de modelo.js e do import
 //     daqui, no mesmo passo. Ele era provisório e existia só para o grafo
 //     carregar.
@@ -825,70 +875,6 @@ if (typeof document !== "undefined") {
 //   mãe: o Critério 7 pede classe, construtor, atributos, método, this e
 //   herança. Uma Serie que não ganha nada da Conteudo tem herança escrita
 //   e sem função. Ver js/modelo.js, etapa 1.
-// ────────────────────────────────────────────────────────────────────────────
-
-// ────────────────────────────────────────────────────────────────────────────
-// TODO M1-T10 · RF07 · Calcular e classificar a compatibilidade
-// ────────────────────────────────────────────────────────────────────────────
-// ETAPA 6 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T09
-// DONO DESTA ETAPA: Tiago.
-// O QUE FAZER AQUI
-//   - Aqui é a ORQUESTRAÇÃO, não o cálculo. Percorrer com map o catálogo
-//     tratado, montando as instâncias de Serie que esta etapa precisa, e
-//     chamar, em cada uma, o método de compatibilidade que a M1-T10
-//     escreve em js/modelo.js (etapa 2).
-//     Onde esse cálculo mora — método da Serie em modelo.js, e não função
-//     pura aqui — é a Questão Aberta 2 do esboço, registrada como pergunta em
-//     js/modelo.js, etapa 2. As duas cabem no briefing, e a escolha é sua.
-//   - Montar o objeto que vai para a tela, com titulo, generosEmComum,
-//     generosNaoExplorados, percentual e classificacao. A tela consome
-//     exatamente esses campos: é o contrato com o Lucas.
-//   - Decidir a ordem dos cards e o recorte final (o slice dos 8 já veio na
-//     M1-T08; aqui é a ordem por afinidade, se for o caso).
-//   - Ainda é válido testar pelo console antes de desenhar: o RF07 do
-//     briefing explicita "ainda só no console, pra validar a lógica antes de
-//     desenhar a tela".
-// POR QUE ESTE TRECHO EXISTE
-//   O cálculo sozinho não devolve nada visível. Alguém precisa percorrer o
-//   catálogo, chamar o método e juntar o que a tela precisa. É o papel do
-//   módulo de fluxo: orquestrar, sem saber detalhe de tela nem de fórmula.
-// REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
-//   cinematch_antigo/cinematch.js — três funções, com papéis distintos, e
-//   confundi-las é o erro mais caro deste bloco.
-//   compatibilidade() (linha 292) é a FÓRMULA: mapeia o catálogo, normaliza os
-//   favoritos, divide e classifica nos limiares das linhas 304 e 306, mas não
-//   sabe nada de tela nem de qual gênero não foi explorado.
-//   calcularCompatibilidades() (linha 323) é a ORQUESTRAÇÃO, e é a referência
-//   mais próxima do que este bloco escreve: ela chama a fórmula uma vez
-//   (linha 329) e depois percorre o resultado item por item. Aqui o mesmo
-//   papel é percorrer as instâncias de Serie e montar o objeto do card.
-//   obterConteudosPorGenero() (linha 472) NÃO é a orquestração e NÃO chama a
-//   fórmula: ela reimplementa o filtro de gêneros (linhas 477 a 479) sobre cada
-//   item e devolve { conteudo, generosEmComum, generosFaltantes } (486 a 490).
-//   A referência útil dela é por outro motivo: é de onde sai a lista de
-//   gêneros NÃO explorados, o generosFaltantes da linha 481, que é o campo
-//   que o RF07 pede e que a fórmula de compatibilidade() não produz.
-// TRECHO DO BRIEFING (docs/BRIEFING.md, RF07, pág. 7)
-//   "Mantém a mesma regra do projeto anterior (gêneros em comum / total de
-//   gêneros do conteúdo × 100) e a mesma classificação por faixa
-//   (Alta/Média/Baixa afinidade), usando if-else, switch-case ou ternário —
-//   só que agora o resultado é exibido na tela, não no console."
-// CONFORMIDADE
-//   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
-//     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - A fórmula e os limiares (>= 80 é Alta, >= 50 é Média) ficam no método
-//     da Serie, em js/modelo.js. Aqui não entra cópias da fórmula: se ela
-//     mudar, muda em um lugar só.
-//   - O total é o de gêneros DO CONTEÚDO, não o do perfil. É o que o briefing
-//     pede e o que o projeto da semana 6 fazia.
-//   - A comparação é direta entre o value do checkbox e o gênero que a
-//     TVMaze devolve, em inglês. Daqui não sai tradução: a normalização de
-//     caixa e acento é do normalizarTexto() (cinematch_antigo/cinematch.js:284)
-//     e ela NÃO traduz. A lista de value em inglês é do Lucas, na M1-T03.
-//   - O Critério 5 pesa 1,00: é o cálculo mais pesado da nota. Conferir com
-//     casos extremos, e não só com um perfil que funciona: um perfil que casa
-//     com quase tudo empurra todo mundo para a faixa Alta e esconde tanto o
-//     erro de divisão quanto o de faixa.
 // ────────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────────
