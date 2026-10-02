@@ -9,6 +9,24 @@
  * resolvesse. O que está abaixo é funcional: construtor com atributos em
  * this, e métodos que os leem.
  */
+
+/**
+ * Prepara um texto para comparação: caixa baixa, sem acento e sem espaço nas
+ * pontas. É a `normalizarTexto` do projeto da semana 6
+ * (cinematch_antigo/cinematch.js:284) e ela NÃO traduz: "Comédia" continua
+ * "comédia" e não vira "Comedy". Fica aqui, sem `export`, porque é detalhe do
+ * cálculo — a lista de exports deste módulo é `Conteudo` e `Serie`.
+ * @param {string} texto
+ * @returns {string}
+ */
+function normalizarTexto(texto) {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
+
 /**
  * Classe base Conteudo (RF06).
  * Representa um item de catálogo com atributos comuns.
@@ -78,6 +96,66 @@ export class Serie extends Conteudo {
     const semTemporadas = this.temporadas === null || this.temporadas === undefined;
     const texto = semTemporadas ? "N/D" : this.temporadas;
     return `${this.titulo} tem ${texto} temporada(s)`;
+  }
+
+  /**
+   * Compara os gêneros favoritos da pessoa com os gêneros desta série e devolve
+   * o objeto que o card da M1-T11 consome (RF07). A regra é a do projeto da
+   * semana 6 (cinematch_antigo/cinematch.js:292-321): gêneros em comum dividido
+   * pelo total de gêneros do CONTEÚDO, vezes 100, com o resultado arredondado
+   * ANTES de virar faixa.
+   *
+   * O denominador é o do conteúdo, nunca o do perfil — é o que o briefing pede
+   * (docs/BRIEFING.md:251) e inverter isso muda a nota.
+   *
+   * Não há guarda de divisão por zero aqui, e é proposital: o `filter` de
+   * `generos.length > 0` da M1-T08 (js/script.js, dentro de tratarCatalogo) é
+   * o que garante o denominador. Uma guarda exigiria `Array.isArray`, que não
+   * foi ensinado (AGENTS.md 2.1).
+   *
+   * @param {string[]} generosFavoritos - valores dos checkboxes, em inglês
+   * @returns {{ generosEmComum: string[], generosNaoExplorados: string[], percentual: string, classificacao: string }}
+   */
+  calcularCompatibilidade(generosFavoritos) {
+    const favoritosNormalizados = generosFavoritos.map(normalizarTexto);
+
+    // Dois `filter` com o mesmo predicado, um negando: o primeiro fica com o que
+    // a pessoa já conhece, o segundo é o filtro de sobra — os gêneros da série
+    // que NÃO estão entre os favoritos. É o `generosFaltantes` da referência
+    // (cinematch_antigo/cinematch.js:481), o campo que o RF07 pede e que a
+    // fórmula pura não produz. `filter` é método que o RF05 já contou.
+    const generosEmComum = this.generos.filter((genero) =>
+      favoritosNormalizados.includes(normalizarTexto(genero)),
+    );
+    const generosNaoExplorados = this.generos.filter((genero) =>
+      !favoritosNormalizados.includes(normalizarTexto(genero)),
+    );
+
+    // O arredondamento vem ANTES da faixa, e a faixa lê o valor arredondado:
+    // 79,5% vira "80" e é Alta. Inverter a ordem faria 79,5 cair em Média.
+    const percentual = (
+      (generosEmComum.length / this.generos.length) *
+      100
+    ).toFixed(0);
+
+    // Os limiares são do briefing: 80 ou mais é Alta, 50 ou mais é Média, o
+    // resto é Baixa (docs/BRIEFING.md:251). Os textos são contrato com o
+    // `renderizarCard` da M1-T11 e com as classes de badge do CSS (M1-T12).
+    let classificacao;
+    if (Number(percentual) >= 80) {
+      classificacao = "Alta afinidade";
+    } else if (Number(percentual) >= 50) {
+      classificacao = "Média afinidade";
+    } else {
+      classificacao = "Baixa afinidade";
+    }
+
+    return {
+      generosEmComum: generosEmComum,
+      generosNaoExplorados: generosNaoExplorados,
+      percentual: percentual,
+      classificacao: classificacao,
+    };
   }
 }
 
@@ -195,74 +273,6 @@ export class Serie extends Conteudo {
 //     PLACEHOLDER_MODELO saiu no fim da M1-T06, então hoje o único lugar que
 //     ainda dependia deste export existir era o `import` do topo de lá: isso
 //     já foi resolvido na M1-T09.
-// ────────────────────────────────────────────────────────────────────────────
-
-// ────────────────────────────────────────────────────────────────────────────
-// TODO M1-T10 · RF07 · Calcular e classificar a compatibilidade
-// ────────────────────────────────────────────────────────────────────────────
-// ETAPA 2 DE 3 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T09
-// DONO DESTA ETAPA: Tiago.
-// O QUE FAZER AQUI
-//   - O método que compara os gêneros do perfil com os da instância e devolve
-//     o objeto de resultado: generosEmComum, generosNaoExplorados, percentual
-//     e classificacao.
-//   - A fórmula: gêneros em comum dividido pelo total de gêneros do CONTEÚDO,
-//     vezes 100. O denominador é do conteúdo, não do perfil — é o que o
-//     briefing e o projeto da semana 6 fazem, e inverter isso muda a nota.
-//   - A classificação, com if-else: 80 ou mais é Alta, 50 ou mais é Média, o
-//     resto é Baixa. O Critério 5 pesa 1,00 e ele exige a faixa, não só o
-//     número.
-//   - A lista de gêneros não explorados é o filtro de sobra: os da instância
-//     que não estão entre os favoritos. A seção 5.4 do briefing diz que um
-//     laço explícito para montar essa lista é bem-vindo, e o filter resolve
-//     com um método que o RF05 já contou.
-//   - Onde o resultado é montado, e o que a tela consome: o contrato de campos
-//     com o js/ui.js é este, e é a lista de campos que o renderizarCard da
-//     M1-T11 vai ler.
-// POR QUE ESTE TRECHO EXISTE
-//   O RF07 é o cálculo, e ele precisa de contexto para existir: a mesma
-//   conta feita sobre um objeto solto não é método de instância. Colocando o
-//   cálculo na Serie, this passa a ter função de verdade e a herança da M1-T09
-//   se justifica. A alternativa é função pura no script.js, que é mais
-//   parecida com o projeto antigo e deixa a classe sem função — a escolha é
-//   sua, e ela está registrada aqui como pergunta, não como resposta.
-// REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
-//   cinematch_antigo/cinematch.js — compatibilidade() (linhas 292 a 321) é a
-//   fórmula: ela mapeia o catálogo, normaliza os favoritos com normalizarTexto,
-//   filtra os gêneros em comum, divide e classifica nos limiares da linha 304
-//   (>= 80, Alta) e da linha 306 (>= 50, Média). A orquestração, que é o papel
-//   do script.js e não deste arquivo, é calcularCompatibilidades() (linha 323).
-//   E obterConteudosPorGenero() (linha 472) NÃO chama a fórmula nem serve de
-//   exemplo de orquestração: ela reimplementa o filtro de gêneros (477 a 479)
-//   e devolve { conteudo, generosEmComum, generosFaltantes } (486 a 490). A
-//   referência útil dela é o generosFaltantes da linha 481, que é a linha de
-//   onde a lista de gêneros não explorados é montada — e é essa lista que este
-//   arquivo precisa devolver por this.
-//   Para a ORDENAÇÃO por afinidade, a referência é o bloco .sort(...) dentro
-//   de recomendarProximoGenero (linhas 438 a 448), cujo desempate usa
-//   localeCompare(..., "pt-BR") na linha 447. As linhas 357 a 359 NÃO são
-//   essa referência: ali é um compatibilidade() seguido de um .find().
-// TRECHO DO BRIEFING (docs/BRIEFING.md, RF07, pág. 7)
-//   "Mantém a mesma regra do projeto anterior (gêneros em comum / total de
-//   gêneros do conteúdo × 100) e a mesma classificação por faixa
-//   (Alta/Média/Baixa afinidade), usando if-else, switch-case ou ternário —
-//   só que agora o resultado é exibido na tela, não no console."
-// CONFORMIDADE
-//   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
-//     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - A normalização dos dois lados, e só de caixa e acento. O normalizarTexto
-//     (cinematch_antigo/cinematch.js:284) NÃO traduz: "Comédia" continua
-//     "comédia" e não vira "Comedy". A comparação é direta com o value que o
-//     Lucas pôs no HTML, e esse value precisa estar em inglês. Se a lista do
-//     HTML vier em português, toda série sai com 0% e o Critério 5, que pesa
-//     1,00, quebra sem erro visível.
-//   - O nome dos campos é contrato com o js/ui.js. O projeto antigo devolvia
-//     compatibilidade e afinidade; aqui o nome é percentual e classificacao,
-//     porque é o que o contrato de classes do card e o CSS da M1-T12
-//     esperam. Mudar de nome é permitido, mas os dois lados têm de mudar
-//     juntos e o vídeo tem de explicar.
-//   - Evitar divisão por array vazio: o filtro de generos.length > 0 já veio
-//     da M1-T08, e é o que evita isso aqui.
 // ────────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────────
