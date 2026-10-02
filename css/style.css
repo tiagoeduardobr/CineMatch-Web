@@ -388,7 +388,8 @@ body {
 .formulario-login input:focus-visible,
 #form-perfil input:focus-visible,
 .formulario-login button:focus-visible,
-#form-perfil button:focus-visible {
+#form-perfil button:focus-visible,
+#botao-trocar-perfil:focus-visible {
 	outline: 2px solid var(--cor-dourado);
 	outline-offset: 3px;
 }
@@ -398,7 +399,8 @@ body {
    ========================= */
 
 .formulario-login button,
-#form-perfil button {
+#form-perfil button,
+#botao-trocar-perfil {
 	min-height: 44px;
 	padding: 11px 18px;
 	border: 1px solid var(--cor-dourado);
@@ -415,7 +417,8 @@ body {
 }
 
 .formulario-login button:hover,
-#form-perfil button:hover {
+#form-perfil button:hover,
+#botao-trocar-perfil:hover {
 	background: var(--cor-dourado-claro);
 	border-color: var(--cor-dourado-claro);
 }
