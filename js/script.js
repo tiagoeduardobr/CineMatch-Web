@@ -790,12 +790,12 @@ if (typeof document !== "undefined") {
 // ETAPA 5 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T08
 // DONO DESTA ETAPA: Tiago.
 // O QUE FAZER AQUI
-//   - JÁ FEITO NA M1-T09: Ampliar o import da linha 17 deste arquivo: ele
+//   - JÁ FEITO NA M1-T09: Ampliar o import da linha 18 deste arquivo: ele
 //     trazia só PLACEHOLDER_MODELO e passou a trazer as classes reais de
 //     ./modelo.js.
 //   - Instanciar uma Serie para cada item do catálogo tratado na M1-T08.
 //     ESTE PASSO AINDA NÃO FOI FEITO: na M1-T09 saíram as classes e o import
-//     da linha 17. Nenhum `new Serie` existe nos três módulos ainda — a M1-T10
+//     da linha 18. Nenhum `new Serie` existe nos três módulos ainda — a M1-T10
 //     instancia, percorrendo o catálogo tratado com map.
 //   - JÁ FEITO NA M1-T09: APAGAR PLACEHOLDER_MODELO de modelo.js e do import
 //     daqui, no mesmo passo. Ele era provisório e existia só para o grafo
