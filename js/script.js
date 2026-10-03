@@ -8,22 +8,22 @@
  * Os `import` abaixo já apontam para os dois módulos irmãos, na mesma pasta, com
  * caminho relativo e extensão explícita — é assim que o navegador resolve módulos
  * ES. Os placeholders existiam para que este arquivo carregasse sem erro: o
- * PLACEHOLDER_MODELO saiu na M1-T09 (modelo.js) e o PLACEHOLDER_UI sai na
- * M1-T11 (ui.js).
+ * PLACEHOLDER_MODELO saiu na M1-T09 (modelo.js) e o PLACEHOLDER_UI saiu na
+ * M1-T11 (ui.js). JÁ FEITO NA M1-T11: o import já traz o renderizarCard.
  *
  * A página só funciona servida por `npm start` (live-server): módulos ES não
  * carregam via file://, por causa do CORS. O live-server é instalado na M1-T18.
  */
-import { PLACEHOLDER_UI, exibirMensagemDeErro, exibirMensagemDeCatalogoVazio } from "./ui.js";
+import { renderizarCard, exibirMensagemDeErro, exibirMensagemDeCatalogoVazio } from "./ui.js";
 import { Conteudo, Serie } from "./modelo.js";
 
-// Os dois `import` acima continuam apontando para os placeholders, e por isso
-// nenhum dos dois nomes aparece no corpo do arquivo: JÁ FEITO NA M1-T09:
-// PLACEHOLDER_MODELO saiu no mesmo passo em que as classes entraram em
-// modelo.js, e PLACEHOLDER_UI sai na M1-T11, quando o renderizarCard entrar
-// em ui.js. Um import que ainda não é usado não quebra o módulo — o grafo
-// carrega igual — e é o estado intermediário que o bloco M1-T17, no fim
-// deste arquivo, descreve.
+// Os dois `import` acima continuam apontando para os módulos irmãos, na
+// mesma pasta. Nenhum dos dois nomes placeholder aparece no corpo do
+// arquivo. JÁ FEITO NA M1-T09: PLACEHOLDER_MODELO saiu no mesmo passo em
+// que as classes entraram em modelo.js. JÁ FEITO NA M1-T11: PLACEHOLDER_UI
+// saiu no mesmo passo em que o renderizarCard entrou em ui.js, e o `import`
+// da linha 17 foi ajustado junto: sem esse ajuste o nome deixa de existir em
+// ui.js e o grafo de módulos não carrega. Ver o bloco M1-T17.
 //
 // NÃO HÁ LINHA DE CONSOLE NESTE ARQUIVO, e isso é decisão, não esquecimento:
 // o professor não quer código de console no material entregue. O que a linha de
@@ -483,6 +483,42 @@ const URL_CATALOGO = "https://api.tvmaze.com/shows?page=0";
 let catalogoBruto = [];
 
 /**
+ * RF08 · M1-T11 · Limpa a #resultados e desenha um card por série recomendada.
+ *
+ * A limpeza mora aqui, e não em ui.js, por dois motivos que valem mais que a
+ * organização: o ui.js não conhece catalogoRecomendado, que é estado deste
+ * arquivo; e limpar por card renderizado custaria uma reconstrução por item.
+ * Aqui a tela é esvaziada uma vez e a lista inteira é percorrida em seguida.
+ *
+ * O seletor é escopado no container de propósito. #template-card-serie, no
+ * index.html, também tem a classe card-serie e é IRMÃO de #resultados, então
+ * document.querySelectorAll(".card-serie") o apagaria junto com os cards — e
+ * o template sumiria da página sem nenhum erro no console. Procurar dentro de
+ * #resultados não tem como alcançá-lo.
+ *
+ * Os dois laços são o for clássico com let i, que é a forma que o
+ * cinematch_antigo/cinematch.js:397 usa e a que o AGENTS.md §2.1 manda portar
+ * (as formas das linhas 171 e 330 do mesmo arquivo não declaram o i e quebram
+ * em módulo ES). Não é map porque aqui não há array novo: o efeito é na tela.
+ * E não é o método com callback porque ele não tem fonte neste repositório —
+ * ver o item da M1-T09 no docs/KANBAN.md.
+ *
+ * @param {Array<{ titulo: string, generosEmComum: string[], generosNaoExplorados:
+ *   string[], percentual: string, classificacao: string }>} lista
+ *   Lista devolvida por calcularCompatibilidades.
+ */
+function renderizarCards(lista) {
+  const container = document.querySelector("#resultados");
+  const anteriores = container.querySelectorAll(".card-serie");
+  for (let i = 0; i < anteriores.length; i++) {
+    anteriores[i].remove();
+  }
+  for (let i = 0; i < lista.length; i++) {
+    renderizarCard(lista[i]);
+  }
+}
+
+/**
  * Busca o catálogo real e leva o resultado da chamada para a tela.
  *
  * A ordem interna é a do RF04: carregando, depois a rede, depois o corpo, e
@@ -580,6 +616,15 @@ async function buscarCatalogo(aviso, generosFavoritos) {
     // limiares vivem no método da Serie, em js/modelo.js, então mudam em um
     // lugar só.
     catalogoRecomendado = calcularCompatibilidades(generosFavoritos);
+
+    // A renderização dos cards roda AQUI, dentro do try e antes da
+    // bifurcação das mensagens, pelo mesmo motivo do cálculo acima: se o DOM
+    // lançar, a exceção cai no mesmo catch e vira estado de erro, nunca uma
+    // página quebrada. Ela entra ANTES do if do estado vazio porque, quando o
+    // tratamento não deixa nada de pé, a limpeza ainda roda — é isso que
+    // impede os cards do perfil anterior de sobrarem quando o botão "Trocar
+    // perfil" leva a um catálogo vazio.
+    renderizarCards(catalogoRecomendado);
 
     // ESTADO 2 — sucesso, agora com a bifurcação do RF05. Continua
     // sobrescrevendo o carregando no MESMO elemento, então ele não fica
@@ -965,9 +1010,9 @@ if (typeof document !== "undefined") {
 //     exatamente este arranjo, e trocar import por require (ou por script
 //     inline) desfaz o módulo.
 //   - O que muda é o que vem dentro dos dois: o PLACEHOLDER_MODELO já saiu na
-//     M1-T09, quando as classes entraram em modelo.js, e o PLACEHOLDER_UI sai
-//     na M1-T11, quando o renderizarCard entrar em ui.js. Cada um sai na SUA
-//     task, e não nesta.
+//     M1-T09, quando as classes entraram em modelo.js. JÁ FEITO NA M1-T11:
+//     o PLACEHOLDER_UI saiu no mesmo passo em que o renderizarCard entrou
+//     em ui.js. Cada um saiu na SUA task, e não nesta.
 //   - Conferir que cada nome importado existe e é exportado no outro arquivo.
 //     Um nome que não bate falha em tempo de execução, sem aviso no console.
 //   - Conferir o index.html: um único script, type="module", apontando para

@@ -2,15 +2,15 @@
  * CineMatch Web — módulo de tela.
  *
  * Responsabilidade (AGENTS.md, seção 3): renderizar os cards de recomendação e
- * as mensagens de carregando, vazio e erro. O código entra na M1-T11 (RF08).
+ * as mensagens de carregando, vazio e erro. JÁ FEITO NA M1-T11 (RF08): o
+ * renderizarCard está escrito mais abaixo, e é ele que dá nome ao módulo.
  *
- * Esqueleto da tarefa M1-T01 (RF15 parcial): este export provisório existe para
- * que o `import` do script.js já resolva desde o primeiro dia. Nada aqui é
- * funcional ainda — a constante PLACEHOLDER_UI é apagada na M1-T11.
+ * Esqueleto da tarefa M1-T01 (RF15 parcial): o export provisório PLACEHOLDER_UI
+ * existia aqui para que o `import` do script.js resolvesse desde o primeiro dia,
+ * e nada mais era funcional. JÁ FEITO NA M1-T11: ele foi apagado no mesmo passo
+ * em que o renderizarCard entrou, e o que o script.js importa deste módulo são
+ * agora funções.
  */
-export const PLACEHOLDER_UI = {
-  pronto: false,
-};
 
 // ────────────────────────────────────────────────────────────────────────────
 // ESBOÇO COMENTADO DA INTERFACE — MAPA DE TRABALHO, NÃO CÓDIGO
@@ -49,16 +49,21 @@ export const PLACEHOLDER_UI = {
  * SOBRE A BRANCH
  *   Os blocos abaixo apontam a branch feature/cinematch-web-interface, que é
  *   a do Lucas e onde este arquivo pertence. Na prática os três .js estão
- *   hoje juntos na feature/cinematch-web, e a recomendação é manter assim até
- *   a M1-T11 implementar o renderizarCard: é aí que o arquivo muda de branch,
- *   não antes. O campo DONO DESTA ETAPA de cada bloco é o que importa no dia
- *   a dia.
+ *   hoje juntos na feature/cinematch-web, e a recomendação era manter assim até
+ *   a M1-T11 implementar o renderizarCard. JÁ FEITO NA M1-T11: a implementação
+ *   rodou na branch de lógica, a feature/cinematch-web, e não na do Lucas — as
+ *   linhas do cabeçalho do bloco dele sobreviveram sem alteração, o rótulo, o
+ *   `ETAPA 4 DE 9 · BRANCH` e o `DONO DESTA ETAPA: Lucas.`, e o que está abaixo
+ *   delas é acréscimo: o `EXECUTADA EM:` e a anotação `JÁ FEITO NA M1-T11:`. O
+ *   corpo do roteiro não sobreviveu, virou a implementação. DONO DESTA ETAPA
+ *   continua sendo o do autor do esboço, e quem executou a etapa foi outra
+ *   pessoa. O campo DONO DESTA ETAPA de cada bloco é o que importa no dia a dia.
  *
  * PLACEHOLDER_UI
- *   A constante da linha 11 PERMANECE e só sai na M1-T11, quando o
- *   renderizarCard entrar. Ela está acima desta região de propósito: os dois
- *   export provisório e o esboço convivem no arquivo, e o import do
- *   script.js precisa resolver desde o primeiro dia.
+ *   JÁ FEITO NA M1-T11: saiu junto com o renderizarCard, que é o que o
+ *   script.js importa deste módulo agora. Ela estava acima desta região de
+ *   propósito — os dois export provisório e o esboço conviviam no arquivo,
+ *   e o import do script.js precisava resolver desde o primeiro dia.
  *
  * SOBRE OS CAMINHOS semana-XX/
  *   As referências a exercício de aula (semana-08/, semana-11/ e semana-12/,
@@ -264,103 +269,106 @@ export function exibirMensagemDeCatalogoVazio(aviso) {
 // ────────────────────────────────────────────────────────────────────────────
 // ETAPA 4 DE 9 · BRANCH: feature/cinematch-web-interface · DEPENDE DE: M1-T10
 // DONO DESTA ETAPA: Lucas.
-// O QUE FAZER AQUI
-//   - Escrever export function renderizarCard(resultado), declarada no topo
-//     do módulo e exportada, para o script.js importar.
-//   - Criar o card com document.createElement('article'), nomear a classe
-//     com className ou classList, e anexar com appendChild em #resultados.
-//   - Mostrar o que o RF08 pede: título, gêneros em comum, gêneros não
-//     explorados, percentual de compatibilidade e a classificação.
-//   - Juntar os gêneros em texto com `.join(', ')`, e escrever com
-//     `textContent`: o RF08 pede dado na tela, e dado na tela é texto.
-//   - Onde o script.js chama: uma vez por item do array de resultados, que
-//     chega pronto da M1-T10 (o cálculo é de lá, não daqui).
-// POR QUE ESTE TRECHO EXISTE
-//   É a etapa que troca o menu numerado do terminal por uma tela. O RF08 diz
-//   que é natural essa função viver em ui.js, e é o que a seção 5.2 do
-//   briefing chama de "tudo que toca a tela".
-// REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
-//   semana-08/cinematch-createElement/script.js — createElement, textContent,
-//   appendChild e remove. É a referência do RF08, e é ela que resolve a
-//   questão de segurança abaixo: textContent escreve texto, e texto nunca é
-//   interpretado como marcação.
-// TRECHO DO BRIEFING (docs/BRIEFING.md, RF08, pág. 8)
-//   export function renderizarCard(resultado) {
-//     const card = document.createElement('article');
-//     card.className = 'card-serie';
-//     card.innerHTML = `
-//       <h3>${resultado.titulo}</h3>
-//       <p>Compatibilidade: ${resultado.percentual}%</p>
-//       <span class="badge ${resultado.classificacao}">${resultado.classificacao}</span>
-//     `;
-//     document.querySelector('#resultados').appendChild(card);
-//   }
-// CONFORMIDADE
-//   - Citar, não copiar: o bloco acima é o exemplo do professor, comentado como
-//     referência. A forma final é sua, e você precisa saber explicar cada linha.
-//   - QUESTÃO ABERTA DESTA ETAPA, FECHADA: o exemplo do professor acima monta o
-//     card com card.innerHTML e interpola o dado da API dentro da crase. Duas
-//     saídas existiam: (a) createElement com textContent, que é a referência
-//     ensinada do RF08; (b) innerHTML, sanitizando o que vem da API. Fica a
-//     (a), e a (b) está descartada: sanitizar exigiria uma API que não foi
-//     ensinada, e o RF08 não pede sanitize.
-//   - POR QUE, COM DADO REAL: o risco não é teórico. Conferido em 28/09/2026,
-//     https://api.tvmaze.com/shows/1 devolveu summary com HTML dentro
-//     ("<p><b>Under the Dome</b> is the story of…"). E a crase não salva
-//     nada disso: `${}` não escapa, e trocar `+` por crase não mudaria nada
-//     contra XSS. O que protege é o DESTINO do valor, e o destino seguro é o
-//     textContent. Então a marcação é montada com createElement e cada dado
-//     entra por textContent, e a crase aparece só onde o valor é lido, nunca
-//     dentro de uma tag.
-//   - O DESENHO DESTA ETAPA, em comentário, é o que a função deve escrever:
-//       const card = document.createElement("article");
-//       card.className = "card-serie";
-//
-//       const titulo = document.createElement("h3");
-//       titulo.textContent = resultado.titulo;
-//       card.appendChild(titulo);
-//
-//       const percentual = document.createElement("p");
-//       percentual.textContent = `Compatibilidade: ${resultado.percentual}%`;
-//       card.appendChild(percentual);
-//
-//       const badge = document.createElement("span");
-//       badge.classList.add("badge");
-//       badge.textContent = resultado.classificacao;
-//       card.appendChild(badge);
-//
-//       document.querySelector("#resultados").appendChild(card);
-//     A classe da faixa — badge-alta, badge-media ou badge-baixa — entra em uma
-//     classList.add logo depois da de "badge", e é a classificação que decide
-//     qual delas; ver a DECLARAÇÃO DE DESVIO abaixo. Ela não aparece desenhada
-//     aqui de propósito: o texto da classificação é da M1-T10, e desenhá-lo
-//     aqui seria inventar o contrato antes de ele existir.
-//   - CONTRATO DE NOMES COM O CSS (a dependência mais provável de
-//     retrabalho entre duas pessoas, e o Lucas é o dono dos dois lados):
-//     o card precisa destas classes, e a M1-T12 é quem as estiliza:
-//       #resultados       o container, no index.html
-//       card-serie        o article de cada card
-//       badge             o elemento da classificação
-//       badge-alta        uma classe por faixa, não uma só
-//       badge-media
-//       badge-baixa
-//     A estilização é da M1-T12 e fica em css/style.css.
-//   - DECLARAÇÃO DE DESVIO: as três classes badge-alta, badge-media e
-//     badge-baixa divergem DE PROPÓSITO do exemplo do professor, que põe
-//     uma classe só, badge mais o valor da classificação interpolado
-//     (docs/BRIEFING.md:269). card-serie e badge batem com o exemplo. O
-//     desvio é para o CSS: três classes fixas dão uma regra por faixa e o
-//     estilo não depende do texto exato que a classificação assumir. Fica
-//     declarado aqui para não virar parecer descumprimento do RF08 na
-//     revisão.
-//   - Como o card é montado com createElement e anexado com appendChild, a
-//     grade não pisca: cada card entra uma vez. Se algum dia for preciso
-//     re-renderizar, a limpeza é um remove() por filho — a mesma API do
-//     semana-08 —, e ela fica no script.js, uma vez, antes dos anexos.
-//   - Os returns de modelo.js só chegam à tela por textContent: template
-//     literal não escapa nada (AGENTS.md §7). Nunca interpolar dado em string
-//     atribuída a innerHTML.
-// ────────────────────────────────────────────────────────────────────────────
+// EXECUTADA EM: feature/cinematch-web por Tiago em 02/10/2026:20:08, por
+// decisão do usuário; ver a divergência registrada na M1-T11 do docs/KANBAN.md.
+// JÁ FEITO NA M1-T11: o corpo deste bloco virou a implementação logo abaixo —
+// renderizarCard. A etapa rodou; o que sobrou do roteiro é o cabeçalho e esta
+// anotação.
+/**
+ * RF08 · M1-T11 · Monta um card de série recomendada e anexa em #resultados.
+ *
+ * Uma série por card, sempre com os cinco campos do RF08
+ * (docs/BRIEFING.md:257): título, gêneros em comum, gêneros não explorados,
+ * percentual de compatibilidade e a classificação.
+ *
+ * Nenhum dado da API é escrito como marcação: tudo passa por textContent, que
+ * coloca o valor na tela como texto e nunca o interpreta como HTML. É o que
+ * mantém o título de uma série do TVMaze longe do innerHTML, mesmo com acento,
+ * aspas ou tag no meio do nome.
+ *
+ * A ordem dos filhos copia o template do index.html: midia primeiro, com a
+ * faixa de classificação dentro, e depois o conteúdo. O badge é position
+ * absolute, então precisa de um ancestral posicionado — e o único que existe na
+ * árvore do card é .midia-serie (position: relative no css/style.css). Por isso
+ * a faixa mora ali e não no conteúdo.
+ *
+ * A faixa traduz o rótulo que a Serie já calculou em classe de cor. Não é a
+ * fórmula de compatibilidade de novo: os limiares 80 e 50 vivem em um lugar
+ * só, no método calcularCompatibilidade de js/modelo.js. Aqui há apenas
+ * rótulo virando classe, e o texto exibido é o rótulo inteiro — "Alta
+ * afinidade", e não "Alta".
+ *
+ * Esta função não limpa a tela nem percorre a lista: quem faz isso, uma vez, é
+ * renderizarCards em js/script.js. Aqui é só construção de um card.
+ *
+ * @param {{ titulo: string, generosEmComum: string[], generosNaoExplorados:
+ *   string[], percentual: string, classificacao: string }} resultado
+ *   Objeto devolvido por calcularCompatibilidades, com os cinco campos já
+ *   prontos: percentual vem como string e classificacao como um dos três
+ *   rótulos de afinidade.
+ */
+export function renderizarCard(resultado) {
+  const card = document.createElement("article");
+  card.className = "card-serie";
+
+  // A faixa de classificação fica em .midia-serie porque .badge é
+  // position: absolute: sem um ancestral posicionado, ela se ancoraria no
+  // bloco inicial da página e apareceria fora do card.
+  const midia = document.createElement("div");
+  midia.className = "midia-serie";
+
+  const badge = document.createElement("span");
+  badge.classList.add("badge");
+  if (resultado.classificacao === "Alta afinidade") {
+    badge.classList.add("badge-alta");
+  } else if (resultado.classificacao === "Média afinidade") {
+    badge.classList.add("badge-media");
+  } else {
+    badge.classList.add("badge-baixa");
+  }
+  badge.textContent = resultado.classificacao;
+  midia.appendChild(badge);
+
+  // O conteúdo é o que o css/style.css estiliza com padding e gap; as três
+  // linhas são os campos que a M1-T10 passou a devolver. `generosEmComum` e
+  // `percentual` — o `compatibilidade` de antes — são rótulos que o
+  // cinematch_antigo/cinematch.js já batizou no bloco exibirRecomendacaoPrincipal;
+  // `generosNaoExplorados` não vem desse bloco, e sim do `generosFaltantes` que
+  // obterConteudosPorGenero monta e listarGenerosFaltantes e recomendarProximoGenero
+  // usam. Por campo e por nome de função, nunca por linha: regra em
+  // docs/KANBAN.md, Convenções técnicas.
+  const conteudo = document.createElement("div");
+  conteudo.className = "conteudo-serie";
+
+  const titulo = document.createElement("h3");
+  titulo.className = "titulo-serie";
+  titulo.textContent = resultado.titulo;
+  conteudo.appendChild(titulo);
+
+  // Não existe filtro de afinidade no fluxo, então um array vazio é o caso
+  // comum e não o raro: séries com 0% de compatibilidade renderizam aqui. O
+  // join de array vazio devolve "", que leria como uma linha truncada; o
+  // fallback com || deixa a linha inteira presente e legível.
+  const emComum = resultado.generosEmComum.join(", ") || "nenhum";
+  const naoExplorados = resultado.generosNaoExplorados.join(", ") || "nenhum";
+  const linhas = [
+    `Gêneros em comum: ${emComum}`,
+    `Gêneros não explorados: ${naoExplorados}`,
+    `Compatibilidade: ${resultado.percentual}%`,
+  ];
+  // Laço clássico com let i: a mesma forma de cinematch_antigo/cinematch.js:397,
+  // a única do arquivo que declara o i. As formas das linhas 171 e 330 não
+  // declaram e quebram com ReferenceError em módulo ES (AGENTS.md 2.1).
+  for (let i = 0; i < linhas.length; i++) {
+    const paragrafo = document.createElement("p");
+    paragrafo.textContent = linhas[i];
+    conteudo.appendChild(paragrafo);
+  }
+
+  card.appendChild(midia);
+  card.appendChild(conteudo);
+  document.querySelector("#resultados").appendChild(card);
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // TODO M1-T13 · RF10 · Usar callback
@@ -526,9 +534,10 @@ export function exibirMensagemDeCatalogoVazio(aviso) {
 //     (M1-T08), renderizarCard (M1-T11), a saudação (M1-T13), o contador
 //     (M1-T14), o carregando com o atraso (M1-T15) e o que for criado pelo
 //     RF13.
-//   - APAGAR PLACEHOLDER_UI, que está na linha 11 deste arquivo, no mesmo
-//     passo em que renderizarCard entrar. Ele é provisório e existia só
-//     para o import do script.js resolver desde o primeiro dia.
+//   - JÁ FEITO NA M1-T11: APAGAR PLACEHOLDER_UI, que estava na linha 11 deste
+//     arquivo quando este esboço foi escrito, no mesmo passo em que
+//     renderizarCard entrou. Ele era provisório e existia só para o import do
+//     script.js resolver desde o primeiro dia.
 //   - Exportar o que o outro módulo precisa e nada mais. O que existe aqui é
 //     named export, com export na frente da declaração, que é o que o
 //     exemplo do professor usa.
