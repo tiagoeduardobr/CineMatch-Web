@@ -217,6 +217,14 @@
         <p id="resultados-status" role="status" aria-live="polite">
           As recomendações serão exibidas aqui.
         </p>
+        <!-- Alvo do contador por closure do RF11 (M1-T14), escrito por
+             exibirContadorDeRecalculos em js/ui.js. Fica dentro de
+             .cabecalho-resultados para herdar a regra que a folha de estilo já
+             dá aos <p> desse bloco, e é um elemento só dele: os quatro estados
+             da chamada reescrevem o #resultados-status, e é por isso que o
+             número não pode morar ali. Não é uma região ao vivo, como o
+             #resultados-status: os dois anunciariam a mesma busca. -->
+        <p id="resultados-contador"></p>
       </div>
       <p id="resultados-boas-vindas"></p>
       <hr class="separador">

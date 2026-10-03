@@ -12,6 +12,8 @@
  * M1-T11 (ui.js). JÁ FEITO NA M1-T11: o import já traz o renderizarCard.
  * JÁ FEITO NA M1-T13: e o exibirMensagemDeBoasVindas, o corpo do callback do
  * RF10, que este arquivo recebe como argumento e dispara em concluirBusca.
+ * JÁ FEITO NA M1-T14: e o exibirContadorDeRecalculos, a função de tela do
+ * número que a closure do RF11 accountou — este arquivo lê o total e repassa.
  *
  * A página só funciona servida por `npm start` (live-server): módulos ES não
  * carregam via file://, por causa do CORS. O live-server é instalado na M1-T18.
@@ -21,6 +23,7 @@ import {
   exibirMensagemDeErro,
   exibirMensagemDeCatalogoVazio,
   exibirMensagemDeBoasVindas,
+  exibirContadorDeRecalculos,
 } from "./ui.js";
 import { Conteudo, Serie } from "./modelo.js";
 
@@ -35,6 +38,12 @@ import { Conteudo, Serie } from "./modelo.js";
 // exibirMensagemDeBoasVindas, porque o RF10 é medido sobre a passagem da
 // função — e uma função só é passada como argumento se foi importada antes.
 // É o mesmo contrato dos outros três: o nome existe em ui.js e é citado aqui.
+// JÁ FEITO NA M1-T14: o mesmo `import` do topo ganhou um quinto nome,
+// exibirContadorDeRecalculos, e o motivo é o mesmo da M1-T13: o número que a
+// closure do RF11 accountou precisa de uma função de tela, e essa função só
+// pode ser chamada daqui se foi importada antes. A leitura do total fica deste
+// lado, em `contadorRecomendacoes.obterTotal()`, e não do lado de lá: passar o
+// par para o ui.js daria ao módulo de tela acesso ao estado privado.
 // A referência por número de linha que este bloco usava saiu junto: o `import`
 // do ui.js passou a ocupar várias linhas, e foi para o número de linha que o
 // próprio quadro proíbe em nota — vale por seletor, ID ou nome de elemento.
@@ -704,6 +713,28 @@ async function buscarCatalogo(aviso, generosFavoritos, nome) {
     // #resultados-status, que é outro elemento.
     concluirBusca(nome, exibirMensagemDeBoasVindas);
 
+    // RF11 · M1-T14 — o total vai para a tela. `obterTotal()` é lido do par
+    // criado uma vez no carregamento do módulo, e o NÚMERO PRONTO é repassado
+    // para a função de tela: quem guarda não escreve, e quem escreve não
+    // calcula nem guarda. É o contrato do par de funções da closure com a
+    // função de exibição, e ele fica na mesma linha do callback da RF10 acima:
+    // as duas coisas que a tela recebe prontas depois que os cards estão
+    // pintados.
+    //
+    // O alvo é #resultados-contador, o <p> que fica dentro de
+    // .cabecalho-resultados no index.html, e NÃO o #resultados-status: os
+    // quatro estados da chamada — carregando, sucesso, erro e o catálogo
+    // vazio — sobrescrevem o #resultados-status por consequência, e o contador
+    // morreria junto com o primeiro deles. É o mesmo motivo que separou a
+    // saudação da M1-T13 em outro elemento, e vale para o mesmo elemento: o
+    // número sobrevive à bifurcação dos estados logo abaixo.
+    //
+    // A leitura é feita aqui, e não dentro da função de tela, por uma razão
+    // que é o próprio RF11: quem lê o total é o código que tem o par, e passar
+    // o par para a função de tela a faria capaz de mexer no estado privado —
+    // que é justamente o que a fechamento esconde.
+    exibirContadorDeRecalculos(contadorRecomendacoes.obterTotal());
+
     // ESTADO 2 — sucesso, agora com a bifurcação do RF05. Continua
     // sobrescrevendo o carregando no MESMO elemento, então ele não fica
     // preso na tela nem exige código de limpeza, e a regra "os estados não
@@ -918,7 +949,7 @@ function tratarCatalogo(bruto) {
  * @returns {Array<{ titulo: string, generosEmComum: string[], generosNaoExplorados: string[], percentual: string, classificacao: string }>}
  */
 function calcularCompatibilidades(generosFavoritos) {
-  return catalogoTratado.map((item) => {
+  const recomendacoes = catalogoTratado.map((item) => {
     const serie = new Serie(item.titulo, item.generos, item.duracaoMinutos);
     const compatibilidade = serie.calcularCompatibilidade(generosFavoritos);
 
@@ -933,7 +964,96 @@ function calcularCompatibilidades(generosFavoritos) {
       classificacao: compatibilidade.classificacao,
     };
   });
+
+  // RF11 · M1-T14 — o contador conta AQUI, e não em outro lugar. "Quantas
+  // vezes a pessoa recalculou a compatibilidade" (RF11) é o que esta função é:
+  // ela recalcula, então é nela que o total anda uma casa. Contar na chamada
+  // de buscarCatalogo daria o mesmo número na tela, porque também é uma
+  // recalculação por busca — e não entregaria o RF11, que é medido sobre a
+  // mecânica da closure, não sobre a frequência do evento.
+  contadorRecomendacoes.incrementar();
+
+  return recomendacoes;
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// M1-T14 · RF11 · CONTADOR DE RECALCULAÇÕES POR CLOSURE
+// ────────────────────────────────────────────────────────────────────────────
+/**
+ * POR QUE ESTA REGIÃO FICA ANTES DO GUARD `typeof document !== "undefined"`
+ *   A mesma ordem de avaliação da M1-T07 e da M1-T08: o guard roda no
+ *   carregamento do módulo e, com perfil salvo, chama buscarCatalogo já na
+ *   primeira execução — e o cálculo de compatibilidade mexe no contador. Se a
+ *   `const contadorRecomendacoes` fosse declarada DEPOIS do guard, essa
+ *   chamada cairia em temporal dead zone e daria ReferenceError. A função, o
+ *   hoisting resolve; a variável, não.
+ */
+
+/**
+ * RF11 · M1-T14 · Cria o contador e devolve o par de funções que mexe nele.
+ *
+ * POR QUE O TOTAL NÃO É UM `let` SOLTO NESTE ARQUIVO
+ *   Um `let total = 0` no topo do módulo entregaria o mesmo número na tela e
+ *   NÃO entregaria o requisito: o Critério 8 é medido sobre o ESCOPO FECHADO,
+ *   e a prova de que o escopo é fechado é que ninguém de fora consegue ler nem
+ *   escrever o total. Dentro desta factory o `total` é alcançado só pelas duas
+ *   funções devolvidas — o resto do módulo, o `ui.js` e a página não têm caminho
+ *   até ele, e é isso que a fechamento (closure) significa: a função devolvida
+ *   continua enxergando o escopo de onde nasceu depois que a factory termina.
+ *
+ * POR QUE DEVOLVE UM PAR E NÃO UM NÚMERO
+ *   Devolver o total nu tiraria a parte difícil do exercício: quem recebesse o
+ *   número poderia alterá-lo, e o estado privado deixaria de ser privado. O par
+ *   é a interface mínima que permite usar o estado sem expô-lo — `incrementar`
+ *   muda, `obterTotal` só lê, e nenhuma das duas entrega a variável.
+ *
+ * POR QUE DECLARAR AS DUAS FUNÇÕES COM `function` E NÃO COM MÉTODO DO OBJETO
+ *   É a forma equivalente, e o que muda é a legibilidade: cada função ganha o
+ *   próprio nome para o JSDoc e para o stack trace, enquanto o par devolvido é
+ *   escrito com as chaves explícitas, como o resto deste módulo — `nome:
+ *   nome.trim()` no objeto `usuario`, `percentual: percentual` no objeto do
+ *   card. A forma da referência é citada abaixo; a forma final é a escrita
+ *   aqui, linha a linha.
+ *
+ * O `total++` é o incremento da referência (cinematch_antigo/cinematch.js:107),
+ * que é a forma de `i++` já usada nos quatro laços deste projeto.
+ *
+ * @returns {{ incrementar: Function, obterTotal: Function }} par que opera
+ *   sobre o total privado.
+ */
+function criarContadorDeRecomendacoes() {
+  let total = 0;
+
+  function incrementar() {
+    total++;
+    return total;
+  }
+
+  function obterTotal() {
+    return total;
+  }
+
+  return {
+    incrementar: incrementar,
+    obterTotal: obterTotal,
+  };
+}
+
+// A factory é chamada UMA VEZ, aqui no escopo do módulo, e o par devolvido
+// fica guardado nesta `const` para o resto da vida da página. É este o ponto
+// que decide se o RF11 está entregue ou não:
+//
+//   - se a factory fosse chamada DENTRO de quem usa o contador — dentro de
+//     calcularCompatibilidades, dentro de buscarCatalogo, dentro do handler —,
+//     cada chamada criaria um `total = 0` novo e o estado privado morreria
+//     junto com a chamada. O número na tela seria sempre 1, e não haveria
+//     closure nenhuma: seria uma variável comum com nome complicado. Por isso
+//     a chamada é de módulo — e é `const`, pelo mesmo motivo de CHAVE_PERFIL e
+//     URL_CATALOGO: o par é o contrato entre quem incrementa e quem lê, e não
+//     é trocado. O escopo de módulo também é o que impede que ele vire global,
+//     e um global entregaria o número na tela sem a mecânica que o Critério 8
+//     mede.
+const contadorRecomendacoes = criarContadorDeRecomendacoes();
 
 if (typeof document !== "undefined") {
   const perfilSalvo = lerPerfilSalvo();
@@ -1057,16 +1177,49 @@ if (typeof document !== "undefined") {
 // ────────────────────────────────────────────────────────────────────────────
 // ETAPA 8 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T13
 // DONO DESTA ETAPA: Tiago.
+// EXECUTADA EM: feature/cinematch-web por Tiago em 03/10/2026:16:19.
+// JÁ FEITO NA M1-T14: a etapa rodou inteira. O que ficou no lugar é o
+// cabeçalho, estas anotações e a implementação em três pontos: a região nova
+// antes do guard `typeof document !== "undefined"`, o incremento dentro de
+// calcularCompatibilidades e a leitura do total dentro de buscarCatalogo.
 // O QUE FAZER AQUI
-//   - Escrever a factory: uma função que cria o contador e DEVOLVE as
-//     funções que mexem nele. O total fica numa variável que só o par criado
-//     por ela enxerga — é essa a closure.
-//   - Chamar a factory uma vez, guardando o par devolvido, e ir passando esse
-//     par para quem precisar do número.
-//   - O contador começa em zero a cada sessão e volta a zero quando o perfil
-//     troca: quem trocou o perfil recalculou do começo.
-//   - O número vai para a tela pelo Lucas, em js/ui.js (etapa 6, mesma
-//     M1-T14). Aqui é só onde o total mora.
+//   - JÁ FEITO NA M1-T14: a factory. `criarContadorDeRecomendacoes()` declara o
+//     `let total = 0` e DEVOLVE o par que mexe nele — `incrementar`, que soma
+//     uma casa e devolve o novo total, e `obterTotal`, que só lê. O total fica
+//     numa variável que só o par criado por ela enxerga, e é isso que é a
+//     closure: as duas funções continuam alcancando o escopo de onde nasceram
+//     depois que a factory termina, e ninguém de fora do par chega nele.
+//   - JÁ FEITO NA M1-T14: a factory é chamada UMA VEZ, na `const
+//     contadorRecomendacoes`, no escopo do módulo, antes do guard — que é o
+//     ponto que decide se a entrega vale. Chamá-la dentro de quem usa o
+//     contador mataria o estado privado a cada chamada e o número na tela seria
+//     sempre 1, sem closure nenhuma. O par é repassado por quem precisa do
+//     número: dentro de calcularCompatibilidades ele incrementa, e dentro de
+//     buscarCatalogo ele é lido por `obterTotal()` e o número pronto vai para a
+//     função de tela.
+//   - JÁ FEITO NA M1-T14, pela metade, e a outra metade está escrita: o
+//     contador começa em zero a cada sessão sem nenhuma linha de código — nada
+//     o grava fora da memória da página, e o RF11 fala em "nesta sessão", então
+//     guardá-lo no localStorage mudaria o significado sem ter sido pedido. O
+//     `incrementar()` do par também não zera, e por isso a segunda metade desta
+//     bullet — voltar a zero quando o perfil troca — ficou de fora. Onde ela
+//     mora é o clique do #botao-trocar-perfil, que é a etapa 1 do js/ui.js e
+//     ainda não foi escrita; hoje esse clique é tratado em iniciarFormulario,
+//     aqui no js/script.js (risco 13 do quadro), e ele não esconde os cards do
+//     perfil anterior, então zerar o número ali deixaria a tela contando uma
+//     coisa e mostrando outra. A volta a zero entra no mesmo passo em que a
+//     etapa 1 do ui.js for escrita, com um `zerar()` no par — e não antes, para
+//     não deixar no grafo uma função que ninguém chama.
+//   - JÁ FEITO NA M1-T14: o número vai para a tela pelo Lucas, em js/ui.js
+//     (etapa 6, mesma M1-T14), em `exibirContadorDeRecalculos(total)`. Aqui é
+//     só onde o total mora: a chamada passa o número pronto e o ui.js escreve.
+//     JÁ FEITO NA M1-T14, com desvio declarado: a etapa 6 do esboço de lá é do
+//     Lucas e foi executada pelo Tiago, na branch de lógica, porque a função só
+//     existe para ser chamada por este arquivo — o mesmo motivo que a M1-T11 e a
+//     M1-T13 registraram. O alvo na tela é o `<p id="resultados-contador">` do
+//     index.html, dentro de .cabecalho-resultados, e o `index.html` é território
+//     da branch de interface: a divergência está na nota da M1-T14 do
+//     docs/KANBAN.md.
 // POR QUE ESTE TRECHO EXISTE
 //   O RF11 pede um estado que sobreviva entre chamadas sem virar uma
 //     variável global. Uma variável let solta no topo do módulo resolveria o

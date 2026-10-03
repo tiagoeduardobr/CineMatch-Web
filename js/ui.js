@@ -451,18 +451,95 @@ export function exibirMensagemDeBoasVindas(nome) {
   boasVindas.textContent = `Olá, ${nome}! Boas-vindas ao CineMatch: as recomendações abaixo vêm dos gêneros que você escolheu no perfil.`;
 }
 
+/**
+ * RF11 · M1-T14 · Escreve na tela o número de recálculos da compatibilidade.
+ *
+ * Esta função é o outro lado do contrato da closure. Ela NÃO tem o contador,
+ * NÃO o calcula e NÃO o guarda: recebe o total já pronto e escreve. Quem guarda
+ * é o par de funções criado uma vez em `criarContadorDeRecomendacoes`, no
+ * js/script.js, e quem lê o total é o script.js, no call site — o
+ * `obterTotal()` fica deste lado de fora justamente para que o módulo de tela
+ * não alcance o estado privado. Nada de `import` do par, nada de estado local:
+ * se esta função guardasse o número, o total pararia de ser privado e a
+ * fechamento da M1-T14 ficaria declarada no código sem ser exercida.
+ *
+ * POR QUE O TEXTO DE ZERO É UMA FRASE E NÃO "0 RECALCULADOS"
+ *   Porque zero é o estado inicial de uma sessão, não um resultado: escrever o
+ *   número-zero na tela produz a leitura de que a pessoa recalculou zero
+ *   vezes, o que é verdade e não informa nada. O ramo de zero escreve o
+ *   estado inicial como frase, e o número aparece a partir do primeiro
+ *   recálculo. A frase do número também foi escrita para valer para 1, 2 ou 30
+ *   sem reescrita — é por isso que ela rotula o que está contando ("Quantas
+ *   vezes…") em vez de repetir o substantivo "recalculada" em número, que
+ *   obrigaria a concordar o particípio a cada contagem.
+ *
+ * POR QUE O `if (!total)` E NÃO `if (total === 0)`
+ *   Porque o `if` não é só o tratamento do zero: é também o tratamento do
+ *   número que NÃO CHEGOU, que é o que o contrato do bloco pede — "se o número
+ *   não chegar, não quebrar a tela". `undefined`, `null` e `NaN` são falsy, e o
+ *   zero também é, então um teste só cobre os quatro casos e nenhum deles
+ *   chega ao `textContent` como "undefined". É o mesmo mecanismo do
+ *   `if (!perfilSalvo)` do `lerPerfilSalvo` no js/script.js.
+ *
+ * POR QUE O ALVO É #resultados-contador E NÃO #resultados-status
+ *   Porque #resultados-status é o elemento que os estados da chamada
+ *   sobrescrevem por consequência — carregando, sucesso, erro e o estado vazio
+ *   da M1-T08 —, e o contador morreria junto com o primeiro deles. O
+ *   <p id="resultados-contador"> do index.html existe para isso: um destino que
+ *   nenhum dos quatro estados reescreve, então o número continua na tela depois
+ *   que o catálogo termina. É a mesma razão que separou a saudação da M1-T13
+ *   em #resultados-boas-vindas.
+ *
+ * POR QUE textContent E NÃO innerHTML
+ *   O destino do valor é a defesa contra XSS (AGENTS.md §7), e o número vem de
+ *   uma contagem interna, não de dado externo — mas o hábito é o mesmo dos
+ *   cards da M1-T11 e da saudação da M1-T13, e a crase da interpolação não
+ *   escapa nada: a proteção está no destino do valor, não na sintaxe da string.
+ *
+ * @param {number} total - quantas vezes a compatibilidade foi recalculada nesta
+ *   sessão, lido do par da closure por quem tem acesso a ele. O zero e a
+ *   ausência de valor caem no mesmo ramo, sem quebrar a tela.
+ */
+export function exibirContadorDeRecalculos(total) {
+  const contador = document.querySelector("#resultados-contador");
+
+  if (!total) {
+    contador.textContent =
+      "Você ainda não recalculou a compatibilidade nesta sessão.";
+    return;
+  }
+
+  contador.textContent = `Quantas vezes a compatibilidade foi recalculada nesta sessão: ${total}.`;
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // TODO M1-T14 · RF11 · Usar closure
 // ────────────────────────────────────────────────────────────────────────────
 // ETAPA 6 DE 9 · BRANCH: feature/cinematch-web-interface · DEPENDE DE: M1-T14 (lógica, js/script.js)
 // DONO DESTA ETAPA: Lucas.
+// EXECUTADA EM: feature/cinematch-web por Tiago em 03/10/2026:16:19, por
+// decisão do usuário; ver a divergência registrada na M1-T14 do docs/KANBAN.md.
+// JÁ FEITO NA M1-T14: o corpo deste bloco virou a implementação logo abaixo —
+// exibirContadorDeRecalculos. A etapa rodou; o que sobrou do roteiro é o
+// cabeçalho e estas anotações. DONO DESTA ETAPA continua sendo o do autor do
+// esboço (Lucas), e quem executou a etapa foi o Tiago, pela mesma razão que a
+// M1-T11 e a M1-T13 registraram neste cabeçalho: o js/script.js, que lê o total
+// e chama esta função, é do Tiago, e a etapa não podia ficar com o grafo de
+// módulos partido.
 // O QUE FAZER AQUI
-//   - Escrever a função que mostra na tela o número que a closure accountou.
-//   - Ela recebe o total como parâmetro e escreve. O total NÃO é calculado
-//     aqui nem guardado aqui: quem guarda é a closure do Tiago, no
-//     js/script.js, na M1-T14 (etapa 8 de lá).
-//   - O contrato entre os dois: o script.js passa o número, esta função
-//     escreve. Se o número não chegar, não quebrar a tela.
+//   - JÁ FEITO NA M1-T14: a função que mostra na tela o número que a closure
+//     accountou. Ela se chama exibirContadorDeRecalculos(total) e é a quinta
+//     nome exportado deste arquivo, o que o `import` do js/script.js cita.
+//   - JÁ FEITO NA M1-T14: ela recebe o total como parâmetro e escreve. O total
+//     NÃO é calculado nem guardado aqui, como o roteiro mandava: quem guarda é
+//     o par devolvido por criarContadorDeRecomendacoes, no js/script.js, e quem
+//     lê o total é o script.js, no call site. O roteiro previa que a função
+//     recebesse o número, e é o que ela recebe — a única decisão que mudou foi
+//     de quem tira o número do par.
+//   - JÁ FEITO NA M1-T14: o contrato entre os dois lados. O script.js passa o
+//     número, esta função escreve, e se o número não chegar a tela não quebra:
+//     o `if (!total)` trata o zero e a ausência de valor no mesmo ramo, e
+//     nenhum dos dois chega ao `textContent`.
 // POR QUE ESTE TRECHO EXISTE
 //   O RF11 pede duas coisas: o contador por closure e que ele apareça na
 //   tela. A primeira é lógica, a segunda é tela. O contador invisível não
@@ -483,6 +560,25 @@ export function exibirMensagemDeBoasVindas(nome) {
 //   - O número começa em zero a cada sessão e volta a zero quando o perfil
 //     troca (etapa 1 deste arquivo). Texto de zero é feio: "0 recalculados"
 //     ainda é o estado inicial, e some com isso se ficar estranho.
+//     JÁ FEITO NA M1-T14, na parte do zero: o texto de zero foi resolvido. Em
+//     vez de "0 recalculados", o ramo de zero escreve "Você ainda não
+//     recalculou a compatibilidade nesta sessão." — o estado inicial como frase,
+//     sem o número solto, e o número passa a aparecer a partir do primeiro
+//     recálculo. JÁ FEITO NA M1-T14, na parte do texto do número: a frase
+//     rotula o que conta ("Quantas vezes a compatibilidade foi recalculada nesta
+//     sessão: N."), então ela é grammatical em 1, 2 ou 30 sem reescrita.
+//     NÃO FEITO, e é a única bullet deste bloco que ficou pendente: a volta a
+//     zero quando o perfil troca. A etapa 1 deste arquivo — a função que
+//     reabre o formulário no clique do #botao-trocar-perfil — ainda não foi
+//     escrita, e hoje quem trata desse clique é o `click` ligado em
+//     iniciarFormulario, no js/script.js (risco 13 do quadro), que só tira o
+//     registro do localStorage e reabre o formulário: ele NÃO esconde os cards
+//     do perfil anterior. Zerar o contador ali, sem a tela trocar junto, apagaria
+//     o número enquanto as imagens da outra compatibilidade continuariam na
+//     tela — pior do que o número sobrando. E o valor do total, sem zerar,
+//     continua sendo o que o RF11 pede: "quantas vezes a pessoa recalculou a
+//     compatibilidade nesta sessão". Combinado com a etapa 1, no mesmo passo
+//     em que ela for escrita.
 // ────────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────────
