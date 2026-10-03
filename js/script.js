@@ -1041,6 +1041,10 @@ function tratarCatalogo(bruto) {
       tipo: "Série",
       generos: serie.genres,
       duracaoMinutos: serie.runtime,
+      imagem:
+        serie.image === null || serie.image === undefined
+          ? ""
+          : serie.image.medium,
     }));
 }
 
@@ -1055,7 +1059,7 @@ function tratarCatalogo(bruto) {
  * reordena nem recorta: a ordem dos cards é a mesma que a M1-T08 gravou.
  *
  * @param {string[]} generosFavoritos - valores dos checkboxes, em inglês
- * @returns {Array<{ titulo: string, generosEmComum: string[], generosNaoExplorados: string[], percentual: string, classificacao: string }>}
+ * @returns {Array<{ titulo: string, imagem: string, generosEmComum: string[], generosNaoExplorados: string[], percentual: string, classificacao: string }>}
  */
 function calcularCompatibilidades(generosFavoritos) {
   const recomendacoes = catalogoTratado.map((item) => {
@@ -1067,6 +1071,7 @@ function calcularCompatibilidades(generosFavoritos) {
     // porque ninguém o consome.
     return {
       titulo: item.titulo,
+      imagem: item.imagem,
       generosEmComum: compatibilidade.generosEmComum,
       generosNaoExplorados: compatibilidade.generosNaoExplorados,
       percentual: compatibilidade.percentual,

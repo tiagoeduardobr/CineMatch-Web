@@ -306,9 +306,9 @@ export function exibirMensagemDeCatalogoVazio(aviso) {
  * Esta função não limpa a tela nem percorre a lista: quem faz isso, uma vez, é
  * renderizarCards em js/script.js. Aqui é só construção de um card.
  *
- * @param {{ titulo: string, generosEmComum: string[], generosNaoExplorados:
- *   string[], percentual: string, classificacao: string }} resultado
- *   Objeto devolvido por calcularCompatibilidades, com os cinco campos já
+ * @param {{ titulo: string, imagem: string, generosEmComum: string[],
+ *   generosNaoExplorados: string[], percentual: string, classificacao: string }}
+ *   resultado Objeto devolvido por calcularCompatibilidades, com os campos já
  *   prontos: percentual vem como string e classificacao como um dos três
  *   rótulos de afinidade.
  */
@@ -321,6 +321,14 @@ export function renderizarCard(resultado) {
   // bloco inicial da página e apareceria fora do card.
   const midia = document.createElement("div");
   midia.className = "midia-serie";
+
+  if (resultado.imagem !== "") {
+    const cartaz = document.createElement("img");
+    cartaz.className = "cartaz-serie";
+    cartaz.src = resultado.imagem;
+    cartaz.alt = `Pôster da série ${resultado.titulo}`;
+    midia.appendChild(cartaz);
+  }
 
   const badge = document.createElement("span");
   badge.classList.add("badge");
