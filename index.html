@@ -1,30 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- O <title> descreve o assunto da página em vez de só nomear a marca: é o que
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- O <title> descreve o assunto da página em vez de só nomear a marca: é o que
        aparece na aba do navegador e no resultado de busca, junto da meta description. -->
-  <title>CineMatch — Recomendação de Séries em Tempo Real</title>
-  <!-- A meta description resume a página para os resultados de busca (RF01/RF13). -->
-  <meta name="description" content="CineMatch: receba recomendações de séries em tempo real a partir do seu perfil de gêneros favoritos, com catálogo real da TVMaze e compatibilidade calculada para você.">
-  <!-- As cinco og tags (Open Graph) controlam como a página aparece quando
+    <title>CineMatch — Recomendação de Séries em Tempo Real</title>
+    <!-- A meta description resume a página para os resultados de busca (RF01/RF13). -->
+    <meta
+      name="description"
+      content="CineMatch: receba recomendações de séries em tempo real a partir do seu perfil de gêneros favoritos, com catálogo real da TVMaze e compatibilidade calculada para você."
+    />
+    <!-- As cinco og tags (Open Graph) controlam como a página aparece quando
        compartilhada em redes sociais: título, descrição, tipo, URL e imagem. -->
-  <meta property="og:title" content="CineMatch — Recomendação de Séries em Tempo Real">
-  <meta property="og:description" content="Recomendações de séries a partir do seu perfil de gêneros favoritos, com catálogo real da TVMaze.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://github.com/tiagoeduardobr/CineMatch-Web">
-  <meta property="og:image" content="./assets/main.png">
-  <link rel="stylesheet" href="./css/style.css">
-</head>
+    <meta
+      property="og:title"
+      content="CineMatch — Recomendação de Séries em Tempo Real"
+    />
+    <meta
+      property="og:description"
+      content="Recomendações de séries a partir do seu perfil de gêneros favoritos, com catálogo real da TVMaze."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://tiagoeduardobr.github.io/CineMatch-Web/"
+    />
+    <meta property="og:image" content="./assets/main.png" />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
 
-<body>
-  <!-- O skip link é o primeiro elemento focável da página: leitores de tela e
+  <body>
+    <!-- O skip link é o primeiro elemento focável da página: leitores de tela e
        navegação por teclado pulam a navbar inteira e vão direto ao conteúdo
        principal, cujo alvo é o id que a <main> recebe. Ele fica invisível e só
        aparece quando recebe foco, pela regra .skip-link do css/style.css. -->
-  <a class="skip-link" href="#conteudo-principal">Pular para o conteúdo principal</a>
-  <!--
+    <a class="skip-link" href="#conteudo-principal"
+      >Pular para o conteúdo principal</a
+    >
+    <!--
     CineMatch Web — por que esta página é organizada assim.
 
     1. Onde cada coisa mora. O index.html fica na raiz porque é o arquivo que o
@@ -48,204 +62,260 @@
        campos normalizados para a futura renderização das séries; ela ainda
        não é preenchida pela lógica JavaScript.
 
-    4. Divergência do briefing, declarada e não silenciada. A seção
-       ".secao-login" (e-mail, senha, "Entrar" e "Criar conta") NÃO consta do
-       briefing: a seção 3 mostra só dois estados, o formulário de perfil e os
-       resultados, e back-end é proibido no Módulo 01 (AGENTS.md §2), então não
-       há servidor contra o qual autenticar. Ela foi mantida como bônus de
-       interface, não conta nota, e está registrada como item de bônus no
-       docs/KANBAN.md. Os dois botões são type="button" e deliberadamente não
-       fazem nada: um type="submit" sem back-end apenas recarregaria a página.
-
-    5. De qual task do quadro vem cada bloco. M1-T02 dá os landmarks
+    4. De qual task do quadro vem cada bloco. M1-T02 dá os landmarks
        (header, main, section e footer), o lang e o title; M1-T03 dá o
        #form-perfil (nome, idade, o fieldset de gêneros e o botão de submit,
        cuja captura pelo evento submit é a M1-T05); M1-T04 dá o estilo, externo
        em css/style.css, mobile-first e com Flexbox.
   -->
-  <header>
-    <nav class="barra-navegacao">
-      <h1 class="marca">CineMatch</h1>
+    <header>
+      <nav class="barra-navegacao">
+        <h1 class="marca">CineMatch</h1>
 
-      <ul class="links-navegacao">
-        <li><a href="#">Início</a></li>
-        <li><a href="#">Sobre nós</a></li>
-        <li><a href="#">Minha Lista</a></li>
-        <li><a href="#">Meu Perfil</a></li>
-      </ul>
+        <ul class="links-navegacao">
+          <li><a href="#">Início</a></li>
+          <li><a href="#">Sobre nós</a></li>
+          <li><a href="#">Minha Lista</a></li>
+          <li><a href="#">Meu Perfil</a></li>
+        </ul>
 
-      <div class="acoes-navegacao" role="group" aria-label="Ações rápidas">
-        <button class="botao-navegacao" type="button" aria-label="Pesquisar">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <circle cx="11" cy="11" r="6.5"></circle>
-            <path d="m16 16 4.5 4.5"></path>
-          </svg>
-        </button>
-        <button class="botao-navegacao" type="button" aria-label="Alternar tema">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"></path>
-          </svg>
-        </button>
-        <button class="botao-navegacao botao-navegacao--perfil" type="button" aria-label="Abrir perfil">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <circle cx="12" cy="8" r="3.25"></circle>
-            <path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path>
-          </svg>
-        </button>
-      </div>
-    </nav>
-  </header>
+        <div class="acoes-navegacao" role="group" aria-label="Ações rápidas">
+          <button class="botao-navegacao" type="button" aria-label="Pesquisar">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="11" cy="11" r="6.5"></circle>
+              <path d="m16 16 4.5 4.5"></path>
+            </svg>
+          </button>
+          <button
+            class="botao-navegacao"
+            type="button"
+            aria-label="Alternar tema"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"
+              ></path>
+            </svg>
+          </button>
+          <button
+            class="botao-navegacao botao-navegacao--perfil"
+            type="button"
+            aria-label="Abrir perfil"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="8" r="3.25"></circle>
+              <path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path>
+            </svg>
+          </button>
+        </div>
+      </nav>
+    </header>
 
-<!-- A <main> recebe o id que é o alvo do skip link no topo do body. -->
-<main id="conteudo-principal">
-    <section class="capa" aria-label="Capa CineMatch">
-      <div class="conteudo-capa">
-        <img
-          class="imagem-capa"
-          src="./assets/main.png"
-          alt="CineMatch em uma paisagem de montanhas, castelo e vulcão"
-          width="2048"
-          height="768"
-        >
-      </div>
-    </section>
+    <!-- A <main> recebe o id que é o alvo do skip link no topo do body. -->
+    <main id="conteudo-principal">
+      <section class="capa" aria-label="Capa CineMatch">
+        <div class="conteudo-capa">
+          <img
+            class="imagem-capa"
+            src="./assets/main.png"
+            alt="CineMatch em uma paisagem de montanhas, castelo e vulcão"
+            width="2048"
+            height="768"
+          />
+        </div>
+      </section>
 
-    <section class="secao-login" aria-labelledby="login-titulo" hidden>
-      <div class="cartao-login">
-        <h2 id="login-titulo">Bem-vindo ao CineMatch</h2>
-        <hr class="separador">
-        <p>Entre para receber recomendações de séries feitas para você.</p>
+      <section class="secao-perfil" aria-labelledby="perfil-titulo">
+        <div class="cartao-perfil">
+          <h2 id="perfil-titulo">Crie seu perfil</h2>
+          <hr class="separador" />
 
-        <form class="formulario-login">
-          <div>
-            <label for="login-email">E-mail</label>
-            <input
-              type="email"
-              id="login-email"
-              name="email"
-              autocomplete="email"
-              required
-            >
-          </div>
-          <div>
-            <label for="login-senha">Senha</label>
-            <input
-              type="password"
-              id="login-senha"
-              name="senha"
-              autocomplete="current-password"
-              required
-            >
-          </div>
-          <button type="button">Entrar</button>
-          <button type="button">Criar conta</button>
-        </form>
-      </div>
-    </section>
-
-    <section class="secao-perfil" aria-labelledby="perfil-titulo">
-      <div class="cartao-perfil">
-        <h2 id="perfil-titulo">Crie seu perfil</h2>
-        <hr class="separador">
-
-        <button id="botao-trocar-perfil" type="button">Trocar perfil</button>
-
-        <form id="form-perfil">
-          <div>
-            <label for="nome">Nome</label>
-            <input type="text" id="nome" name="nome" autocomplete="name" required>
-          </div>
-          <div>
-            <label for="idade">Idade</label>
-            <input type="number" id="idade" name="idade" min="1" required>
+          <div id="formulario-status" role="status" aria-live="polite">
+            Preencha seu perfil para receber recomendações.
           </div>
 
-          <fieldset class="generos">
-            <legend>Gêneros favoritos</legend>
-            <div class="lista-generos">
-              <label class="genero" for="genero-drama">
-                <input type="checkbox" id="genero-drama" name="genero" value="Drama">
-                Drama
-              </label>
-              <label class="genero" for="genero-comedia">
-                <input type="checkbox" id="genero-comedia" name="genero" value="Comedy">
-                Comédia
-              </label>
-              <label class="genero" for="genero-acao">
-                <input type="checkbox" id="genero-acao" name="genero" value="Action">
-                Ação
-              </label>
-              <label class="genero" for="genero-ficcao-cientifica">
-                <input type="checkbox" id="genero-ficcao-cientifica" name="genero" value="Science-Fiction">
-                Ficção Científica
-              </label>
-              <label class="genero" for="genero-terror">
-                <input type="checkbox" id="genero-terror" name="genero" value="Horror">
-                Terror
-              </label>
-              <label class="genero" for="genero-romance">
-                <input type="checkbox" id="genero-romance" name="genero" value="Romance">
-                Romance
-              </label>
-              <label class="genero" for="genero-fantasia">
-                <input type="checkbox" id="genero-fantasia" name="genero" value="Fantasy">
-                Fantasia
-              </label>
-              <label class="genero" for="genero-aventura">
-                <input type="checkbox" id="genero-aventura" name="genero" value="Adventure">
-                Aventura
-              </label>
-              <label class="genero" for="genero-suspense">
-                <input type="checkbox" id="genero-suspense" name="genero" value="Thriller">
-                Suspense
-              </label>
-              <label class="genero" for="genero-documentario">
-                <input type="checkbox" id="genero-documentario" name="genero" value="Documentary">
-                Documentário
-              </label>
+          <form id="form-perfil">
+            <div>
+              <label for="nome">Nome</label>
+              <input
+                type="text"
+                id="nome"
+                name="nome"
+                autocomplete="name"
+                required
+              />
             </div>
-          </fieldset>
+            <div>
+              <label for="idade">Idade</label>
+              <input type="number" id="idade" name="idade" min="1" required />
+            </div>
 
-          <button type="submit">Ver recomendações</button>
-        </form>
-      </div>
-    </section>
+            <fieldset class="generos">
+              <legend>Gêneros favoritos</legend>
+              <div class="lista-generos">
+                <label class="genero" for="genero-drama">
+                  <input
+                    type="checkbox"
+                    id="genero-drama"
+                    name="genero"
+                    value="Drama"
+                  />
+                  Drama
+                </label>
+                <label class="genero" for="genero-comedia">
+                  <input
+                    type="checkbox"
+                    id="genero-comedia"
+                    name="genero"
+                    value="Comedy"
+                  />
+                  Comédia
+                </label>
+                <label class="genero" for="genero-acao">
+                  <input
+                    type="checkbox"
+                    id="genero-acao"
+                    name="genero"
+                    value="Action"
+                  />
+                  Ação
+                </label>
+                <label class="genero" for="genero-ficcao-cientifica">
+                  <input
+                    type="checkbox"
+                    id="genero-ficcao-cientifica"
+                    name="genero"
+                    value="Science-Fiction"
+                  />
+                  Ficção Científica
+                </label>
+                <label class="genero" for="genero-terror">
+                  <input
+                    type="checkbox"
+                    id="genero-terror"
+                    name="genero"
+                    value="Horror"
+                  />
+                  Terror
+                </label>
+                <label class="genero" for="genero-romance">
+                  <input
+                    type="checkbox"
+                    id="genero-romance"
+                    name="genero"
+                    value="Romance"
+                  />
+                  Romance
+                </label>
+                <label class="genero" for="genero-fantasia">
+                  <input
+                    type="checkbox"
+                    id="genero-fantasia"
+                    name="genero"
+                    value="Fantasy"
+                  />
+                  Fantasia
+                </label>
+                <label class="genero" for="genero-aventura">
+                  <input
+                    type="checkbox"
+                    id="genero-aventura"
+                    name="genero"
+                    value="Adventure"
+                  />
+                  Aventura
+                </label>
+                <label class="genero" for="genero-suspense">
+                  <input
+                    type="checkbox"
+                    id="genero-suspense"
+                    name="genero"
+                    value="Thriller"
+                  />
+                  Suspense
+                </label>
+                <label class="genero" for="genero-documentario">
+                  <input
+                    type="checkbox"
+                    id="genero-documentario"
+                    name="genero"
+                    value="Documentary"
+                  />
+                  Documentário
+                </label>
+              </div>
+            </fieldset>
 
-    <section class="secao-resultados" aria-labelledby="resultados-titulo">
-      <div class="cabecalho-resultados">
-        <h2 id="resultados-titulo">Recomendações para você</h2>
-        <p id="resultados-status" role="status" aria-live="polite">
-          As recomendações serão exibidas aqui.
-        </p>
-      </div>
-      <p id="resultados-boas-vindas"></p>
-      <hr class="separador">
-      <div id="resultados" class="resultados"></div>
-      <article id="template-card-serie" class="card-serie" data-tipo="serie" hidden>
-        <div class="midia-serie">
-          <img class="cartaz-serie" data-campo="poster" alt="Pôster da série, aguardando catálogo">
-          <span class="badge badge-media">Média</span>
+            <button type="submit">Ver recomendações</button>
+          </form>
         </div>
-        <div class="conteudo-serie">
-          <h3 class="titulo-serie" data-campo="title">Título da série</h3>
-          <div class="metadados-serie">
-            <span class="nota-serie">★ <span data-campo="rating">Sem nota</span>/10</span>
-            <span data-campo="releaseDate">Ano de lançamento</span>
-            <span data-campo="duration">Duração indisponível</span>
+      </section>
+
+      <section
+        class="secao-resultados"
+        aria-labelledby="resultados-titulo"
+        hidden
+      >
+        <div class="cabecalho-resultados">
+          <div class="introducao-resultados">
+            <h2 id="resultados-titulo">Recomendações para você</h2>
+            <p id="resultados-boas-vindas"></p>
+            <p id="resultados-status" role="status" aria-live="polite">
+              As recomendações serão exibidas aqui.
+            </p>
+            <!-- Alvo do contador por closure do RF11 (M1-T14), escrito por
+              exibirContadorDeRecalculos em js/ui.js. Ele permanece separado
+              do status porque os estados da busca reescrevem o status. -->
+            <p id="resultados-contador"></p>
           </div>
-          <div class="generos-serie" data-campo="genres">Gêneros</div>
-          <p class="sinopse-serie" data-campo="synopsis">Sinopse da série em texto puro.</p>
-          <p class="status-serie">Status: <span data-campo="status">Indisponível</span></p>
-          <p class="plataforma-serie">Onde assistir: <span data-campo="platform">Indisponível</span></p>
-          <a class="link-serie" href="#" data-campo="url">Ver detalhes</a>
+          <button id="botao-trocar-perfil" type="button" hidden>
+            Trocar perfil
+          </button>
         </div>
-      </article>
-    </section>
-  </main>
-  <footer>
-    <p>CineMatch — Te acompanha em todas as aventuras.</p>
-  </footer>
+        <hr class="separador" />
+        <div id="resultados" class="resultados"></div>
+        <article
+          id="template-card-serie"
+          class="card-serie"
+          data-tipo="serie"
+          hidden
+        >
+          <div class="midia-serie">
+            <img
+              class="cartaz-serie"
+              data-campo="poster"
+              alt="Pôster da série, aguardando catálogo"
+            />
+            <span class="badge badge-media">Média</span>
+          </div>
+          <div class="conteudo-serie">
+            <h3 class="titulo-serie" data-campo="title">Título da série</h3>
+            <div class="metadados-serie">
+              <span class="nota-serie"
+                >★ <span data-campo="rating">Sem nota</span>/10</span
+              >
+              <span data-campo="releaseDate">Ano de lançamento</span>
+              <span data-campo="duration">Duração indisponível</span>
+            </div>
+            <div class="generos-serie" data-campo="genres">Gêneros</div>
+            <p class="sinopse-serie" data-campo="synopsis">
+              Sinopse da série em texto puro.
+            </p>
+            <p class="status-serie">
+              Status: <span data-campo="status">Indisponível</span>
+            </p>
+            <p class="plataforma-serie">
+              Onde assistir: <span data-campo="platform">Indisponível</span>
+            </p>
+            <a class="link-serie" href="#" data-campo="url">Ver detalhes</a>
+          </div>
+        </article>
+      </section>
+    </main>
+    <footer>
+      <p>CineMatch — Te acompanha em todas as aventuras.</p>
+    </footer>
 
-  <script type="module" src="./js/script.js"></script>
-</body>
+    <script type="module" src="./js/script.js"></script>
+  </body>
 </html>

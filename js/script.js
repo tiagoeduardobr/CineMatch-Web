@@ -10,11 +10,27 @@
  * ES. Os placeholders existiam para que este arquivo carregasse sem erro: o
  * PLACEHOLDER_MODELO saiu na M1-T09 (modelo.js) e o PLACEHOLDER_UI saiu na
  * M1-T11 (ui.js). JÁ FEITO NA M1-T11: o import já traz o renderizarCard.
+ * JÁ FEITO NA M1-T13: e o exibirMensagemDeBoasVindas, o corpo do callback do
+ * RF10, que este arquivo recebe como argumento e dispara em concluirBusca.
+ * JÁ FEITO NA M1-T14: e o exibirContadorDeRecalculos, a função de tela do
+ * número que a closure do RF11 accountou — este arquivo lê o total e repassa.
+ * JÁ FEITO NA M1-T15: e o exibirMensagemDeCarregando e o
+ * exibirResultadosComAtraso, o estado de carregando do RF12 e o atraso
+ * proposital da exibição — os dois nascem em js/ui.js, porque os dois são de
+ * tela, e este arquivo só os chama.
  *
  * A página só funciona servida por `npm start` (live-server): módulos ES não
  * carregam via file://, por causa do CORS. O live-server é instalado na M1-T18.
  */
-import { renderizarCard, exibirMensagemDeErro, exibirMensagemDeCatalogoVazio } from "./ui.js";
+import {
+  renderizarCard,
+  exibirMensagemDeErro,
+  exibirMensagemDeCatalogoVazio,
+  exibirMensagemDeBoasVindas,
+  exibirContadorDeRecalculos,
+  exibirMensagemDeCarregando,
+  exibirResultadosComAtraso,
+} from "./ui.js";
 import { Conteudo, Serie } from "./modelo.js";
 
 // Os dois `import` acima continuam apontando para os módulos irmãos, na
@@ -22,8 +38,30 @@ import { Conteudo, Serie } from "./modelo.js";
 // arquivo. JÁ FEITO NA M1-T09: PLACEHOLDER_MODELO saiu no mesmo passo em
 // que as classes entraram em modelo.js. JÁ FEITO NA M1-T11: PLACEHOLDER_UI
 // saiu no mesmo passo em que o renderizarCard entrou em ui.js, e o `import`
-// da linha 17 foi ajustado junto: sem esse ajuste o nome deixa de existir em
+// do topo foi ajustado junto: sem esse ajuste o nome deixa de existir em
 // ui.js e o grafo de módulos não carrega. Ver o bloco M1-T17.
+// JÁ FEITO NA M1-T13: o mesmo `import` do topo ganhou mais um nome,
+// exibirMensagemDeBoasVindas, porque o RF10 é medido sobre a passagem da
+// função — e uma função só é passada como argumento se foi importada antes.
+// É o mesmo contrato dos outros três: o nome existe em ui.js e é citado aqui.
+// JÁ FEITO NA M1-T14: o mesmo `import` do topo ganhou um quinto nome,
+// exibirContadorDeRecalculos, e o motivo é o mesmo da M1-T13: o número que a
+// closure do RF11 accountou precisa de uma função de tela, e essa função só
+// pode ser chamada daqui se foi importada antes. A leitura do total fica deste
+// lado, em `contadorRecomendacoes.obterTotal()`, e não do lado de lá: passar o
+// par para o ui.js daria ao módulo de tela acesso ao estado privado.
+// A referência por número de linha que este bloco usava saiu junto: o `import`
+// do ui.js passou a ocupar várias linhas, e foi para o número de linha que o
+// próprio quadro proíbe em nota — vale por seletor, ID ou nome de elemento.
+//
+// JÁ FEITO NA M1-T15: o mesmo `import` do topo ganhou mais dois nomes,
+// exibirMensagemDeCarregando e exibirResultadosComAtraso, e o motivo é o mesmo
+// dos quatro anteriores: os dois são de tela, e só podem ser chamados daqui se
+// foram importados antes. A escrita direta da frase de carregando em
+// #resultados-status saiu de buscarCatalogo no mesmo passo — é o débito que a
+// nota da M1-T07 do docs/KANBAN.md marcou para esta task. O atraso do RF12
+// também não é escrito aqui: este arquivo só passa a apresentação adiada para
+// a função de tela, que é quem segura o setTimeout.
 //
 // NÃO HÁ LINHA DE CONSOLE NESTE ARQUIVO, e isso é decisão, não esquecimento:
 // o professor não quer código de console no material entregue. O que a linha de
@@ -255,10 +293,16 @@ function limparPerfilSalvo() {
  * já devolveu por booleano.
  */
 function mostrarResultados(usuario, aviso) {
+  const secaoPerfil = document.querySelector(".secao-perfil");
+  const secaoResultados = document.querySelector(".secao-resultados");
   const formPerfil = document.querySelector("#form-perfil");
   const statusResultados = document.querySelector("#resultados-status");
+  const botaoTrocarPerfil = document.querySelector("#botao-trocar-perfil");
 
+  secaoPerfil.hidden = true;
+  secaoResultados.hidden = false;
   formPerfil.hidden = true;
+  botaoTrocarPerfil.hidden = false;
 
   // Template literal, e não concatenação com `+`: a crase é a forma de
   // interpolar valor neste projeto. Mas a crase NÃO é a defesa contra XSS:
@@ -268,7 +312,6 @@ function mostrarResultados(usuario, aviso) {
   // marcação. É o mesmo caminho que a M1-T11 aplica nos cards, e aqui o dado
   // é o nome que quem preencheu o formulário digitou.
   const saudacao = `Olá, ${usuario.nome}! Suas recomendações serão carregadas em seguida.`;
-
   statusResultados.textContent = `${saudacao}${aviso}`;
 }
 
@@ -276,23 +319,27 @@ function mostrarResultados(usuario, aviso) {
  * Devolve o formulário para a tela, tirando o `hidden` e escribiendo a mensagem
  * que o chamador quiser.
  *
- * Os campos NÃO são limpos aqui. O motivo é duplo: limpar exigiria uma API de
- * formulário que não está no que foi ensinado, e o comportamento útil é
- * editável — quem está trocando de perfil vê o que já tinha preenchido e muda
- * o que quiser. O envio seguinte sobrescreve o registro, então não sobra
- * perfil antigo misturado com o novo.
+ * Os campos são limpos pelo chamador antes de reabrir o formulário. Assim,
+ * "Trocar perfil" começa uma nova coleta, sem deixar dados do perfil anterior
+ * misturados com o novo.
  */
 function mostrarFormulario(mensagem) {
+  const secaoPerfil = document.querySelector(".secao-perfil");
+  const secaoResultados = document.querySelector(".secao-resultados");
   const formPerfil = document.querySelector("#form-perfil");
-  const statusResultados = document.querySelector("#resultados-status");
+  const formularioStatus = document.querySelector("#formulario-status");
+  const botaoTrocarPerfil = document.querySelector("#botao-trocar-perfil");
 
+  secaoPerfil.hidden = false;
+  secaoResultados.hidden = true;
   formPerfil.hidden = false;
-  statusResultados.textContent = mensagem;
+  botaoTrocarPerfil.hidden = true;
+  formularioStatus.textContent = mensagem;
 }
 
 function iniciarFormulario() {
   const formPerfil = document.querySelector("#form-perfil");
-  const statusResultados = document.querySelector("#resultados-status");
+  const formularioStatus = document.querySelector("#formulario-status");
   const botaoTrocarPerfil = document.querySelector("#botao-trocar-perfil");
 
   botaoTrocarPerfil.addEventListener("click", function () {
@@ -303,10 +350,11 @@ function iniciarFormulario() {
     // recarregamento que caia em file:// derruba os import por CORS e deixa o
     // index.html sem nenhum JavaScript (risco 2 do quadro).
     const registroFoiLimpo = limparPerfilSalvo();
+    formPerfil.reset();
 
     if (registroFoiLimpo) {
       mostrarFormulario(
-        "Preencha o formulário de novo para receber outras recomendações."
+        "Preencha o formulário de novo para receber outras recomendações.",
       );
     } else {
       // Mesma regra do risco 3 no caminho inverso: a falha do storage é
@@ -315,7 +363,7 @@ function iniciarFormulario() {
       // o formulário na próxima visita. A frase abaixo é uma crase sem `${}`:
       // não entra valor nenhum nela, e o texto inteiro fica em uma linha só.
       mostrarFormulario(
-        `Preencha o formulário de novo. Não conseguimos atualizar o registro deste navegador, então ele pode abrir sozinho na próxima visita.`
+        `Preencha o formulário de novo. Não conseguimos atualizar o registro deste navegador, então ele pode abrir sozinho na próxima visita.`,
       );
     }
   });
@@ -348,7 +396,7 @@ function iniciarFormulario() {
       erros.push("Selecione pelo menos um gênero favorito.");
     }
 
-    statusResultados.textContent = "";
+    formularioStatus.textContent = "";
 
     if (erros.length > 0) {
       const mensagemErros = document.createElement("ul");
@@ -361,7 +409,7 @@ function iniciarFormulario() {
         mensagemErros.appendChild(itemErro);
       }
 
-      statusResultados.appendChild(mensagemErros);
+      formularioStatus.appendChild(mensagemErros);
       return;
     }
 
@@ -375,8 +423,7 @@ function iniciarFormulario() {
       // já que a mesma task de evento apaga tudo que estava no elemento. O
       // espaço no início + o ponto no fim é o que garante a junção limpa
       // nos três destinos, sem espaço duplo e sem frase colada.
-      aviso =
-        ` Não foi possível salvar o perfil neste navegador, então ele não será lembrado na próxima visita.`;
+      aviso = ` Não foi possível salvar o perfil neste navegador, então ele não será lembrado na próxima visita.`;
     }
 
     mostrarResultados(usuario, aviso);
@@ -387,8 +434,10 @@ function iniciarFormulario() {
     // para quem recomendar. Não sobra rejeição pendurada porque o catch
     // interno de buscarCatalogo nunca relança. O `aviso` vai junto: sem
     // repassá-lo, a função sobrescreveria a saudação e o recado de storage
-    // na mesma task de evento, antes de qualquer paint.
-    buscarCatalogo(aviso, usuario.generosFavoritos);
+    // na mesma task de evento, antes de qualquer paint. O `nome` é o terceiro
+    // argumento e é o que a saudação do RF10 vai escrever: ele vem do campo
+    // #nome do próprio formulário, já aparado e validado acima.
+    buscarCatalogo(aviso, usuario.generosFavoritos, usuario.nome);
   });
 }
 
@@ -431,7 +480,13 @@ function iniciarFormulario() {
  *   erro de rede aparece na tela, por exibirMensagemDeErro. O atraso
  *   proposital do RF12 é da M1-T15 e vai na EXIBIÇÃO: somado dentro desta
  *   função, ele atrasaria também o estado de erro e mascararia justamente a
- *   falha que este bloco existe para mostrar (risco 4). AbortController,
+ *   falha que este bloco existe para mostrar (risco 4).
+ *   JÁ FEITO NA M1-T15: o atraso entrou, e continua FORA da chamada de rede —
+ *   ele mora em exibirResultadosComAtraso, em js/ui.js, e esta função só o
+ *   agenda DEPOIS de a rede responder e de o catálogo estar tratado e
+ *   calculado. O catch, que é o que este parágrafo defende, continua sem
+ *   atraso nenhum: a falha aparece na hora, com a frase amigável.
+ *   AbortController,
  *   encadeamento opcional `?.`, `??`, Object.assign, axios e POST/PUT/DELETE
  *   estão fora do que a seção 2.1 libera sem perguntar: a chamada é um fetch
  *   GET puro, de leitura.
@@ -519,6 +574,44 @@ function renderizarCards(lista) {
 }
 
 /**
+ * RF10 · M1-T13 · Encerra a busca disparando o callback que recebeu.
+ *
+ * POR QUE ESTA FUNÇÃO EXISTE E NÃO BASTA CHAMAR A SAUDAÇÃO DIRETO
+ *   O RF10 é medido sobre a FORMA, não sobre o efeito: uma função recebida como
+ *   parâmetro e disparada por quem a recebeu. Escrever
+ *   `exibirMensagemDeBoasVindas(nome)` direto produziria exatamente o mesmo
+ *   texto na tela e NÃO entregaria o requisito — o que separa callback de
+ *   chamada comum é que quem recebe a função é quem decide o momento de
+ *   dispará-la e o que ela recebe como argumento. Por isso o nome tem dono
+ *   próprio e o disparo acontece dentro do corpo, e não no call site.
+ *
+ * POR QUE O NOME É REPASSADO AO CALLBACK
+ *   O callback não busca nada: ele só escreve na tela. Quem tem o nome é o
+ *   fluxo, e o nome chega aqui por parâmetro — vem do #nome do formulário ou do
+ *   registro cinematchPerfil, repassado pelo terceiro argumento de
+ *   buscarCatalogo. O callback(nome) é o que entrega o dado a quem precisa
+ *   dele, no mesmo formato de um parâmetro comum.
+ *
+ * POR QUE NÃO É UMA FLAG "PRONTO"
+ *   Uma variável dizendo que a busca acabou resolveria o mesmo efeito na tela
+ *   com menos código, e é por isso que ela não vale: o Critério 8 mede a
+ *   mecânica do callback, e flag não é callback.
+ *
+ * REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
+ *   cinematch_antigo/cinematch.js:511 — saudacaoDespedida(usuario, callback)
+ *   recebe a função como segundo parâmetro e a chama no corpo, na linha 519;
+ *   a chamada de exemplo, saudacaoDespedida(usuario, despedida), está na
+ *   linha 65. O que se porta é a FORMA — receber e disparar no corpo — e não o
+ *   console, que o professor afastou do código entregue.
+ *
+ * @param {string} nome - nome da pessoa, repassado ao callback como argumento.
+ * @param {Function} callback - função a ser disparada; recebe `nome`.
+ */
+function concluirBusca(nome, callback) {
+  callback(nome);
+}
+
+/**
  * Busca o catálogo real e leva o resultado da chamada para a tela.
  *
  * A ordem interna é a do RF04: carregando, depois a rede, depois o corpo, e
@@ -526,6 +619,13 @@ function renderizarCards(lista) {
  * ANTES de ler o corpo, porque status 200 não garante corpo útil — e uma
  * resposta de erro ainda tem corpo (HTML de página de erro, por exemplo),
  * que seria lido como se fosse o catálogo.
+ *
+ * JÁ FEITO NA M1-T15: hoje há DOIS catch neste fluxo, e não um. O de cima é o
+ * do fetch e continua cobrindo rede, `response.ok`, corpo inesperado e o
+ * tratamento; o segundo embrulha a apresentação do resultado, que passou a
+ * rodar dentro de um `setTimeout` (em js/ui.js) e por isso cai FORA do alcance
+ * deste. A frase de erro é a mesma nos dois — ela virou uma `const` antes do
+ * try justamente para não ser escrita duas vezes.
  *
  * O corpo é lido com `await resposta.json()` DENTRO do try de propósito:
  * json() lança em corpo que não é JSON, e essa exceção precisa cair no
@@ -558,14 +658,38 @@ function renderizarCards(lista) {
  *   parâmetro e não por estado de módulo: o perfil já vive em cinematchPerfil,
  *   e um `let` a mais aqui seria uma segunda fonte da verdade que ficaria
  *   velha depois do botão "Trocar perfil".
+ * @param {string} nome - nome da pessoa, para a saudação do RF10. Chega pelo
+ *   mesmo caminho dos outros dois, por parâmetro, e é o terceiro na ordem: o
+ *   nome é do formulário e, como os gêneros, não é recalculado aqui — é
+ *   repassado. JÁ FEITO NA M1-T13: antes desta task o nome não chegava a lugar
+ *   nenhum, porque esta função só recebia `aviso` e `generosFavoritos` e nenhum
+ *   dos dois é o nome; a saudação ficava sem dado para escrever.
  */
-async function buscarCatalogo(aviso, generosFavoritos) {
+async function buscarCatalogo(aviso, generosFavoritos, nome) {
   const statusResultados = document.querySelector("#resultados-status");
 
-  // ESTADO 1 — carregando, escrito ANTES do fetch. É o texto do briefing, e
-  // pedir o estado antes da chamada é o que distingue "rede lenta" de
-  // "página parada": sem esta linha, os dois parecem a mesma coisa na tela.
-  statusResultados.textContent = "Buscando as melhores séries pra você...";
+  // ESTADO 1 — carregando, escrito ANTES do fetch, por
+  // exibirMensagemDeCarregando (js/ui.js). JÁ FEITO NA M1-T15: a frase saiu
+  // daqui e passou a ser escrita pelo módulo de tela, que é onde ela sempre
+  // deveria ter morado — é o débito que a nota da M1-T07 do docs/KANBAN.md
+  // marcou para esta task. O texto continua sendo o literal do briefing, e o
+  // alvo continua sendo o mesmo #resultados-status: pedir o estado antes da
+  // chamada é o que distingue "rede lenta" de "página parada" — sem isto, os
+  // dois parecem a mesma coisa na tela.
+  exibirMensagemDeCarregando();
+
+  // A frase de erro fica pronta UMA vez e serve para os DOIS catch deste
+  // fluxo: o do fetch, lá embaixo, e o da apresentação adiada, que a M1-T15
+  // criou. O segundo só existiu porque a apresentação saiu do alcance do
+  // primeiro: o callback do setTimeout executa em outra task de evento, depois
+  // de este try já ter terminado, e sem um try/catch do lado de dentro uma
+  // exceção de DOM viraria página quebrada em vez de estado de erro — a mesma
+  // consequência que o comentário da renderização prometia. O `${aviso}` entra
+  // pela mesma razão de sempre: o carregando apagou o recado de persistência
+  // no mesmo tick em que ele foi escrito, e sem repassá-lo aqui a pessoa nunca
+  // veria o aviso. Junta sem espaço duplo porque o aviso já começa com um
+  // espaço e a frase anterior termina em ponto; com "" (guard), nada muda.
+  const mensagemDeErro = `Não foi possível carregar as séries agora. Verifique sua conexão com a internet e tente novamente.${aviso}`;
 
   try {
     // Fetch GET puro, sem axios e sem escrita em servidor: o Módulo 01 só
@@ -617,57 +741,148 @@ async function buscarCatalogo(aviso, generosFavoritos) {
     // lugar só.
     catalogoRecomendado = calcularCompatibilidades(generosFavoritos);
 
-    // A renderização dos cards roda AQUI, dentro do try e antes da
-    // bifurcação das mensagens, pelo mesmo motivo do cálculo acima: se o DOM
-    // lançar, a exceção cai no mesmo catch e vira estado de erro, nunca uma
-    // página quebrada. Ela entra ANTES do if do estado vazio porque, quando o
-    // tratamento não deixa nada de pé, a limpeza ainda roda — é isso que
-    // impede os cards do perfil anterior de sobrarem quando o botão "Trocar
-    // perfil" leva a um catálogo vazio.
-    renderizarCards(catalogoRecomendado);
+    // RF12 · M1-T15 — a apresentação do resultado é ADIADA por
+    // exibirResultadosComAtraso (js/ui.js), que é quem segura o setTimeout. O
+    // atraso entra aqui, depois de a rede responder e de o catálogo estar
+    // tratado e calculado, e nunca dentro do fetch: é a regra do AGENTS.md §7
+    // e a mitigação do risco 4 do quadro — somado à chamada de rede, ele
+    // atrasaria também o estado de erro. Este call site é, então, o único ponto
+    // em que o RF12 acontece: a rede já respondeu, e o que se adia é só o
+    // desenho do resultado.
+    //
+    // O try/catch que embrulha a apresentação DENTRO do callback não é
+    // redundância: o setTimeout executa em OUTRA task de evento, depois que o
+    // try externo desta função já terminou, então uma exceção de DOM não
+    // chegaria mais no catch lá embaixo. Com ele, a consequência é a mesma de
+    // sempre — exceção vira estado de erro amigável, nunca página quebrada —,
+    // só que 800 ms depois. É por isso que a frase de erro virou uma `const`
+    // antes do try: os dois catch escrevem o mesmo texto, com o mesmo aviso, e
+    // sem a string ficar escrita em dois lugares.
+    exibirResultadosComAtraso(function () {
+      try {
+        // A renderização dos cards roda PRIMEIRO aqui, antes da bifurcação das
+        // mensagens, pelo mesmo motivo do cálculo lá em cima. JÁ FEITO NA
+        // M1-T15: ela saiu do try externo e passou a rodar dentro deste — o
+        // comentário que existia prometia que uma exceção de DOM viraria
+        // estado de erro, e é este try/catch que mantém a promessa, porque o
+        // catch de fora já não alcança esta execução. Ela entra ANTES do if do
+        // estado vazio porque, quando o tratamento não deixa nada de pé, a
+        // limpeza ainda roda — é isso que impede os cards do perfil anterior
+        // de sobrarem quando o botão "Trocar perfil" leva a um catálogo vazio.
+        // O carregando já foi apagado por exibirResultadosComAtraso antes de
+        // chegar até aqui, então ele nunca convive com os cards.
+        renderizarCards(catalogoRecomendado);
 
-    // ESTADO 2 — sucesso, agora com a bifurcação do RF05. Continua
-    // sobrescrevendo o carregando no MESMO elemento, então ele não fica
-    // preso na tela nem exige código de limpeza, e a regra "os estados não
-    // podem ficar na tela ao mesmo tempo" se resolve pelo alvo comum. Quando
-    // o tratamento não deixa nada de pé, quem fala é o estado VAZIO —
-    // exibirMensagemDeCatalogoVazio, da M1-T08, com a frase do professor;
-    // caso contrário, a frase de sucesso mostra OS DOIS números, o bruto que
-    // veio da API e o tratado que segue adiante (240 → 8 medidos), que é a
-    // evidência na tela do RF05 no lugar do registro de console que o
-    // briefing pedia (risco 12). Dizer só "240 séries disponíveis" seria
-    // enganoso: são 8 que fluem para a M1-T09. O `${aviso}` reentra nos
-    // DOIS ramos desta bifurcação (vazio e sucesso); o terceiro destino, o
-    // erro, é o catch abaixo. O carregando apagou a saudação com o recado
-    // de storage na mesma task de evento: sem repassar, o aviso morreria
-    // antes do paint. O carregando CONTINUA sem o aviso, porque o texto
-    // dele é o literal do briefing (RF12) e não pode ser alterado. O aviso
-    // já vem com espaço no início e as frases terminam em ponto, então a
-    // junção não gera espaço duplo nem palavra colada; com "" (guard),
-    // nada muda.
-    if (catalogoTratado.length === 0) {
-      // Não é falha da chamada: o fetch respondeu, o corpo chegou inteiro,
-      // só o filtro do RF05 não deixou nada de pé. Por isso a frase é a do
-      // professor e não a de erro — três causas, três mensagens.
-      exibirMensagemDeCatalogoVazio(aviso);
-    } else {
-      statusResultados.textContent =
-        `Catálogo carregado: ${catalogoBruto.length} séries disponíveis, ${catalogoTratado.length} depois do tratamento.${aviso}`;
-    }
+        // RF10 · M1-T13 — o callback, disparado aqui. `exibirMensagemDeBoasVindas`
+        // entra como ARGUMENTO, sem parênteses: quem a recebe é `concluirBusca`, e é
+        // ela quem a dispara, no corpo. Chamar a saudação direto aqui daria o
+        // mesmo efeito na tela e não entregaria o RF10, que é medido sobre a forma.
+        //
+        // A ORDEM É DE LEITURA, não de execução: a saudação entra DEPOIS de
+        // renderizarCards e ANTES da bifurcação dos estados. Antes dos cards, ela
+        // chegaria sozinha na tela e a frase de sucesso — que é a prova de que o
+        // cálculo rodou — viraria a última linha lida. Depois da bifurcação, o
+        // cartão de estado já teria falado por último e a saudação entraria como
+        // remendo, e não como chegada.
+        //
+        // Ela escreve em #resultados-boas-vindas, o <p> que fica entre o
+        // #resultados-status e o <hr class="separador"> no index.html, e por isso a
+        // bifurcação logo abaixo não apaga o nome: os quatro estados escrevem no
+        // #resultados-status, que é outro elemento.
+        //
+        // JÁ FEITO NA M1-T15: a chamada passou a rodar dentro da apresentação
+        // adiada, e nada mudou na forma nem na ordem relativa — o callback
+        // continua sendo argumento de concluirBusca, continua depois dos cards
+        // e continua antes da bifurcação; o que mudou foi quando ela acontece,
+        // 800 ms depois, junto com o resto do desenho do resultado.
+        concluirBusca(nome, exibirMensagemDeBoasVindas);
+
+        // RF11 · M1-T14 — o total vai para a tela. `obterTotal()` é lido do par
+        // criado uma vez no carregamento do módulo, e o NÚMERO PRONTO é repassado
+        // para a função de tela: quem guarda não escreve, e quem escreve não
+        // calcula nem guarda. É o contrato do par de funções da closure com a
+        // função de exibição, e ele fica na mesma linha do callback da RF10 acima:
+        // as duas coisas que a tela recebe prontas depois que os cards estão
+        // pintados.
+        //
+        // O alvo é #resultados-contador, o <p> que fica dentro de
+        // .cabecalho-resultados no index.html, e NÃO o #resultados-status: os
+        // quatro estados da chamada — carregando, sucesso, erro e o catálogo
+        // vazio — sobrescrevem o #resultados-status por consequência, e o contador
+        // morreria junto com o primeiro deles. É o mesmo motivo que separou a
+        // saudação da M1-T13 em outro elemento, e vale para o mesmo elemento: o
+        // número sobrevive à bifurcação dos estados logo abaixo.
+        //
+        // A leitura é feita aqui, e não dentro da função de tela, por uma razão
+        // que é o próprio RF11: quem lê o total é o código que tem o par, e passar
+        // o par para a função de tela a faria capaz de mexer no estado privado —
+        // que é justamente o que a fechamento esconde.
+        //
+        // JÁ FEITO NA M1-T15: a leitura passou a acontecer dentro da
+        // apresentação adiada, e continua sendo feita DESTE lado: o par segue
+        // no módulo de fluxo, e o número chega pronto à função de tela.
+        exibirContadorDeRecalculos(contadorRecomendacoes.obterTotal());
+
+        // ESTADO 2 — sucesso, agora com a bifurcação do RF05. Continua
+        // sobrescrevendo o carregando no MESMO elemento, e a regra "os estados
+        // não podem ficar na tela ao mesmo tempo" se resolve pelo alvo comum.
+        // JÁ FEITO NA M1-T15: passou a existir também um código de limpeza
+        // explícito — a primeira instrução do callback do setTimeout, em
+        // js/ui.js, apaga o carregando ANTES dos cards desenharem, enquanto a
+        // sobrescrita de aqui continua sendo o que troca um estado FINAL por
+        // outro. Os dois mecanismos se complementam: um tira o carregando na
+        // hora certa, o outro impede que dois estados finais coexistam. Quando
+        // o tratamento não deixa nada de pé, quem fala é o estado VAZIO —
+        // exibirMensagemDeCatalogoVazio, da M1-T08, com a frase do professor;
+        // caso contrário, a frase de sucesso mostra OS DOIS números, o bruto que
+        // veio da API e o tratado que segue adiante (240 → 8 medidos), que é a
+        // evidência na tela do RF05 no lugar do registro de console que o
+        // briefing pedia (risco 12). Dizer só "240 séries disponíveis" seria
+        // enganoso: são 8 que fluem para a M1-T09. O `${aviso}` reentra nos
+        // DOIS ramos desta bifurcação (vazio e sucesso); o terceiro destino, o
+        // erro, é o catch lá no fim desta função — e o deste próprio try, se a
+        // apresentação falhar antes de escrever qualquer um dos dois. O
+        // carregando apagou a saudação com o recado de storage na mesma task
+        // de evento: sem repassar, o aviso morreria antes do paint. O
+        // carregando CONTINUA sem o aviso, porque o texto dele é o literal do
+        // briefing (RF12) e não pode ser alterado. O aviso já vem com espaço no
+        // início e as frases terminam em ponto, então a junção não gera espaço
+        // duplo nem palavra colada; com "" (guard), nada muda.
+        if (catalogoTratado.length === 0) {
+          // Não é falha da chamada: o fetch respondeu, o corpo chegou inteiro,
+          // só o filtro do RF05 não deixou nada de pé. Por isso a frase é a do
+          // professor e não a de erro — três causas, três mensagens.
+          exibirMensagemDeCatalogoVazio(aviso);
+        } else {
+          statusResultados.textContent = `Catálogo carregado: ${catalogoBruto.length} séries disponíveis, ${catalogoTratado.length} depois do tratamento.${aviso}`;
+        }
+      } catch (erro) {
+        // ESTADO 3 (metade da apresentação) — exceção do DESENHO, não da rede.
+        // `erro` é ignorado do mesmo jeito do catch externo: à tela vai a frase
+        // amigável, com o mesmo `${aviso}`, e nunca erro.message nem stack
+        // trace. Este catch é o preço de a apresentação ter saído do try de
+        // cima — sem ele, a exceção sairia sem tratamento nenhum, porque o
+        // setTimeout roda em outra task de evento —, e ele mantém a promessa do
+        // comentário da renderização: exceção de DOM vira estado de erro,
+        // nunca página quebrada.
+        exibirMensagemDeErro(mensagemDeErro);
+      }
+    });
   } catch (erro) {
     // ESTADO 3 — erro. `erro` é ignorado, no mesmo padrão do salvarPerfil:
     // quem lê a mensagem é a pessoa, e o que ela lê é português, sem
     // erro.message e sem stack trace — a causa continua acessível na aba
     // Network. Aqui também não entra atraso nenhum: adiar a frase faria a
     // página parecer travada com o erro já conhecido, que é o efeito
-    // contrário do que o RF04 pede. O `${aviso}` reentra pelo mesmo motivo
-    // do estado de sucesso: o carregando apagou o recado de persistência,
-    // e sem repassá-lo aqui ele nunca chegaria ao paint. Junta sem espaço
-    // duplo porque o aviso já começa com um espaço e a frase anterior
-    // termina com ponto; com "" (guard), não muda nada.
-    exibirMensagemDeErro(
-      `Não foi possível carregar as séries agora. Verifique sua conexão com a internet e tente novamente.${aviso}`
-    );
+    // contrário do que o RF04 pede. JÁ FEITO NA M1-T15: é justamente este o
+    // contraste que o RF12 pede — o atraso proposital existe só no caminho de
+    // exibição do resultado, embrulhado acima; a falha de rede continua sendo
+    // anunciada na hora, no mesmo tick em que o fetch rejeita. O `${aviso}`
+    // reentra pelo mesmo motivo do estado de sucesso: o carregando apagou o
+    // recado de persistência, e sem repassá-lo aqui ele nunca chegaria ao
+    // paint. Junta sem espaço duplo porque o aviso já começa com um espaço e a
+    // frase anterior termina com ponto; com "" (guard), não muda nada.
+    exibirMensagemDeErro(mensagemDeErro);
   }
 }
 
@@ -717,6 +932,9 @@ async function buscarCatalogo(aviso, generosFavoritos) {
  *   - setTimeout: o atraso proposital do RF12 é da M1-T15 e vai na
  *     EXIBIÇÃO, nunca no tratamento dos dados; dentro de um fetch ele
  *     mascararia justamente o estado de erro (risco 4).
+ *     JÁ FEITO NA M1-T15: esta função continua sem setTimeout nenhum — o
+ *     atraso mora em exibirResultadosComAtraso, em js/ui.js, e é chamado por
+ *     buscarCatalogo DEPOIS que o tratamento já rodou.
  *   - ??, ?. e Object.assign não foram ensinados (§2.1), e Array.isArray não
  *     aparece no material: quem checa lista usa `length === undefined`, como
  *     o próprio buscarCatalogo já faz. O null do runtime é repassado como
@@ -840,7 +1058,7 @@ function tratarCatalogo(bruto) {
  * @returns {Array<{ titulo: string, generosEmComum: string[], generosNaoExplorados: string[], percentual: string, classificacao: string }>}
  */
 function calcularCompatibilidades(generosFavoritos) {
-  return catalogoTratado.map((item) => {
+  const recomendacoes = catalogoTratado.map((item) => {
     const serie = new Serie(item.titulo, item.generos, item.duracaoMinutos);
     const compatibilidade = serie.calcularCompatibilidade(generosFavoritos);
 
@@ -855,7 +1073,96 @@ function calcularCompatibilidades(generosFavoritos) {
       classificacao: compatibilidade.classificacao,
     };
   });
+
+  // RF11 · M1-T14 — o contador conta AQUI, e não em outro lugar. "Quantas
+  // vezes a pessoa recalculou a compatibilidade" (RF11) é o que esta função é:
+  // ela recalcula, então é nela que o total anda uma casa. Contar na chamada
+  // de buscarCatalogo daria o mesmo número na tela, porque também é uma
+  // recalculação por busca — e não entregaria o RF11, que é medido sobre a
+  // mecânica da closure, não sobre a frequência do evento.
+  contadorRecomendacoes.incrementar();
+
+  return recomendacoes;
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// M1-T14 · RF11 · CONTADOR DE RECALCULAÇÕES POR CLOSURE
+// ────────────────────────────────────────────────────────────────────────────
+/**
+ * POR QUE ESTA REGIÃO FICA ANTES DO GUARD `typeof document !== "undefined"`
+ *   A mesma ordem de avaliação da M1-T07 e da M1-T08: o guard roda no
+ *   carregamento do módulo e, com perfil salvo, chama buscarCatalogo já na
+ *   primeira execução — e o cálculo de compatibilidade mexe no contador. Se a
+ *   `const contadorRecomendacoes` fosse declarada DEPOIS do guard, essa
+ *   chamada cairia em temporal dead zone e daria ReferenceError. A função, o
+ *   hoisting resolve; a variável, não.
+ */
+
+/**
+ * RF11 · M1-T14 · Cria o contador e devolve o par de funções que mexe nele.
+ *
+ * POR QUE O TOTAL NÃO É UM `let` SOLTO NESTE ARQUIVO
+ *   Um `let total = 0` no topo do módulo entregaria o mesmo número na tela e
+ *   NÃO entregaria o requisito: o Critério 8 é medido sobre o ESCOPO FECHADO,
+ *   e a prova de que o escopo é fechado é que ninguém de fora consegue ler nem
+ *   escrever o total. Dentro desta factory o `total` é alcançado só pelas duas
+ *   funções devolvidas — o resto do módulo, o `ui.js` e a página não têm caminho
+ *   até ele, e é isso que a fechamento (closure) significa: a função devolvida
+ *   continua enxergando o escopo de onde nasceu depois que a factory termina.
+ *
+ * POR QUE DEVOLVE UM PAR E NÃO UM NÚMERO
+ *   Devolver o total nu tiraria a parte difícil do exercício: quem recebesse o
+ *   número poderia alterá-lo, e o estado privado deixaria de ser privado. O par
+ *   é a interface mínima que permite usar o estado sem expô-lo — `incrementar`
+ *   muda, `obterTotal` só lê, e nenhuma das duas entrega a variável.
+ *
+ * POR QUE DECLARAR AS DUAS FUNÇÕES COM `function` E NÃO COM MÉTODO DO OBJETO
+ *   É a forma equivalente, e o que muda é a legibilidade: cada função ganha o
+ *   próprio nome para o JSDoc e para o stack trace, enquanto o par devolvido é
+ *   escrito com as chaves explícitas, como o resto deste módulo — `nome:
+ *   nome.trim()` no objeto `usuario`, `percentual: percentual` no objeto do
+ *   card. A forma da referência é citada abaixo; a forma final é a escrita
+ *   aqui, linha a linha.
+ *
+ * O `total++` é o incremento da referência (cinematch_antigo/cinematch.js:107),
+ * que é a forma de `i++` já usada nos quatro laços deste projeto.
+ *
+ * @returns {{ incrementar: Function, obterTotal: Function }} par que opera
+ *   sobre o total privado.
+ */
+function criarContadorDeRecomendacoes() {
+  let total = 0;
+
+  function incrementar() {
+    total++;
+    return total;
+  }
+
+  function obterTotal() {
+    return total;
+  }
+
+  return {
+    incrementar: incrementar,
+    obterTotal: obterTotal,
+  };
+}
+
+// A factory é chamada UMA VEZ, aqui no escopo do módulo, e o par devolvido
+// fica guardado nesta `const` para o resto da vida da página. É este o ponto
+// que decide se o RF11 está entregue ou não:
+//
+//   - se a factory fosse chamada DENTRO de quem usa o contador — dentro de
+//     calcularCompatibilidades, dentro de buscarCatalogo, dentro do handler —,
+//     cada chamada criaria um `total = 0` novo e o estado privado morreria
+//     junto com a chamada. O número na tela seria sempre 1, e não haveria
+//     closure nenhuma: seria uma variável comum com nome complicado. Por isso
+//     a chamada é de módulo — e é `const`, pelo mesmo motivo de CHAVE_PERFIL e
+//     URL_CATALOGO: o par é o contrato entre quem incrementa e quem lê, e não
+//     é trocado. O escopo de módulo também é o que impede que ele vire global,
+//     e um global entregaria o número na tela sem a mecânica que o Critério 8
+//     mede.
+const contadorRecomendacoes = criarContadorDeRecomendacoes();
 
 if (typeof document !== "undefined") {
   const perfilSalvo = lerPerfilSalvo();
@@ -869,8 +1176,9 @@ if (typeof document !== "undefined") {
     // caminho do formulário aberto não busca catálogo. O primeiro argumento é ""
     // de propósito: aqui não há aviso de persistência a sobreviver, porque o
     // perfil veio do próprio localStorage; o segundo são os gêneros favoritos,
-    // lidos do mesmo perfil salvo.
-    buscarCatalogo("", perfilSalvo.generosFavoritos);
+    // lidos do mesmo perfil salvo; e o terceiro é o nome, lido do mesmo lugar —
+    // é ele que a saudação do RF10 escreve quando a busca terminar.
+    buscarCatalogo("", perfilSalvo.generosFavoritos, perfilSalvo.nome);
   } else {
     mostrarFormulario("Preencha o formulário para receber recomendações.");
   }
@@ -927,15 +1235,28 @@ if (typeof document !== "undefined") {
 // ────────────────────────────────────────────────────────────────────────────
 // ETAPA 7 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T11
 // DONO DESTA ETAPA: Tiago.
+// EXECUTADA EM: feature/cinematch-web por Tiago em 03/10/2026:15:47.
+// JÁ FEITO NA M1-T13: a etapa rodou inteira, e o que ficou no lugar é o
+// cabeçalho, estas anotações e a implementação em concluirBusca e na chamada
+// dentro de buscarCatalogo. Os três bullets do roteiro abaixo foram cumpridos
+// como estavam escritos, e nenhum precisou de decisão nova.
 // O QUE FAZER AQUI
-//   - Passar a função de saudação como ARGUMENTO, não chamá-la direto: a
-//     função entra na posição de callback e é quem a dispara.
-//   - Disparar assim que o catálogo termina de carregar E a renderização
-//     inicial acaba. Nessa ordem: antes disso a saudação chega na tela antes
-//     dos cards, e a leitura fica estranha.
-//   - O nome exibirMensagemDeBoasVindas(nome) é o do briefing, e a função
-//     que escreve na tela é do Lucas, em js/ui.js (etapa 5, mesma M1-T13).
-//     O corpo do callback mora lá; aqui mora a passagem.
+//   - JÁ FEITO NA M1-T13: passar a função de saudação como ARGUMENTO, sem
+//     chamá-la direto. A função entrou na posição de callback e quem a dispara
+//     é quem a recebeu — concluirBusca(nome, callback) chama callback(nome) no
+//     corpo, e o call site só entrega a referência.
+//   - JÁ FEITO NA M1-T13: disparar assim que o catálogo termina de carregar E a
+//     renderização inicial acaba. A chamada ficou logo depois de
+//     renderizarCards(catalogoRecomendado) e antes da bifurcação dos estados,
+//     dentro do try. A ordem se mantém: os cards já estão na tela quando a
+//     saudação aparece, e a frase de sucesso ainda é a última coisa lida.
+//   - JÁ FEITO NA M1-T13: o nome da pessoa precisou chegar até aqui, e esse
+//     acréscimo não estava no roteiro. `buscarCatalogo` recebia `aviso` e
+//     `generosFavoritos`, e nenhum dos dois é o nome — sem ele o callback não
+//     teria o que escrever. O nome passou a ser o TERCEIRO parâmetro de
+//     buscarCatalogo, repassado pelo nome e a saudação como argumento.
+//     `exibirMensagemDeBoasVindas(nome)` continua com o nome do briefing, e a
+//     função que escreve na tela continua sendo do Lucas, em js/ui.js.
 // POR QUE ESTE TRECHO EXISTE
 //   O RF10 é sobre a forma, não sobre a saudação. Passar uma função como
 //   argumento e deixar quem a chamou decidir o momento é o que separa callback
@@ -965,16 +1286,49 @@ if (typeof document !== "undefined") {
 // ────────────────────────────────────────────────────────────────────────────
 // ETAPA 8 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T13
 // DONO DESTA ETAPA: Tiago.
+// EXECUTADA EM: feature/cinematch-web por Tiago em 03/10/2026:16:19.
+// JÁ FEITO NA M1-T14: a etapa rodou inteira. O que ficou no lugar é o
+// cabeçalho, estas anotações e a implementação em três pontos: a região nova
+// antes do guard `typeof document !== "undefined"`, o incremento dentro de
+// calcularCompatibilidades e a leitura do total dentro de buscarCatalogo.
 // O QUE FAZER AQUI
-//   - Escrever a factory: uma função que cria o contador e DEVOLVE as
-//     funções que mexem nele. O total fica numa variável que só o par criado
-//     por ela enxerga — é essa a closure.
-//   - Chamar a factory uma vez, guardando o par devolvido, e ir passando esse
-//     par para quem precisar do número.
-//   - O contador começa em zero a cada sessão e volta a zero quando o perfil
-//     troca: quem trocou o perfil recalculou do começo.
-//   - O número vai para a tela pelo Lucas, em js/ui.js (etapa 6, mesma
-//     M1-T14). Aqui é só onde o total mora.
+//   - JÁ FEITO NA M1-T14: a factory. `criarContadorDeRecomendacoes()` declara o
+//     `let total = 0` e DEVOLVE o par que mexe nele — `incrementar`, que soma
+//     uma casa e devolve o novo total, e `obterTotal`, que só lê. O total fica
+//     numa variável que só o par criado por ela enxerga, e é isso que é a
+//     closure: as duas funções continuam alcancando o escopo de onde nasceram
+//     depois que a factory termina, e ninguém de fora do par chega nele.
+//   - JÁ FEITO NA M1-T14: a factory é chamada UMA VEZ, na `const
+//     contadorRecomendacoes`, no escopo do módulo, antes do guard — que é o
+//     ponto que decide se a entrega vale. Chamá-la dentro de quem usa o
+//     contador mataria o estado privado a cada chamada e o número na tela seria
+//     sempre 1, sem closure nenhuma. O par é repassado por quem precisa do
+//     número: dentro de calcularCompatibilidades ele incrementa, e dentro de
+//     buscarCatalogo ele é lido por `obterTotal()` e o número pronto vai para a
+//     função de tela.
+//   - JÁ FEITO NA M1-T14, pela metade, e a outra metade está escrita: o
+//     contador começa em zero a cada sessão sem nenhuma linha de código — nada
+//     o grava fora da memória da página, e o RF11 fala em "nesta sessão", então
+//     guardá-lo no localStorage mudaria o significado sem ter sido pedido. O
+//     `incrementar()` do par também não zera, e por isso a segunda metade desta
+//     bullet — voltar a zero quando o perfil troca — ficou de fora. Onde ela
+//     mora é o clique do #botao-trocar-perfil, que é a etapa 1 do js/ui.js e
+//     ainda não foi escrita; hoje esse clique é tratado em iniciarFormulario,
+//     aqui no js/script.js (risco 13 do quadro), e ele não esconde os cards do
+//     perfil anterior, então zerar o número ali deixaria a tela contando uma
+//     coisa e mostrando outra. A volta a zero entra no mesmo passo em que a
+//     etapa 1 do ui.js for escrita, com um `zerar()` no par — e não antes, para
+//     não deixar no grafo uma função que ninguém chama.
+//   - JÁ FEITO NA M1-T14: o número vai para a tela pelo Lucas, em js/ui.js
+//     (etapa 6, mesma M1-T14), em `exibirContadorDeRecalculos(total)`. Aqui é
+//     só onde o total mora: a chamada passa o número pronto e o ui.js escreve.
+//     JÁ FEITO NA M1-T14, com desvio declarado: a etapa 6 do esboço de lá é do
+//     Lucas e foi executada pelo Tiago, na branch de lógica, porque a função só
+//     existe para ser chamada por este arquivo — o mesmo motivo que a M1-T11 e a
+//     M1-T13 registraram. O alvo na tela é o `<p id="resultados-contador">` do
+//     index.html, dentro de .cabecalho-resultados, e o `index.html` é território
+//     da branch de interface: a divergência está na nota da M1-T14 do
+//     docs/KANBAN.md.
 // POR QUE ESTE TRECHO EXISTE
 //   O RF11 pede um estado que sobreviva entre chamadas sem virar uma
 //     variável global. Uma variável let solta no topo do módulo resolveria o
