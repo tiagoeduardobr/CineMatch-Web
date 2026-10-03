@@ -10,11 +10,18 @@
  * ES. Os placeholders existiam para que este arquivo carregasse sem erro: o
  * PLACEHOLDER_MODELO saiu na M1-T09 (modelo.js) e o PLACEHOLDER_UI saiu na
  * M1-T11 (ui.js). JÁ FEITO NA M1-T11: o import já traz o renderizarCard.
+ * JÁ FEITO NA M1-T13: e o exibirMensagemDeBoasVindas, o corpo do callback do
+ * RF10, que este arquivo recebe como argumento e dispara em concluirBusca.
  *
  * A página só funciona servida por `npm start` (live-server): módulos ES não
  * carregam via file://, por causa do CORS. O live-server é instalado na M1-T18.
  */
-import { renderizarCard, exibirMensagemDeErro, exibirMensagemDeCatalogoVazio } from "./ui.js";
+import {
+  renderizarCard,
+  exibirMensagemDeErro,
+  exibirMensagemDeCatalogoVazio,
+  exibirMensagemDeBoasVindas,
+} from "./ui.js";
 import { Conteudo, Serie } from "./modelo.js";
 
 // Os dois `import` acima continuam apontando para os módulos irmãos, na
@@ -22,8 +29,15 @@ import { Conteudo, Serie } from "./modelo.js";
 // arquivo. JÁ FEITO NA M1-T09: PLACEHOLDER_MODELO saiu no mesmo passo em
 // que as classes entraram em modelo.js. JÁ FEITO NA M1-T11: PLACEHOLDER_UI
 // saiu no mesmo passo em que o renderizarCard entrou em ui.js, e o `import`
-// da linha 17 foi ajustado junto: sem esse ajuste o nome deixa de existir em
+// do topo foi ajustado junto: sem esse ajuste o nome deixa de existir em
 // ui.js e o grafo de módulos não carrega. Ver o bloco M1-T17.
+// JÁ FEITO NA M1-T13: o mesmo `import` do topo ganhou mais um nome,
+// exibirMensagemDeBoasVindas, porque o RF10 é medido sobre a passagem da
+// função — e uma função só é passada como argumento se foi importada antes.
+// É o mesmo contrato dos outros três: o nome existe em ui.js e é citado aqui.
+// A referência por número de linha que este bloco usava saiu junto: o `import`
+// do ui.js passou a ocupar várias linhas, e foi para o número de linha que o
+// próprio quadro proíbe em nota — vale por seletor, ID ou nome de elemento.
 //
 // NÃO HÁ LINHA DE CONSOLE NESTE ARQUIVO, e isso é decisão, não esquecimento:
 // o professor não quer código de console no material entregue. O que a linha de
@@ -387,8 +401,10 @@ function iniciarFormulario() {
     // para quem recomendar. Não sobra rejeição pendurada porque o catch
     // interno de buscarCatalogo nunca relança. O `aviso` vai junto: sem
     // repassá-lo, a função sobrescreveria a saudação e o recado de storage
-    // na mesma task de evento, antes de qualquer paint.
-    buscarCatalogo(aviso, usuario.generosFavoritos);
+    // na mesma task de evento, antes de qualquer paint. O `nome` é o terceiro
+    // argumento e é o que a saudação do RF10 vai escrever: ele vem do campo
+    // #nome do próprio formulário, já aparado e validado acima.
+    buscarCatalogo(aviso, usuario.generosFavoritos, usuario.nome);
   });
 }
 
@@ -519,6 +535,44 @@ function renderizarCards(lista) {
 }
 
 /**
+ * RF10 · M1-T13 · Encerra a busca disparando o callback que recebeu.
+ *
+ * POR QUE ESTA FUNÇÃO EXISTE E NÃO BASTA CHAMAR A SAUDAÇÃO DIRETO
+ *   O RF10 é medido sobre a FORMA, não sobre o efeito: uma função recebida como
+ *   parâmetro e disparada por quem a recebeu. Escrever
+ *   `exibirMensagemDeBoasVindas(nome)` direto produziria exatamente o mesmo
+ *   texto na tela e NÃO entregaria o requisito — o que separa callback de
+ *   chamada comum é que quem recebe a função é quem decide o momento de
+ *   dispará-la e o que ela recebe como argumento. Por isso o nome tem dono
+ *   próprio e o disparo acontece dentro do corpo, e não no call site.
+ *
+ * POR QUE O NOME É REPASSADO AO CALLBACK
+ *   O callback não busca nada: ele só escreve na tela. Quem tem o nome é o
+ *   fluxo, e o nome chega aqui por parâmetro — vem do #nome do formulário ou do
+ *   registro cinematchPerfil, repassado pelo terceiro argumento de
+ *   buscarCatalogo. O callback(nome) é o que entrega o dado a quem precisa
+ *   dele, no mesmo formato de um parâmetro comum.
+ *
+ * POR QUE NÃO É UMA FLAG "PRONTO"
+ *   Uma variável dizendo que a busca acabou resolveria o mesmo efeito na tela
+ *   com menos código, e é por isso que ela não vale: o Critério 8 mede a
+ *   mecânica do callback, e flag não é callback.
+ *
+ * REFERÊNCIA ENSAIADA (AGENTS.md 2.1)
+ *   cinematch_antigo/cinematch.js:511 — saudacaoDespedida(usuario, callback)
+ *   recebe a função como segundo parâmetro e a chama no corpo, na linha 519;
+ *   a chamada de exemplo, saudacaoDespedida(usuario, despedida), está na
+ *   linha 65. O que se porta é a FORMA — receber e disparar no corpo — e não o
+ *   console, que o professor afastou do código entregue.
+ *
+ * @param {string} nome - nome da pessoa, repassado ao callback como argumento.
+ * @param {Function} callback - função a ser disparada; recebe `nome`.
+ */
+function concluirBusca(nome, callback) {
+  callback(nome);
+}
+
+/**
  * Busca o catálogo real e leva o resultado da chamada para a tela.
  *
  * A ordem interna é a do RF04: carregando, depois a rede, depois o corpo, e
@@ -558,8 +612,14 @@ function renderizarCards(lista) {
  *   parâmetro e não por estado de módulo: o perfil já vive em cinematchPerfil,
  *   e um `let` a mais aqui seria uma segunda fonte da verdade que ficaria
  *   velha depois do botão "Trocar perfil".
+ * @param {string} nome - nome da pessoa, para a saudação do RF10. Chega pelo
+ *   mesmo caminho dos outros dois, por parâmetro, e é o terceiro na ordem: o
+ *   nome é do formulário e, como os gêneros, não é recalculado aqui — é
+ *   repassado. JÁ FEITO NA M1-T13: antes desta task o nome não chegava a lugar
+ *   nenhum, porque esta função só recebia `aviso` e `generosFavoritos` e nenhum
+ *   dos dois é o nome; a saudação ficava sem dado para escrever.
  */
-async function buscarCatalogo(aviso, generosFavoritos) {
+async function buscarCatalogo(aviso, generosFavoritos, nome) {
   const statusResultados = document.querySelector("#resultados-status");
 
   // ESTADO 1 — carregando, escrito ANTES do fetch. É o texto do briefing, e
@@ -625,6 +685,24 @@ async function buscarCatalogo(aviso, generosFavoritos) {
     // impede os cards do perfil anterior de sobrarem quando o botão "Trocar
     // perfil" leva a um catálogo vazio.
     renderizarCards(catalogoRecomendado);
+
+    // RF10 · M1-T13 — o callback, disparado aqui. `exibirMensagemDeBoasVindas`
+    // entra como ARGUMENTO, sem parênteses: quem a recebe é `concluirBusca`, e é
+    // ela quem a dispara, no corpo. Chamar a saudação direto aqui daria o
+    // mesmo efeito na tela e não entregaria o RF10, que é medido sobre a forma.
+    //
+    // A ORDEM É DE LEITURA, não de execução: a saudação entra DEPOIS de
+    // renderizarCards e ANTES da bifurcação dos estados. Antes dos cards, ela
+    // chegaria sozinha na tela e a frase de sucesso — que é a prova de que o
+    // cálculo rodou — viraria a última linha lida. Depois da bifurcação, o
+    // cartão de estado já teria falado por último e a saudação entraria como
+    // remendo, e não como chegada.
+    //
+    // Ela escreve em #resultados-boas-vindas, o <p> que fica entre o
+    // #resultados-status e o <hr class="separador"> no index.html, e por isso a
+    // bifurcação logo abaixo não apaga o nome: os quatro estados escrevem no
+    // #resultados-status, que é outro elemento.
+    concluirBusca(nome, exibirMensagemDeBoasVindas);
 
     // ESTADO 2 — sucesso, agora com a bifurcação do RF05. Continua
     // sobrescrevendo o carregando no MESMO elemento, então ele não fica
@@ -869,8 +947,9 @@ if (typeof document !== "undefined") {
     // caminho do formulário aberto não busca catálogo. O primeiro argumento é ""
     // de propósito: aqui não há aviso de persistência a sobreviver, porque o
     // perfil veio do próprio localStorage; o segundo são os gêneros favoritos,
-    // lidos do mesmo perfil salvo.
-    buscarCatalogo("", perfilSalvo.generosFavoritos);
+    // lidos do mesmo perfil salvo; e o terceiro é o nome, lido do mesmo lugar —
+    // é ele que a saudação do RF10 escreve quando a busca terminar.
+    buscarCatalogo("", perfilSalvo.generosFavoritos, perfilSalvo.nome);
   } else {
     mostrarFormulario("Preencha o formulário para receber recomendações.");
   }
@@ -927,15 +1006,28 @@ if (typeof document !== "undefined") {
 // ────────────────────────────────────────────────────────────────────────────
 // ETAPA 7 DE 10 · BRANCH: feature/cinematch-web · DEPENDE DE: M1-T11
 // DONO DESTA ETAPA: Tiago.
+// EXECUTADA EM: feature/cinematch-web por Tiago em 03/10/2026:15:47.
+// JÁ FEITO NA M1-T13: a etapa rodou inteira, e o que ficou no lugar é o
+// cabeçalho, estas anotações e a implementação em concluirBusca e na chamada
+// dentro de buscarCatalogo. Os três bullets do roteiro abaixo foram cumpridos
+// como estavam escritos, e nenhum precisou de decisão nova.
 // O QUE FAZER AQUI
-//   - Passar a função de saudação como ARGUMENTO, não chamá-la direto: a
-//     função entra na posição de callback e é quem a dispara.
-//   - Disparar assim que o catálogo termina de carregar E a renderização
-//     inicial acaba. Nessa ordem: antes disso a saudação chega na tela antes
-//     dos cards, e a leitura fica estranha.
-//   - O nome exibirMensagemDeBoasVindas(nome) é o do briefing, e a função
-//     que escreve na tela é do Lucas, em js/ui.js (etapa 5, mesma M1-T13).
-//     O corpo do callback mora lá; aqui mora a passagem.
+//   - JÁ FEITO NA M1-T13: passar a função de saudação como ARGUMENTO, sem
+//     chamá-la direto. A função entrou na posição de callback e quem a dispara
+//     é quem a recebeu — concluirBusca(nome, callback) chama callback(nome) no
+//     corpo, e o call site só entrega a referência.
+//   - JÁ FEITO NA M1-T13: disparar assim que o catálogo termina de carregar E a
+//     renderização inicial acaba. A chamada ficou logo depois de
+//     renderizarCards(catalogoRecomendado) e antes da bifurcação dos estados,
+//     dentro do try. A ordem se mantém: os cards já estão na tela quando a
+//     saudação aparece, e a frase de sucesso ainda é a última coisa lida.
+//   - JÁ FEITO NA M1-T13: o nome da pessoa precisou chegar até aqui, e esse
+//     acréscimo não estava no roteiro. `buscarCatalogo` recebia `aviso` e
+//     `generosFavoritos`, e nenhum dos dois é o nome — sem ele o callback não
+//     teria o que escrever. O nome passou a ser o TERCEIRO parâmetro de
+//     buscarCatalogo, repassado pelo nome e a saudação como argumento.
+//     `exibirMensagemDeBoasVindas(nome)` continua com o nome do briefing, e a
+//     função que escreve na tela continua sendo do Lucas, em js/ui.js.
 // POR QUE ESTE TRECHO EXISTE
 //   O RF10 é sobre a forma, não sobre a saudação. Passar uma função como
 //   argumento e deixar quem a chamou decidir o momento é o que separa callback

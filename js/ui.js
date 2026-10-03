@@ -375,6 +375,15 @@ export function renderizarCard(resultado) {
 // ────────────────────────────────────────────────────────────────────────────
 // ETAPA 5 DE 9 · BRANCH: feature/cinematch-web-interface · DEPENDE DE: M1-T11
 // DONO DESTA ETAPA: Lucas.
+// EXECUTADA EM: feature/cinematch-web por Tiago em 03/10/2026:15:47, por
+// decisão do usuário; ver a divergência registrada na M1-T13 do docs/KANBAN.md.
+// JÁ FEITO NA M1-T13: o corpo deste bloco virou a implementação logo abaixo —
+// exibirMensagemDeBoasVindas. A etapa rodou; o que sobrou do roteiro é o
+// cabeçalho e esta anotação. DONO DESTA ETAPA continua sendo o do autor do
+// esboço (Lucas), e quem executou a etapa foi o Tiago: a mesma forma do que a
+// M1-T11 registrou neste cabeçalho, pelo mesmo motivo — o js/script.js, que
+// importa e dispara esta função, é do Tiago, e a etapa não podia ficar com o
+// grafo de módulos partido.
 // O QUE FAZER AQUI
 //   - Escrever a função que escreve a saudação na tela, usando o nome do
 //     briefing: exibirMensagemDeBoasVindas(nome).
@@ -402,6 +411,45 @@ export function renderizarCard(resultado) {
 //   - Usar textContent para escrever o nome. Nome é digitado por pessoa
 //     usuária, e é o mesmo caminho de XSS da etapa 4.
 // ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * RF10 · M1-T13 · Escreve a saudação de boas-vindas com o nome da pessoa.
+ *
+ * Esta função é o CORPO do callback: ela é declarada aqui, e quem a recebe como
+ * argumento — e quem decide o momento de dispará-la — é o js/script.js, na
+ * função concluirBusca. É a forma de saudacaoDespedida(usuario, callback) da
+ * semana 6, que também recebe outra função e a chama no próprio corpo: aqui a
+ * função recebida é a saudação, e quem recebe é o encerramento da busca.
+ *
+ * POR QUE O ALVO É #resultados-boas-vindas E NÃO #resultados-status
+ *   Porque #resultados-status é o elemento que os estados da chamada
+ *   sobrescrevem por consequência — carregando, sucesso, erro e também o
+ *   estado vazio da M1-T08 —, e a saudação morreria junto com o primeiro deles.
+ *   O <p id="resultados-boas-vindas"> do index.html existe para isso: um destino
+ *   que nenhum dos quatro estados reescreve, então o nome continua na tela
+ *   depois que o catálogo termina. Por isso o aviso de falha de persistência
+ *   NÃO entra aqui — ele pertence aos estados, e a saudação é outro elemento.
+ *
+ * POR QUE textContent E NÃO innerHTML
+ *   O destino do valor é a defesa contra XSS (AGENTS.md §7): o nome é digitado
+ *   por pessoa usuária no #nome do formulário, e textContent o escreve como
+ *   texto, nunca como marcação. A crase não muda nada nessa frente — ${} não
+ *   escapa, não sanitiza e não neutraliza —, então a proteção está no destino
+ *   do valor, não na sintaxe da string. É o mesmo caminho dos cards da M1-T11.
+ *
+ * A frase é escrita para continuar verdadeira nos três estados da chamada: ela
+ * diz de onde vêm as recomendações, e não que há recomendações na tela — o
+ * estado vazio da M1-T08 passa por aqui sem que a saudação precise de duas
+ * versões.
+ *
+ * @param {string} nome - nome já validado e aparado no #nome do formulário, ou
+ *   o que veio do registro cinematchPerfil quando a página abre com perfil salvo.
+ */
+export function exibirMensagemDeBoasVindas(nome) {
+  const boasVindas = document.querySelector("#resultados-boas-vindas");
+
+  boasVindas.textContent = `Olá, ${nome}! Boas-vindas ao CineMatch: as recomendações abaixo vêm dos gêneros que você escolheu no perfil.`;
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // TODO M1-T14 · RF11 · Usar closure
