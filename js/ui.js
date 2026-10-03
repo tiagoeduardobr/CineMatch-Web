@@ -4,6 +4,11 @@
  * Responsabilidade (AGENTS.md, seção 3): renderizar os cards de recomendação e
  * as mensagens de carregando, vazio e erro. JÁ FEITO NA M1-T11 (RF08): o
  * renderizarCard está escrito mais abaixo, e é ele que dá nome ao módulo.
+ * JÁ FEITO NA M1-T15 (RF12): a mensagem de carregando também mora aqui agora —
+ * exibirMensagemDeCarregando escreve a frase do briefing e
+ * exibirResultadosComAtraso segura o setTimeout que adia a apresentação do
+ * resultado. Era o débito que a nota da M1-T07 do docs/KANBAN.md marcou para
+ * esta task: a frase era escrita direto pelo js/script.js.
  *
  * Esqueleto da tarefa M1-T01 (RF15 parcial): o export provisório PLACEHOLDER_UI
  * existia aqui para que o `import` do script.js resolvesse desde o primeiro dia,
@@ -586,15 +591,33 @@ export function exibirContadorDeRecalculos(total) {
 // ────────────────────────────────────────────────────────────────────────────
 // ETAPA 7 DE 9 · BRANCH: feature/cinematch-web-interface · DEPENDE DE: M1-T07, M1-T11
 // DONO DESTA ETAPA: Lucas.
+// EXECUTADA EM: feature/cinematch-web por Tiago em 03/10/2026:18:43.
+// JÁ FEITO NA M1-T15: o corpo deste bloco virou a implementação logo abaixo —
+// as duas funções exibirMensagemDeCarregando e exibirResultadosComAtraso, mais
+// a constante do atraso. A etapa rodou na branch de lógica, e não na do Lucas,
+// pela mesma razão das M1-T11, M1-T13 e M1-T14: quem chama as duas funções é o
+// js/script.js, e a etapa não podia ficar com o grafo de módulos partido. O que
+// sobrou do roteiro é o cabeçalho e estas anotações. DONO DESTA ETAPA continua
+// sendo o do autor do esboço (Lucas), e quem executou a etapa foi o Tiago.
 // O QUE FAZER AQUI
-//   - Mostrar "Buscando as melhores séries pra você..." enquanto o fetch
-//     corre. O script.js pede este estado ANTES de chamar a API, na M1-T07;
-//     esta função é o que ele chama.
-//   - Aplicar o setTimeout do atraso proposital AQUI, na exibição, entre o
-//     estado de carregando e o momento de mostrar os cards. Delay pequeno: o
+//   - JÁ FEITO NA M1-T15: Mostrar "Buscando as melhores séries pra você..."
+//     enquanto o fetch corre. A frase passou a ser escrita por
+//     exibirMensagemDeCarregando(), que é a função que o js/script.js chama no
+//     topo de buscarCatalogo, antes do fetch; a escrita direta em
+//     #resultados-status saiu de lá no mesmo passo — é o débito que a nota da
+//     M1-T07 do docs/KANBAN.md marcou para esta task, pago no carregando. A
+//     frase de sucesso continua no js/script.js, porque ela depende de dados
+//     que são daquele módulo (os totais bruto e tratado).
+//   - JÁ FEITO NA M1-T15: Aplicar o setTimeout do atraso proposital AQUI, na
+//     exibição, entre o estado de carregando e o momento de mostrar os cards.
+//     Ele está em exibirResultadosComAtraso(), que recebe a apresentação pronta
+//     e só a dispara quando o delay acaba — o fetch já terminou quando o atraso
+//     começa, então o estado de erro nunca é adiado. Delay pequeno de 800 ms: o
 //     ponto é a mensagem ficar legível, não simular lentidão.
-//   - Limpar a mensagem de carregando antes de renderizar os cards, para os
-//     dois estados não aparecerem juntos.
+//   - JÁ FEITO NA M1-T15: Limpar a mensagem de carregando antes de renderizar
+//     os cards. A limpeza é a primeira instrução do callback do setTimeout, e
+//     portanto roda antes de o js/script.js desenhar qualquer card: os dois
+//     estados não aparecem juntos, nem por um paint.
 // POR QUE ESTE TRECHO EXISTE
 //   Uma chamada de rede leva tempo, e sem feedback a pessoa acha que a página
 //   travou. É o estado "carregando" do trio que o RF04 e a seção 5.4 do
@@ -616,13 +639,125 @@ export function exibirContadorDeRecalculos(total) {
 //     de erro que a M1-T07 precisa mostrar: a página pareceria travada, e não
 //     fora do ar. O briefing (RF04, pág. 6) e o risco 4 do quadro pedem o
 //     contrário do que o instinto sugere, e por isso está escrito aqui.
+//     JÁ FEITO NA M1-T15: é exatamente o que o código abaixo faz — o atraso é
+//     de exibição, agendado DEPOIS de a rede responder, e o catch do fetch em
+//     js/script.js continua sem atraso nenhum.
 //   - O projeto antigo usava setTimeout dentro de uma Promise para simular a
 //     API. Aqui a API é real: não repetir esse padrão.
+//     JÁ FEITO NA M1-T15: não há Promise nenhuma aqui — setTimeout chamado
+//     direto, com a função como primeiro argumento e o tempo como segundo, que
+//     é a forma da referência acima.
 //   - É este bloco que faz o trio fechar: carregando (aqui), vazio (etapa 3)
 //     e erro (etapa 2). O Critério 13 é avaliado nos três.
 //   - Geolocation é o bônus opcional do RF12, do backlog, e não entra aqui:
 //     não conta nota e pede permissão de localização.
 // ────────────────────────────────────────────────────────────────────────────
+
+// O atraso da exibição, em milissegundos. `const` porque é uma decisão de
+// estilo da interface e não muda em execução — o mesmo motivo de CHAVE_PERFIL
+// e de URL_CATALOGO no js/script.js. Os 800 ms são o tempo de uma frase ser
+// percebida sem a tela parecer travada: a referência ensinada usava 2000 ms
+// para SIMULAR uma API que não existia (cinematch_antigo/cinematch.js), e aqui
+// a API é real — o atraso existe só para o estado de carregando ser lido, que
+// é o que o RF12 pede quando fala em "pequeno atraso proposital na exibição".
+const ATRASO_DA_EXIBICAO_MS = 800;
+
+/**
+ * RF12 · M1-T15 · Mostra o estado de carregando enquanto o fetch corre.
+ *
+ * POR QUE ESTA FUNÇÃO EXISTE E POR QUE O TEXTO VIVE AQUI
+ *   A tela é responsabilidade deste módulo (AGENTS.md, seção 3), e escrever a
+ *   frase direto no js/script.js — que era o que o código fazia desde a M1-T07
+ *   — mantinha no módulo de fluxo uma escrita em DOM que lhe cabe. O débito
+ *   estava declarado na nota da M1-T07 do docs/KANBAN.md com prazo nesta task,
+ *   e é ele que esta função paga. O call site não mudou de lugar nem de
+ *   momento: continua no topo de buscarCatalogo, antes do fetch, o que é o que
+ *   distingue "rede lenta" de "página parada" na tela.
+ *
+ * POR QUE O ALVO É O MESMO #resultados-status DOS OUTROS ESTADOS
+ *   Porque os quatro estados (carregando, sucesso, vazio e erro) escrevem no
+ *   MESMO elemento — o <p id="resultados-status"> com role="status" e
+ *   aria-live="polite" do index.html — e é isso que faz a frase anterior sumir
+ *   por consequência, sem código de limpeza entre um estado e outro. Um alvo
+ *   novo deixaria os dois estados na tela ao mesmo tempo, que é justamente o
+ *   que o esboço desta etapa proibia.
+ *
+ * POR QUE A FRASE NÃO LEVA O `aviso` DE FALHA DE PERSISTÊNCIA
+ *   O texto é o literal do briefing (RF12) e não pode ser alterado. O aviso da
+ *   M1-T06 ("Não foi possível salvar o perfil…") entra nos destinos que
+ *   sobrescrevem este elemento DEPOIS do carregando — sucesso, vazio e erro —,
+ *   e é justamente porque o carregando o apagou no mesmo tick em que ele foi
+ *   escrito que esses destinos precisam repassá-lo.
+ *
+ * POR QUE textContent E NÃO innerHTML
+ *   O destino do valor é a defesa contra XSS (AGENTS.md §7), e aqui não há
+ *   dado externo nenhum — a frase inteira é literal. Mesmo assim o caminho é o
+ *   mesmo de sempre, porque é o hábito que segura a regra: textContent escreve
+ *   como texto e nunca interpreta como marcação, enquanto a crase não escapa
+ *   nada.
+ */
+export function exibirMensagemDeCarregando() {
+  const statusResultados = document.querySelector("#resultados-status");
+  statusResultados.textContent = "Buscando as melhores séries pra você...";
+}
+
+/**
+ * RF12 · M1-T15 · Dispara a apresentação do resultado depois de um atraso.
+ *
+ * POR QUE O setTimeout ESTÁ AQUI E NÃO DENTRO DO FETCH
+ *   É a regra do AGENTS.md (seção 7, gotcha do RF12) e a CONFORMIDADE do bloco
+ *   acima: o atraso é de EXIBIÇÃO. Somado dentro de buscarCatalogo, antes ou
+ *   durante a chamada de rede, ele se somaria à latência da rede e atrasaria
+ *   também o estado de erro — a página pareceria travada com a falha já
+ *   conhecida, mascarando exatamente o que a M1-T07 existe para mostrar
+ *   (risco 4 do quadro). Aqui quem agenda é o módulo de tela, e quem chama
+ *   agenda DEPOIS de a rede responder e de o catálogo estar tratado.
+ *
+ * POR QUE A APRESENTAÇÃO CHEGA COMO ARGUMENTO
+ *   setTimeout recebe uma função — é o formato da referência ensinada
+ *   (cinematch_antigo/cinematch.js, buscarCatalogoSimulado) —, e este módulo
+ *   não sabe o que fazer quando o atraso acaba: limpar a lista, montar os
+ *   cards, disparar o callback do RF10, ler o total da closure e escrever a
+ *   frase de sucesso ou de vazio são assunto do js/script.js, que é quem tem os
+ *   dados. Aqui só se espera e se chama. Isto NÃO é o callback do RF10: aquele
+ *   é requisito e é medido sobre a passagem da função em concluirBusca; este é
+ *   simplesmente a forma de usar a Browser API de tempo, cujo primeiro
+ *   argumento é sempre uma função.
+ *
+ * POR QUE O CARREGANDO É LIMPO DENTRO DO setTimeout E NÃO NO MOMENTO DE
+ * AGENDAR
+ *   Limpar na hora de agendar apagaria a mensagem na mesma task de evento em
+ *   que ela foi escrita, antes de qualquer paint — a pessoa não veria nada. A
+ *   limpeza tem de acontecer quando o atraso termina, e antes de a apresentação
+ *   rodar: é o terceiro bullet do esboço desta etapa, e é o que garante que a
+ *   mensagem de carregando não coexista com os cards nem por um paint, mesmo
+ *   que a apresentação demore mais um pouco para escrever o estado final.
+ *
+ * POR QUE A EXCEÇÃO DA APRESENTAÇÃO NÃO CHEGA AO catch DE buscarCatalogo
+ *   Este callback executa em OUTRA task de evento, depois de o try daquele
+ *   arquivo já ter terminado, então fica fora do alcance dinâmico do catch de
+ *   lá. Por isso o chamador envolve a própria apresentação em um try/catch e
+ *   escreve o estado de erro ali dentro: a consequência visual é a mesma de
+ *   sempre (exceção de DOM vira frase amigável, nunca página quebrada), só que
+ *  800 ms depois. O combinado entre os dois módulos está no JSDoc deste
+ *   parâmetro.
+ *
+ * @param {Function} apresentarResultados - função que desenha o resultado,
+ *   sem argumentos; chamada dentro do atraso, já com o carregando limpo. Quem
+ *   a escreve é a própria, com try/catch interno — ver o motivo acima.
+ */
+export function exibirResultadosComAtraso(apresentarResultados) {
+  setTimeout(function () {
+    const statusResultados = document.querySelector("#resultados-status");
+
+    // A limpeza vem primeiro, antes de qualquer card: os dois estados não
+    // aparecem juntos nem por um paint, e o estado que escrever depois é que
+    // decide o texto final.
+    statusResultados.textContent = "";
+
+    apresentarResultados();
+  }, ATRASO_DA_EXIBICAO_MS);
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // TODO M1-T16 · RF13 · SEO básico e acessibilidade

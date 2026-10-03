@@ -263,6 +263,14 @@ body {
 	border-top: 1px solid rgba(217, 174, 109, 0.08);
 }
 
+.secao-perfil[hidden] {
+	display: none;
+}
+
+.secao-resultados[hidden] {
+	display: none;
+}
+
 .cartao-login,
 .cartao-perfil {
 	width: 100%;
@@ -328,6 +336,18 @@ body {
 	opacity: 0.7;
 }
 
+#formulario-status {
+	margin: 0 0 18px;
+	color: var(--cor-texto-muted);
+	line-height: 1.6;
+}
+
+#formulario-status ul {
+	margin: 0;
+	padding-left: 20px;
+	color: var(--cor-dourado-claro);
+}
+
 /* =========================
    FORMULÁRIOS
    ========================= */
@@ -338,6 +358,10 @@ body {
 	flex-direction: column;
 	gap: 18px;
 	margin-top: 24px;
+}
+
+#form-perfil[hidden] {
+	display: none;
 }
 
 .formulario-login > div,
@@ -496,13 +520,54 @@ body {
    ========================= */
 
 .cabecalho-resultados {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 28px;
 	width: 100%;
 	max-width: 1180px;
 	margin: 0 auto;
 }
 
+.introducao-resultados {
+	min-width: 0;
+}
+
 .cabecalho-resultados h2 {
+	margin-bottom: 8px;
 	font-size: 30px;
+}
+
+.cabecalho-resultados p {
+	margin: 0;
+}
+
+#resultados-boas-vindas {
+	margin-bottom: 8px;
+	color: var(--cor-texto);
+	line-height: 1.6;
+}
+
+#resultados-status {
+	color: var(--cor-texto-muted);
+	line-height: 1.6;
+}
+
+#resultados-contador {
+	margin-top: 10px;
+	color: var(--cor-dourado-claro);
+	font-size: 13px;
+}
+
+#botao-trocar-perfil {
+	flex: 0 0 auto;
+	background: transparent;
+	color: var(--cor-dourado);
+}
+
+#botao-trocar-perfil:hover {
+	background: var(--cor-dourado);
+	color: var(--cor-fundo);
 }
 
 .resultados {
@@ -686,9 +751,7 @@ footer {
 	}
 
 	.cabecalho-resultados {
-		display: flex;
 		align-items: baseline;
-		justify-content: space-between;
 		gap: 24px;
 	}
 
@@ -741,6 +804,15 @@ footer {
 	.secao-perfil,
 	.secao-resultados {
 		padding: 42px 5%;
+	}
+
+	.cabecalho-resultados {
+		flex-direction: column;
+		gap: 18px;
+	}
+
+	#botao-trocar-perfil {
+		width: 100%;
 	}
 }
 
