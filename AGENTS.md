@@ -10,7 +10,7 @@ Este arquivo é carregado automaticamente no contexto de todos os agentes que tr
 
 | Dado | Valor |
 | --- | --- |
-| Repositório | https://github.com/tiagoeduardobr/CineMatch-Web |
+| Repositório | <https://github.com/tiagoeduardobr/CineMatch-Web> |
 | Módulo | Desenvolvimento Mobile — Módulo 01 — Semana 13 (Projeto Avaliativo Final) |
 | Prazo de entrega | 05/10/2026 até 22h, contado pela última atualização no GitHub |
 | Peso na nota | 60% da nota do módulo — 15 critérios somando 10,00 pontos |
@@ -243,18 +243,6 @@ O diretório externo para trabalho temporário, como scripts e extrações, é `
 
 ---
 
-## 8. Agent Workflow — Orquestração
-
-Existem cinco agentes globais já configurados, **fora deste repositório**, em `C:\Users\Tiago\.config\opencode\agents\`.
-
-| Agente | Papel neste projeto |
-| --- | --- |
-| `task-build` | Orquestrador. Delega tudo aos demais e não edita código |
-| `task-planner` | Planeja. **Deve ler `docs/KANBAN.md`, não procurar `docs/PROJECT_BACKLOG_*.md`** |
-| `dev` | Implementa. Marca a task no `docs/KANBAN.md` com `Get-Date -Format 'dd/MM/yyyy:HH:mm'`, conforme a seção 5 |
-| `code-review` | Revisa o código contra os RFs e a convenção do quadro |
-| `git-commit` | Commits e branches. As duas branches fixas de feature (`feature/cinematch-web` e `feature/cinematch-web-interface`), com `main` e `develop` permitidos aqui |
-
 Regras de orquestração que valem para este projeto:
 
 1. **Nenhum agente edita código diretamente.** O `task-build` delega tudo ao `dev`, e o Git vai sempre para o `git-commit`. Nenhum agente fora do `git-commit` executa `git add`, `git commit`, `git push`, `git checkout -b` ou `git rm` por conta própria.
@@ -319,7 +307,6 @@ Prazo: **05/10/2026 até 22h**, contado pela última atualização no repositór
 | --- | --- |
 | `docs/KANBAN.md` | **O backlog e a fonte de verdade do estado do quadro.** 24 tarefas, 15 RFs rastreados e 24 itens de checklist |
 | `docs/BRIEFING.md` | Transcrição pesquisável do briefing, extraída do PDF. Útil porque agentes não leem PDF. Substituída pelo PDF em qualquer divergência |
-| `docs/AI_HANDOVER_CONTEXT.md` | Snapshot de handoff entre sessões de agente: estado do repositório, decisões tomadas e problemas abertos. Substituído a cada nova sessão |
 | `docs/Projeto Avaliativo Final - Módulo 01 - Mobile React Native T1 - M1S13 (1).pdf` | O briefing original, 16 páginas. Fonte de verdade; `docs/BRIEFING.md` é a cópia pesquisável |
 | `.gitattributes` | Força LF em `md`, `js`, `css` e `html`, e CRLF em `bat`. Não remover |
 | `index.html`, `css/style.css`, `js/script.js`, `js/ui.js`, `js/modelo.js`, `assets/main.png`, `package.json` | A aplicação e o `package.json` do `live-server`. O estado da implementação vive no `docs/KANBAN.md`, não aqui |
