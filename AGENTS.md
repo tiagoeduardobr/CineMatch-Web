@@ -153,6 +153,8 @@ Os agentes deste ambiente vêm configurados de outro projeto e esperam um backlo
 - **Não invente IDs novos** sem antes acrescentar a tarefa ao quadro.
 - A coluna *Backlog* é a **lista canônica** dos bônus. Não duplique esses itens em outra seção.
 
+**O esboço comentado nos módulos não é intocável.** Registrar uma etapa cumprida com `JÁ FEITO NA M1-Txx:` é a forma correta, e apagar a linha em silêncio não é. A regra completa, com o porquê e o precedente, está na **seção 7** — ela vale para quem executa a task, não só para quem move a linha do quadro.
+
 ---
 
 ## 6. Git — Fluxo e Override de Padrões
@@ -221,6 +223,14 @@ O diretório externo para trabalho temporário, como scripts e extrações, é `
 > **Advertência — template literal NÃO é defesa contra XSS, e nunca deve ser apresentado como tal.** `${}` não escapa, não sanitiza e não neutraliza nada. Dado que vem da API ou que foi digitado por pessoa usuária **é XSS** quando é interpolado numa string que depois é atribuída a `innerHTML`; é esse o risco que a regra acima **não** cobre. Trocar `+` por crase **não muda nada** nessa frente, porque o dado interpolado continua indo para o mesmo lugar — a crase muda a sintaxe, não o destino do valor.
 >
 > A defesa real, e a única, é **`textContent` e `createElement`**: eles escrevem o dado como texto e nunca o interpretam como marcação. É isso que os cards de fato usam hoje — medido no repositório, `innerHTML` aparece **0 vezes em código** nos três módulos, e as únicas ocorrências estão em comentários e no esboço comentado de `js/ui.js`. Se `innerHTML` entrar em código executado, isso vira violação, mesmo dentro de uma crase.
+
+### O esboço comentado pode ser anotado (convenção de escrita de código)
+
+**Regra.** Os esboços comentados de `js/script.js`, `js/ui.js` e `js/modelo.js` — o mapa do roteiro da seção 5.1 do briefing — **não são intocáveis**. Quando uma task implementa o que um bloco mandava escrever, o bloco **permanece** e recebe a anotação `JÁ FEITO NA M1-Txx:`, dizendo o que foi feito e por quê. Vale inclusive quando a instrução ficou falsa: "apagar o `PLACEHOLDER_MODELO`" continua no lugar quando o próprio placeholder sai junto com a implementação que o torna desnecessário, com o marcador registrando que a etapa rodou. **O que não se faz é apagar a linha em silêncio, nem deixá-la como se ainda mandasse.**
+
+**Por que.** A instrução do esboço é o contrato de trabalho entre quem escreve o mapa e quem executa a etapa, e os dois caminhos óbvios falham em sentidos opostos. **Deixar como está** é mentira no código — manda apagar um símbolo que não existe mais, e quem conferir depois perde tempo procurando o que não está lá. **Apagar a linha** destrói o contrato — cada item do bloco é um passo que o autor do esboço espera ver cumprido, e sem rastro quem implementa a etapa seguinte repete o trabalho ou duvida de que ele foi feito. **Anotar** é o que mantém o código honesto: deixa, no lugar onde o leitor vai procurar, a verdade sobre o que era, o que virou e por quê. Sem a regra escrita, a decisão fica de quem implementou e muda de pessoa para pessoa, porque a única evidência disponível é o diff.
+
+**Precedente real.** Não é teoria — está aplicada em duas tasks. Na **`M1-T09`**, o bloco das classes em `js/modelo.js` foi **preservado**, com o corpo virando implementação; o `JÁ FEITO NA M1-T09:` aparece no cabeçalho do arquivo, nas notas dos dois `import` do `js/script.js` e no próprio bloco, inclusive na linha que mandava `APAGAR PLACEHOLDER_MODELO` — cujo nome saiu do `import` do `js/script.js` no mesmo passo. Na **`M1-T11`**, idem, com `JÁ FEITO NA M1-T11:` no cabeçalho do `js/ui.js`, nos pontos que citavam `PLACEHOLDER_UI`, no bloco dele dentro do esboço — que segue ali — e nas notas dos `import` e da etapa 9 do `js/script.js`. O cabeçalho do esboço do `js/ui.js` registra o porquê na primeira vez que isso aconteceu: `DONO DESTA ETAPA` continua sendo o do autor do esboço, e quem executou a etapa foi outra pessoa. **Confira por `grep -rn "JÁ FEITO NA M1-T" js/`**, não pelo número de linha: o marcador sobrevive a qualquer inserção, a linha não.
 
 ### Gotchas técnicas do projeto
 
@@ -329,6 +339,7 @@ Prazo: **05/10/2026 até 22h**, contado pela última atualização no repositór
 - Sem `console.log` no código entregue — o professor afastou esse requirement do briefing.
 - Sem `!important`: ajuste o seletor ou apague a regra.
 - `localStorage` sempre em `try/catch`, com `removeItem` liberado e `clear()` proibido.
+- Esboço comentado anotável com `JÁ FEITO NA M1-Txx:`, nunca apagado em silêncio.
 - Versione arquivo por nome explícito, com `git add <arquivo>`.
 
 > **Regra de precedência:** quando este arquivo, o `docs/KANBAN.md` e o PDF divergirem, o **PDF vence** — é o briefing do professor. Corrija os outros dois. Para o *como* escrever o código, a fonte de verdade é a seção 2.1.
