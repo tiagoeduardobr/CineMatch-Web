@@ -545,6 +545,12 @@ body {
 .midia-serie {
 	position: relative;
 	background: var(--cor-fundo-secundario);
+	/*
+	o card montado por `renderizarCard` em `js/ui.js` não cria `.cartaz-serie`;
+	sem conteúdo em fluxo, a caixa colapsa, porque o único filho é o `.badge`, que é `position: absolute` e por isso não sustenta altura;
+	`aspect-ratio: 2 / 3` reproduz a geometria que o pôster ocuparia no template estático.
+	*/
+	aspect-ratio: 2 / 3;
 }
 
 .cartaz-serie {
