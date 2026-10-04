@@ -14,8 +14,29 @@
  */
 export function exibirMensagemDeErro(texto) {
   const statusResultados = document.querySelector("#resultados-status");
-  // textContent e não innerHTML: a defesa contra XSS é o destino do valor, nunca a sintaxe da string.
   statusResultados.textContent = texto;
+}
+
+/**
+ * Monta a lista de erros do formulário dentro de #formulario-status.
+ * A validação continua no módulo de fluxo; este módulo fica responsável por
+ * transformar os erros em elementos visíveis e acessíveis.
+ */
+export function exibirErrosDeFormulario(erros) {
+  const formularioStatus = document.querySelector("#formulario-status");
+  formularioStatus.textContent = "";
+
+  const mensagemErros = document.createElement("ul");
+  mensagemErros.setAttribute("role", "alert");
+  mensagemErros.setAttribute("aria-live", "assertive");
+
+  for (let i = 0; i < erros.length; i++) {
+    const itemErro = document.createElement("li");
+    itemErro.textContent = erros[i];
+    mensagemErros.appendChild(itemErro);
+  }
+
+  formularioStatus.appendChild(mensagemErros);
 }
 
 /**
@@ -74,7 +95,6 @@ export function renderizarCard(resultado) {
   titulo.textContent = resultado.titulo;
   conteudo.appendChild(titulo);
 
-  // 0% é caso comum: o join de um array vazio devolveria "" e truncaria a linha.
   const emComum = resultado.generosEmComum.join(", ") || "nenhum";
   const naoExplorados = resultado.generosNaoExplorados.join(", ") || "nenhum";
   const linhas = [
