@@ -51,13 +51,13 @@ A semana 6 é o mini-projeto da linha de cima e a semana 13 é este projeto. Nen
 
 | RF | Referência |
 | --- | --- |
-| RF02 Formulário e validação | `semana-09/exercicio-form/script.js` — `FormData`, `preventDefault()`, `getAll()`, array `erros` |
+| RF02 Formulário e validação | `semana-09/exercicio-form/script.js` — `FormData`, `preventDefault()`, `getAll()`, array `erros`, `forEach`, `querySelectorAll`, `classList` e `remove` |
 | RF03 `localStorage` | `semana-11/ceu-aberto/script.js` — `setItem(chave, valor)` e `getItem(...) \|\| padrão`. É a referência da **forma** da API; o `try/catch` exigido pela Seção 7 não aparece nesse arquivo e foi acrescentado em `js/script.js` pela `M1-T06`, nas funções `salvarPerfil()` e `lerPerfilSalvo()`. Os quatro métodos foram ensinados: `setItem` (salvar), `getItem` (ler), `removeItem` (remover **uma** chave) e `clear` (apagar **tudo**). Contrato do `getItem`: devolve **`null`** quando a chave não existe, **nunca `undefined`** |
 | RF04 `fetch` | `semana-11/ceu-aberto-api/script.js` — `try`/`catch`, `response.ok === false`, `throw new Error` |
-| RF05 Métodos de array | `cinematch_antigo/cinematch.js` — `map`, `filter`, `find` e `sort` com `localeCompare("pt-BR")` |
+| RF05 Métodos de array | `cinematch_antigo/cinematch.js` — `map`, `filter`, `find` e `sort` com `localeCompare("pt-BR")`; `forEach` também aparece nos exercícios de formulário e DOM |
 | RF06 Herança e `this` | `cinematch_antigo/class.js` — `Serie extends Conteudo`, `super()`, `instanceof` |
 | RF07 Compatibilidade | `cinematch_antigo/cinematch.js` — `compatibilidade()` e `obterConteudosPorGenero()`, limiares 80 e 50 |
-| RF08 Render no DOM | `semana-08/cinematch-createElement/script.js` — `createElement`, `textContent`, `appendChild`, `remove` |
+| RF08 Render no DOM | `semana-08/cinematch-createElement/script.js` — `createElement`, `textContent`, `appendChild`, `remove` e `forEach` |
 | RF09 Flexbox e responsividade | `semana-10/` — media queries, `gap`, `clamp()` |
 | RF10 Callback | `cinematch_antigo/cinematch.js` — `saudacaoDespedida(usuario, callback)` |
 | RF11 Closure | `cinematch_antigo/cinematch.js` — `criarContadorDeRecomendacoes()` |
@@ -69,7 +69,9 @@ RF01 e RF15 não têm linha própria. O RF01 tem exemplo em `semana-11/ceu-abert
 
 #### Não ensinado — não use sem perguntar
 
-Nenhum item abaixo aparece em nenhum dos dois repositórios. Se um deliverable exigir algum deles, pergunte antes de escribir: encadeamento opcional `?.`, `Object.assign`, `structuredClone`, `AbortController`, `IntersectionObserver` e `ResizeObserver`, *debounce*, *throttle*, `<template>`, `padStart` e `Intl.`.
+Nenhum item abaixo aparece nos dois repositórios consultados. Se um deliverable exigir algum deles, pergunte antes de escrever: encadeamento opcional `?.`, `Object.assign`, `structuredClone`, `AbortController`, `IntersectionObserver` e `ResizeObserver`, *debounce*, *throttle*, `<template>`, `padStart` e `Intl.`.
+
+`forEach` e `querySelectorAll` **não** pertencem a esta lista de técnicas não ensinadas: `forEach` aparece em `semana-08/cinematch-createElement/script.js` e em `semana-09/exercicio-form/script.js`, enquanto `querySelectorAll` aparece explicitamente no exercício de formulário. O uso dessas APIs é permitido; a escolha entre `forEach` e um laço clássico deve seguir o padrão da referência que estiver sendo portada, sem transformar preferência de implementação em regra do curso.
 
 Um caso fora da lista, para não confundir: `??` aparece **uma vez** em `cinematch_antigo/cinematch.js:211`, no cálculo do próximo id. Não foi ensinado e não deve ser replicado.
 
@@ -325,6 +327,8 @@ Prazo: **05/10/2026 até 22h**, contado pela última atualização no repositór
 - `const` por padrão; `let` somente quando o valor realmente muda.
 - Sem `console.log` no código entregue — o professor afastou esse requirement do briefing.
 - Sem `!important`: ajuste o seletor ou apague a regra.
+- Em Markdown, use asteriscos para ênfase (`*texto*` e `**texto**`), nunca sublinhados; não deixe espaços imediatamente dentro dos marcadores.
+- Ao adicionar termos técnicos ou palavras em português ao Markdown, registre as grafias no `cspell.json`, preferindo incluir as variantes com e sem acento quando elas aparecem no código ou em identificadores.
 - `localStorage` sempre em `try/catch`, com `removeItem` liberado e `clear()` proibido.
 - Esboço comentado anotável com `JÁ FEITO NA M1-Txx:`, nunca apagado em silêncio.
 - Versione arquivo por nome explícito, com `git add <arquivo>`.
