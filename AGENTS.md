@@ -18,7 +18,7 @@ Este arquivo é carregado automaticamente no contexto de todos os agentes que tr
 
 A aplicação coleta perfil (nome, idade, gêneros) por formulário, persiste em `localStorage`, busca o catálogo na TVMaze via `fetch` e renderiza cards de recomendação calculados por compatibilidade.
 
-**Plágio é nota 0.** O briefing autoriza usar IA, desde que o resultado seja adaptado e o aluno saiba explicar cada linha. Isso muda como o código deve ser escrito aqui: comentado, com o raciocínio explícito, não só o resultado.
+**Plágio é nota 0.** O briefing autoriza usar IA, desde que o resultado seja adaptado e o aluno saiba explicar cada linha. Isso muda como o código deve ser escrito aqui: o raciocínio tem de estar explícito, não só o resultado — e a forma dele hoje é a convenção de comentários da **seção 7**: cabeçalho de módulo, docstring acima de cada função, método e classe, e no máximo uma linha de comentário inline onde o raciocínio não sai do próprio código.
 
 ---
 
@@ -153,7 +153,7 @@ Os agentes deste ambiente vêm configurados de outro projeto e esperam um backlo
 - **Não invente IDs novos** sem antes acrescentar a tarefa ao quadro.
 - A coluna *Backlog* é a **lista canônica** dos bônus. Não duplique esses itens em outra seção.
 
-**O esboço comentado nos módulos não é intocável.** Registrar uma etapa cumprida com `JÁ FEITO NA M1-Txx:` é a forma correta, e apagar a linha em silêncio não é. A regra completa, com o porquê e o precedente, está na **seção 7** — ela vale para quem executa a task, não só para quem move a linha do quadro.
+**O esboço comentado dos módulos foi aposentado.** Cada etapa do roteiro virou código, e anotar a etapa cumprida dentro do arquivo deixou de ser regra: o estado de uma task vive no checkbox da linha do `docs/KANBAN.md`, não em comentário dentro de `js/`. O que ainda sobrou nos arquivos é resíduo a remover, não instrução a seguir. A convenção que governa a escrita do código hoje — o que pode ser comentado e o que não pode — está na **seção 7**.
 
 ---
 
@@ -224,13 +224,24 @@ O diretório externo para trabalho temporário, como scripts e extrações, é `
 >
 > A defesa real, e a única, é **`textContent` e `createElement`**: eles escrevem o dado como texto e nunca o interpretam como marcação. É isso que os cards de fato usam hoje — medido no repositório, `innerHTML` aparece **0 vezes em código** nos três módulos, e as únicas ocorrências estão em comentários e no esboço comentado de `js/ui.js`. Se `innerHTML` entrar em código executado, isso vira violação, mesmo dentro de uma crase.
 
-### O esboço comentado pode ser anotado (convenção de escrita de código)
+### Comentários: três formas e nada além delas (convenção de escrita de código)
 
-**Regra.** Os esboços comentados de `js/script.js`, `js/ui.js` e `js/modelo.js` — o mapa do roteiro da seção 5.1 do briefing — **não são intocáveis**. Quando uma task implementa o que um bloco mandava escrever, o bloco **permanece** e recebe a anotação `JÁ FEITO NA M1-Txx:`, dizendo o que foi feito e por quê. Vale inclusive quando a instrução ficou falsa: "apagar o `PLACEHOLDER_MODELO`" continua no lugar quando o próprio placeholder sai junto com a implementação que o torna desnecessário, com o marcador registrando que a etapa rodou. **O que não se faz é apagar a linha em silêncio, nem deixá-la como se ainda mandasse.**
+**Regra.** Todo comentário dos três módulos — `js/script.js`, `js/ui.js` e `js/modelo.js` — é uma de três formas, e só essas três:
 
-**Por que.** A instrução do esboço é o contrato de trabalho entre quem escreve o mapa e quem executa a etapa, e os dois caminhos óbvios falham em sentidos opostos. **Deixar como está** é mentira no código — manda apagar um símbolo que não existe mais, e quem conferir depois perde tempo procurando o que não está lá. **Apagar a linha** destrói o contrato — cada item do bloco é um passo que o autor do esboço espera ver cumprido, e sem rastro quem implementa a etapa seguinte repete o trabalho ou duvida de que ele foi feito. **Anotar** é o que mantém o código honesto: deixa, no lugar onde o leitor vai procurar, a verdade sobre o que era, o que virou e por quê. Sem a regra escrita, a decisão fica de quem implementou e muda de pessoa para pessoa, porque a única evidência disponível é o diff.
+1. **Cabeçalho de módulo:** um `/** ... */` no topo do arquivo, dizendo o que é aquele módulo e qual é a responsabilidade dele dentro da estrutura da seção 3.
+2. **Docstring de função, método ou classe:** um `/** ... */` logo acima da declaração, dizendo o que a peça faz e qual é o contrato dela com quem chama.
+3. **Comentário inline de no máximo uma linha:** um `//` no ponto exato onde o raciocínio não sai do próprio código. Uma linha, sempre — se o raciocínio não cabe numa linha, ele pertence à docstring de cima, não ao meio do corpo da função.
 
-**Precedente real.** Não é teoria — está aplicada em duas tasks. Na **`M1-T09`**, o bloco das classes em `js/modelo.js` foi **preservado**, com o corpo virando implementação; o `JÁ FEITO NA M1-T09:` aparece no cabeçalho do arquivo, nas notas dos dois `import` do `js/script.js` e no próprio bloco, inclusive na linha que mandava `APAGAR PLACEHOLDER_MODELO` — cujo nome saiu do `import` do `js/script.js` no mesmo passo. Na **`M1-T11`**, idem, com `JÁ FEITO NA M1-T11:` no cabeçalho do `js/ui.js`, nos pontos que citavam `PLACEHOLDER_UI`, no bloco dele dentro do esboço — que segue ali — e nas notas dos `import` e da etapa 9 do `js/script.js`. O cabeçalho do esboço do `js/ui.js` registra o porquê na primeira vez que isso aconteceu: `DONO DESTA ETAPA` continua sendo o do autor do esboço, e quem executou a etapa foi outra pessoa. **Confira por `grep -rn "JÁ FEITO NA M1-T" js/`**, não pelo número de linha: o marcador sobrevive a qualquer inserção, a linha não.
+**O que é proibido dentro de comentário.** Parágrafo longo, narração de história de task e vocabulário de projeto: `RF` + número, `M1-T`, `task`, `briefing`, `risco`, `quadro`. Nenhum desses nomes fala de código — eles falam de estado e de rastreamento, e estado e rastreamento moram no `docs/KANBAN.md`. Comentário explica a linha, quadro guarda a tarefa: copiar o identificador de uma task para dentro de comentário é guardar no código um dado que já tem casa própria, e quem vier depois paga o preço procurando estado no lugar errado.
+
+**Por que a regra mudou.** Os esboços da seção 5.1 do briefing cumpriram o papel deles: cada bloco virou código, e o que sobrou deles foi comentário. A densidade chegou a **82% dos arquivos — 2165 linhas de comentário contra 486 que não são comentário, das quais 371 são código e 115 em branco**. Nessa proporção o comentário pesa mais que o código e a leitura vira arqueologia. O raciocínio do professor está mais assegurado por uma docstring concentrada, no topo do que ela descreve, do que por parágrafo espalhado pelo corpo — e **o aluno continua tendo de explicar cada linha**, que é o que a autorização de IA da seção 1 continua exigindo. Mudou o recipiente, não a obrigação: agora a explicação vem pelo cabeçalho e pela docstring, que é onde quem lê procura primeiro.
+
+**Registro histórico.** A regra antiga existiu e foi aplicada de fato: na **`M1-T09`**, o bloco das classes em `js/modelo.js`, e na **`M1-T11`**, o do `renderizarCard` em `js/ui.js`, receberam dentro do próprio esboço a anotação de etapa cumprida, com o nome da task ao lado do passo. Ela foi **aposentada em 04/10/2026**, nesta mesma mudança, junto com os esboços. **Não é um esquecimento, é uma decisão** — e a razão está no parágrafo anterior: estado não se escreve dentro do código. O texto literal do marcador saiu deste arquivo junto com a regra, de propósito; quem quiser conferir o que sobrou dele procura no `js/`, nunca aqui.
+
+**Como verificar.** Dois comandos: um mede o problema, o outro aponta o alvo.
+
+- Densidade de comentário em `js/`, medida por `grep -hE '^[[:space:]]*(//|/\*|\*)' js/*.js | wc -l` contra `wc -l js/*.js` — hoje **2165 de 2651, que é 82%**. Não tem alvo, é só o número que motivou esta seção.
+- Vocabulário de projeto em `js/`, medido por `grep -rnE 'RF[0-9]+|M1-T[0-9]+|briefing|risco|quadro|task' js/ | wc -l` — o alvo é **0**. Um valor maior que zero significa que vocabulário de estado e de rastreamento sobrou em comentário, e o `js/` está em desacordo com a convenção escrita aqui: estado mora no `docs/KANBAN.md`, não no código. Quem for julgar roda o comando na hora — é ele que responde, nunca este arquivo.
 
 ### Gotchas técnicas do projeto
 
@@ -326,7 +337,7 @@ Prazo: **05/10/2026 até 22h**, contado pela última atualização no repositór
 - Sem `console.log` no código entregue — o professor afastou esse requirement do briefing.
 - Sem `!important`: ajuste o seletor ou apague a regra.
 - `localStorage` sempre em `try/catch`, com `removeItem` liberado e `clear()` proibido.
-- Esboço comentado anotável com `JÁ FEITO NA M1-Txx:`, nunca apagado em silêncio.
+- Comentário em três formas: cabeçalho de módulo, docstring `/** */` acima de função, método ou classe, e inline de no máximo uma linha, sem vocabulário de projeto.
 - Versione arquivo por nome explícito, com `git add <arquivo>`.
 
 > **Regra de precedência:** quando este arquivo, o `docs/KANBAN.md` e o PDF divergirem, o **PDF vence** — é o briefing do professor. Corrija os outros dois. Para o *como* escrever o código, a fonte de verdade é a seção 2.1.
