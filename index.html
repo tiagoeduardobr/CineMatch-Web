@@ -3,16 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- O <title> descreve o assunto da página em vez de só nomear a marca: é o que
-       aparece na aba do navegador e no resultado de busca, junto da meta description. -->
     <title>CineMatch — Recomendação de Séries em Tempo Real</title>
-    <!-- A meta description resume a página para os resultados de busca (RF01/RF13). -->
     <meta
       name="description"
       content="CineMatch: receba recomendações de séries em tempo real a partir do seu perfil de gêneros favoritos, com catálogo real da TVMaze e compatibilidade calculada para você."
     />
-    <!-- As cinco og tags (Open Graph) controlam como a página aparece quando
-       compartilhada em redes sociais: título, descrição, tipo, URL e imagem. -->
     <meta
       property="og:title"
       content="CineMatch — Recomendação de Séries em Tempo Real"
@@ -38,36 +33,6 @@
     <a class="skip-link" href="#conteudo-principal"
       >Pular para o conteúdo principal</a
     >
-    <!--
-    CineMatch Web — por que esta página é organizada assim.
-
-    1. Onde cada coisa mora. O index.html fica na raiz porque é o arquivo que o
-       live-server serve em "/": colocado em subpasta, a URL de entrada mudaria
-       e o "npm start" deixaria de apontar para a página. A folha de estilo vai
-       em css/, os três módulos ES em js/ e a imagem em assets/. Os três módulos
-       (script.js, ui.js e modelo.js) estão na mesma pasta de propósito, para
-       que o import entre eles seja um caminho relativo curto, "./ui.js", sem
-       subir e descer diretórios.
-
-    2. Por que <script type="module"> e não um <script> comum. Um módulo ES é
-       buscado com a política de origem do documento, então ele nunca carrega
-       via file://: abrir o index.html por duplo clique dispara erro de CORS nos
-       import e a página fica sem JavaScript. Por isso a página só funciona
-       servida, com "npm start" subindo o live-server na porta 8080.
-
-    3. O único h1. A marca "CineMatch" no nav é o único <h1> da página, porque
-       existe um único h1 por documento e ele identifica o assunto dela. As
-       seções usam <h2>, que é a hierarquia com que o leitor de tela navega.
-       A seção de resultados contém #template-card-serie, um article oculto com
-       campos normalizados para a futura renderização das séries; ela ainda
-       não é preenchida pela lógica JavaScript.
-
-    4. De qual task do quadro vem cada bloco. M1-T02 dá os landmarks
-       (header, main, section e footer), o lang e o title; M1-T03 dá o
-       #form-perfil (nome, idade, o fieldset de gêneros e o botão de submit,
-       cuja captura pelo evento submit é a M1-T05); M1-T04 dá o estilo, externo
-       em css/style.css, mobile-first e com Flexbox.
-  -->
     <header>
       <nav class="barra-navegacao">
         <h1 class="marca">CineMatch</h1>
@@ -111,7 +76,6 @@
       </nav>
     </header>
 
-    <!-- A <main> recebe o id que é o alvo do skip link no topo do body. -->
     <main id="conteudo-principal">
       <section class="capa" aria-label="Capa CineMatch">
         <div class="conteudo-capa">

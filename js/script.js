@@ -15,6 +15,7 @@
 import {
   renderizarCard,
   exibirMensagemDeErro,
+  exibirErrosDeFormulario,
   exibirMensagemDeCatalogoVazio,
   exibirMensagemDeBoasVindas,
   exibirContadorDeRecalculos,
@@ -23,7 +24,6 @@ import {
 } from "./ui.js";
 import { Conteudo, Serie } from "./modelo.js";
 
-// Literal único é o contrato entre quem grava e quem lê: chave divergente devolve null e quebra o perfil em silêncio.
 const CHAVE_PERFIL = "cinematchPerfil";
 
 /**
@@ -121,12 +121,33 @@ function mostrarFormulario(mensagem) {
 }
 
 /**
+ * Devolve todas as mensagens da validação do perfil.
+ * A função só verifica os dados; a criação da lista acessível fica em ui.js.
+ */
+function validarUsuario(usuario) {
+  const erros = [];
+
+  if (usuario.nome === "") {
+    erros.push("Informe seu nome.");
+  }
+
+  if (Number.isNaN(usuario.idade) || usuario.idade < 1) {
+    erros.push("Informe uma idade válida.");
+  }
+
+  if (usuario.generosFavoritos.length === 0) {
+    erros.push("Selecione pelo menos um gênero favorito.");
+  }
+
+  return erros;
+}
+
+/**
  * Liga o formulário e o botão "Trocar perfil": valida no submit, grava o
  * perfil, mostra os resultados e dispara a busca do catálogo.
  */
 function iniciarFormulario() {
   const formPerfil = document.querySelector("#form-perfil");
-  const formularioStatus = document.querySelector("#formulario-status");
   const botaoTrocarPerfil = document.querySelector("#botao-trocar-perfil");
 
   botaoTrocarPerfil.addEventListener("click", function () {
@@ -158,34 +179,10 @@ function iniciarFormulario() {
       generosFavoritos: generosFavoritos,
     };
 
-    const erros = [];
-
-    if (usuario.nome === "") {
-      erros.push("Informe seu nome.");
-    }
-
-    if (Number.isNaN(usuario.idade) || usuario.idade < 1) {
-      erros.push("Informe uma idade válida.");
-    }
-
-    if (usuario.generosFavoritos.length === 0) {
-      erros.push("Selecione pelo menos um gênero favorito.");
-    }
-
-    formularioStatus.textContent = "";
+    const erros = validarUsuario(usuario);
 
     if (erros.length > 0) {
-      const mensagemErros = document.createElement("ul");
-      mensagemErros.setAttribute("role", "alert");
-      mensagemErros.setAttribute("aria-live", "assertive");
-
-      for (let i = 0; i < erros.length; i++) {
-        const itemErro = document.createElement("li");
-        itemErro.textContent = erros[i];
-        mensagemErros.appendChild(itemErro);
-      }
-
-      formularioStatus.appendChild(mensagemErros);
+      exibirErrosDeFormulario(erros);
       return;
     }
 
@@ -193,21 +190,17 @@ function iniciarFormulario() {
     let aviso = "";
 
     if (!persistiu) {
-      // O espaço inicial é proposital: o aviso entra no fim de frases de três destinos diferentes.
       aviso = ` Não foi possível salvar o perfil neste navegador, então ele não será lembrado na próxima visita.`;
     }
 
     mostrarResultados(usuario, aviso);
 
-    // Sem await: o catch interno nunca relança; o aviso vai junto porque o carregando sobrescreve a saudação.
     buscarCatalogo(aviso, usuario.generosFavoritos, usuario.nome);
   });
 }
 
-// URL escrita uma só vez, pela mesma razão da CHAVE_PERFIL: uma troca de página é uma edição.
 const URL_CATALOGO = "https://api.tvmaze.com/shows?page=0";
 
-// Começa vazio para a leitura nunca estourar se algo ler a variável antes de a rede responder.
 let catalogoBruto = [];
 
 /**
@@ -254,63 +247,66 @@ function concluirBusca(nome, callback) {
 async function buscarCatalogo(aviso, generosFavoritos, nome) {
   const statusResultados = document.querySelector("#resultados-status");
 
-  // Carregando escrito antes do fetch: é o que distingue "rede lenta" de "página parada".
+  renderizarCards([]);
   exibirMensagemDeCarregando();
 
-  // Frase única para os dois catch; o `${aviso}` reentra porque o carregando apagou o recado antes de qualquer paint.
-  const mensagemDeErro = `Não foi possível carregar as séries agora. Verifique sua conexão com a internet e tente novamente.${aviso}`;
+  const mensagemDeErro = criarMensagemDeErroDaBusca(aviso);
 
   try {
     const resposta = await fetch(URL_CATALOGO);
 
-    // response.ok antes de ler o corpo: status de erro ainda tem corpo, que pareceria catálogo.
     if (resposta.ok === false) {
       throw new Error(`A TVMaze respondeu com status ${resposta.status}.`);
     }
 
-    // json() também lança e fica dentro do try de propósito: corpo que não é JSON cai no mesmo catch.
     const corpo = await resposta.json();
 
-    // Guarda de formato lançada para o mesmo catch; lista vazia legítima passa daqui.
     if (corpo === null || corpo.length === undefined) {
       throw new Error("A resposta da TVMaze não veio como lista de séries.");
     }
 
-    // A resposta bruta fica guardada sem filtro: filtrar genres e rating é o trabalho de tratarCatalogo.
     catalogoBruto = corpo;
 
-    // Tratamento e cálculo ficam dentro do try: exceção de formato vira estado de erro amigável, nunca página quebrada.
     catalogoTratado = tratarCatalogo(catalogoBruto);
     catalogoRecomendado = calcularCompatibilidades(generosFavoritos);
 
-    // O try/catch de dentro não é redundante: o callback do setTimeout roda em outro ciclo de eventos, depois que este try já terminou.
     exibirResultadosComAtraso(function () {
       try {
-        // Antes do if: mesmo com a lista tratada vazia, a limpeza roda e tira os cards do perfil anterior.
         renderizarCards(catalogoRecomendado);
 
-        // exibirMensagemDeBoasVindas vai como argumento, sem parênteses: quem dispara é concluirBusca.
         concluirBusca(nome, exibirMensagemDeBoasVindas);
 
-        // O total sai pronto de obterTotal(): passar o par ao ui.js daria acesso ao estado privado.
         exibirContadorDeRecalculos(contadorRecomendacoes.obterTotal());
 
-        // Todos os estados escrevem no mesmo #resultados-status, então um some quando o outro entra.
         if (catalogoTratado.length === 0) {
-          // Não é falha da chamada: o fetch respondeu e só o filtro não deixou nada de pé.
           exibirMensagemDeCatalogoVazio(aviso);
         } else {
           statusResultados.textContent = `Catálogo carregado: ${catalogoBruto.length} séries disponíveis, ${catalogoTratado.length} depois do tratamento.${aviso}`;
         }
       } catch (erro) {
-        // Exceção do desenho, não da rede: à tela vai a frase amigável, nunca erro.message.
-        exibirMensagemDeErro(mensagemDeErro);
+        tratarErroDaBusca(mensagemDeErro);
       }
     });
   } catch (erro) {
-    // Erro da chamada, sem atraso: adiar a frase faria a página parecer travada com o erro já conhecido.
-    exibirMensagemDeErro(mensagemDeErro);
+    tratarErroDaBusca(mensagemDeErro);
   }
+}
+
+/**
+ * Mantém a mensagem amigável da rede em um único lugar.
+ * O erro técnico não é exposto na tela; o fluxo mostra a orientação ensinada
+ * para falhas de fetch e conserva o aviso de persistência quando existir.
+ */
+function criarMensagemDeErroDaBusca(aviso) {
+  return `Não foi possível carregar as séries agora. Verifique sua conexão com a internet e tente novamente.${aviso}`;
+}
+
+/**
+ * Centraliza os dois caminhos de falha da busca: rede/resposta e renderização
+ * atrasada. Ambos terminam no estado de erro da interface.
+ */
+function tratarErroDaBusca(mensagem) {
+  exibirMensagemDeErro(mensagem);
 }
 
 let catalogoTratado = [];
@@ -330,7 +326,15 @@ let catalogoRecomendado = [];
  */
 function tratarCatalogo(bruto) {
   return bruto
-    .filter((serie) => serie.genres.length > 0 && serie.rating.average)
+    .filter(
+      (serie) =>
+        serie.genres !== null &&
+        serie.genres !== undefined &&
+        serie.genres.length > 0 &&
+        serie.rating !== null &&
+        serie.rating !== undefined &&
+        serie.rating.average,
+    )
     .sort((a, b) => b.rating.average - a.rating.average)
     .slice(0, 8)
     .map((serie) => ({
@@ -360,7 +364,6 @@ function calcularCompatibilidades(generosFavoritos) {
     const serie = new Serie(item.titulo, item.generos, item.duracaoMinutos);
     const compatibilidade = serie.calcularCompatibilidade(generosFavoritos);
 
-    // Cinco campos, e nenhum outro: o `id` não é copiado porque ninguém o consome.
     return {
       titulo: item.titulo,
       imagem: item.imagem,
@@ -371,7 +374,6 @@ function calcularCompatibilidades(generosFavoritos) {
     };
   });
 
-  // O contador conta aqui: quem recalcula é esta função, e é nela que o total anda uma casa.
   contadorRecomendacoes.incrementar();
 
   return recomendacoes;
@@ -409,17 +411,14 @@ function criarContadorDeRecomendacoes() {
   };
 }
 
-// A factory roda uma única vez no escopo do módulo: cada chamada criaria um `total` novo e o número na tela seria sempre 1.
 const contadorRecomendacoes = criarContadorDeRecomendacoes();
 
-// Todo o estado acima é declarado antes do guard: com perfil salvo ele chama buscarCatalogo, e `const` e `let` cairiam em temporal dead zone.
 if (typeof document !== "undefined") {
   const perfilSalvo = lerPerfilSalvo();
 
   if (perfilSalvo) {
     mostrarResultados(perfilSalvo, "");
 
-    // Sem await, pelo mesmo raciocínio do submit: o catch interno nunca relança.
     buscarCatalogo("", perfilSalvo.generosFavoritos, perfilSalvo.nome);
   } else {
     mostrarFormulario("Preencha o formulário para receber recomendações.");

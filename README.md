@@ -118,8 +118,8 @@ Responsabilidades dos três módulos JavaScript (RF14):
 
 | Arquivo | Responsabilidade | O que **não** faz |
 | --- | --- | --- |
-| `js/script.js` | Orquestra o fluxo: valida o formulário, persiste o perfil, busca o catálogo e chama o cálculo | Não escreve cards na tela |
-| `js/ui.js` | Tudo que toca o DOM: estados da chamada, `renderizarCard`, saudação, contador e `setTimeout` | Não calcula compatibilidade |
+| `js/script.js` | Orquestra o fluxo: valida o formulário, persiste o perfil, busca o catálogo e chama o cálculo; controla a troca entre formulário e resultados | Não monta cards nem listas de erros no DOM |
+| `js/ui.js` | Componentes visuais: estados da chamada, lista de erros, `renderizarCard`, saudação, contador e `setTimeout` | Não calcula compatibilidade nem controla o fluxo da aplicação |
 | `js/modelo.js` | As classes `Conteudo` e `Serie` e a fórmula de compatibilidade | Não acessa `document` nem `localStorage` |
 
 ---
@@ -295,7 +295,7 @@ Itens registrados no [quadro Kanban](docs/KANBAN.md), na coluna *Backlog* — b�
 - **Buscar mais páginas da TVMaze** (`?page=1`, `?page=2`…) para ampliar o catálogo disponível além da página 0 consultada hoje.
 - **Modo escuro** com um toggle de tema, reforçando a manipulação de classes via `classList`.
 - **Combinar com uma API de filmes**, voltando a ter "filmes e séries" como no mini-projeto original.
-- **Tela de login funcional** — o layout já existe em `index.html`, mas os botões são `type="button"` sem comportamento: back-end é proibido no Módulo 01, então a autenticação real exigiria outra disciplina.
+- **Tela de login** — foi uma ideia de bônus descartada e removida do `index.html`, porque autenticação e back-end estão fora do escopo do Módulo 01.
 
 ---
 

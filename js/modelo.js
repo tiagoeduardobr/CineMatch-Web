@@ -92,7 +92,6 @@ export class Serie extends Conteudo {
   calcularCompatibilidade(generosFavoritos) {
     const favoritosNormalizados = generosFavoritos.map(normalizarTexto);
 
-    // Dois filter com o mesmo predicado, um negando: o segundo é o de sobra, que a fórmula pura não produz.
     const generosEmComum = this.generos.filter((genero) =>
       favoritosNormalizados.includes(normalizarTexto(genero)),
     );
@@ -106,7 +105,6 @@ export class Serie extends Conteudo {
       100
     ).toFixed(0);
 
-    // Os textos das faixas são contrato com o renderizarCard e com as classes do badge no CSS.
     let classificacao;
     if (Number(percentual) >= 80) {
       classificacao = "Alta afinidade";

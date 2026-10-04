@@ -138,20 +138,6 @@ body {
 	content: "";
 }
 
-.links-navegacao .ativo {
-	color: var(--cor-dourado-claro);
-}
-
-.links-navegacao .ativo::after {
-	position: absolute;
-	right: 0;
-	bottom: -5px;
-	left: 0;
-	height: 2px;
-	background: var(--cor-dourado);
-	content: "";
-}
-
 .acoes-navegacao {
 	display: flex;
 	align-items: center;
@@ -250,7 +236,6 @@ body {
    PADRÃO DAS SEÇÕES
    ========================= */
 
-.secao-login,
 .secao-perfil,
 .secao-resultados {
 	width: 100%;
@@ -258,7 +243,6 @@ body {
 	background: var(--cor-fundo);
 }
 
-.secao-login + .secao-perfil,
 .secao-perfil + .secao-resultados {
 	border-top: 1px solid rgba(217, 174, 109, 0.08);
 }
@@ -271,9 +255,9 @@ body {
 	display: none;
 }
 
-.cartao-login,
 .cartao-perfil {
 	width: 100%;
+	max-width: 900px;
 	margin: 0 auto;
 	padding: 28px 22px;
 	background:
@@ -288,15 +272,6 @@ body {
 	box-shadow: 0 20px 50px var(--cor-sombra);
 }
 
-.cartao-login {
-	max-width: 520px;
-}
-
-.cartao-perfil {
-	max-width: 900px;
-}
-
-.cartao-login h2,
 .cartao-perfil h2,
 .cabecalho-resultados h2 {
 	margin-bottom: 10px;
@@ -307,12 +282,10 @@ body {
 	letter-spacing: 0.4px;
 }
 
-.cartao-login h2::first-letter,
 .cartao-perfil h2::first-letter {
 	color: var(--cor-dourado-claro);
 }
 
-.cartao-login > p,
 .cabecalho-resultados p {
 	color: var(--cor-texto-muted);
 	line-height: 1.7;
@@ -352,7 +325,6 @@ body {
    FORMULÁRIOS
    ========================= */
 
-.formulario-login,
 #form-perfil {
 	display: flex;
 	flex-direction: column;
@@ -364,20 +336,17 @@ body {
 	display: none;
 }
 
-.formulario-login > div,
 #form-perfil > div {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 }
 
-.formulario-login label,
 #form-perfil > div label {
 	color: var(--cor-texto);
 	font-size: 15px;
 }
 
-.formulario-login input,
 #form-perfil input[type="text"],
 #form-perfil input[type="number"] {
 	width: 100%;
@@ -391,27 +360,22 @@ body {
 	transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
-.formulario-login input::placeholder,
 #form-perfil input::placeholder {
 	color: var(--cor-texto-muted);
 }
 
-.formulario-login input:hover,
 #form-perfil input[type="text"]:hover,
 #form-perfil input[type="number"]:hover {
 	border-color: var(--cor-borda-forte);
 }
 
-.formulario-login input:focus,
 #form-perfil input:focus {
 	border-color: var(--cor-dourado);
 	background: #0e0e0e;
 	outline: none;
 }
 
-.formulario-login input:focus-visible,
 #form-perfil input:focus-visible,
-.formulario-login button:focus-visible,
 #form-perfil button:focus-visible,
 #botao-trocar-perfil:focus-visible {
 	outline: 2px solid var(--cor-dourado);
@@ -422,7 +386,6 @@ body {
    BOTÕES
    ========================= */
 
-.formulario-login button,
 #form-perfil button,
 #botao-trocar-perfil {
 	min-height: 44px;
@@ -440,20 +403,10 @@ body {
 		color 0.2s ease;
 }
 
-.formulario-login button:hover,
 #form-perfil button:hover,
 #botao-trocar-perfil:hover {
 	background: var(--cor-dourado-claro);
 	border-color: var(--cor-dourado-claro);
-}
-
-.formulario-login button:last-of-type {
-	background: transparent;
-	color: var(--cor-dourado);
-}
-
-.formulario-login button:last-of-type:hover {
-	background: rgba(217, 174, 109, 0.1);
 }
 
 /* =========================
@@ -507,12 +460,6 @@ body {
 	height: 16px;
 	margin: 0;
 	accent-color: var(--cor-dourado);
-}
-
-.genero--selecionado {
-	background: rgba(217, 174, 109, 0.14);
-	border-color: var(--cor-dourado);
-	color: var(--cor-dourado-claro);
 }
 
 /* =========================
@@ -727,13 +674,11 @@ footer {
 		padding: 0 5%;
 	}
 
-	.secao-login,
 	.secao-perfil,
 	.secao-resultados {
 		padding: 72px 8%;
 	}
 
-	.cartao-login,
 	.cartao-perfil {
 		padding: 34px;
 	}
@@ -801,7 +746,6 @@ footer {
 		height: clamp(240px, 62vw, 430px);
 	}
 
-	.secao-login,
 	.secao-perfil,
 	.secao-resultados {
 		padding: 42px 5%;
@@ -835,7 +779,6 @@ footer {
 		height: 300px;
 	}
 
-	.cartao-login,
 	.cartao-perfil {
 		padding: 22px 17px;
 	}
