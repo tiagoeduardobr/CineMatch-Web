@@ -32,11 +32,13 @@ Documento de apoio à gravação prevista no item **5.8 do briefing**. Cobre os 
 >
 > O objetivo deste projeto é pegar essa mesma lógica e dar a ela uma interface que qualquer pessoa abre no navegador — inclusive no celular. A pessoa preenche um formulário com nome, idade e gêneros; o perfil fica guardado no `localStorage`; o site busca o catálogo **real** na API pública da TVMaze; e devolve cards com séries ordenadas por compatibilidade, com um badge dizendo se a afinidade é alta, média ou baixa."
 
-**Tela — demonstração em 3 movimentos:**
+**Tela — demonstração em 5 movimentos, sem trocar de contexto:**
 
 1. Formulário: preencha na frente da câmera, mostre os erros de validação se deixar um campo vazio.
 2. Os cards aparecendo — e diga o que a pessoa está vendo: *"esse aqui tem 92% de afinidade porque temos três gêneros em comum"*.
 3. Recarregue a página — o perfil volta sozinho. É o `localStorage` provando que funciona.
+4. Clique em **Meu Perfil**: mostre que o formulário é preenchido novamente e que o perfil não é apagado; explique que só **Trocar perfil** remove os dados.
+5. Mostre **Minha Lista** e **Sobre o CineMatch**: cada item abre uma tela exclusiva, ocultando as outras seções; clique em **Início** e mostre o retorno às recomendações.
 
 **Frases que valem mostrar, porque é o que o professor pontua (Critério 5):**
 
@@ -65,9 +67,9 @@ Documento de apoio à gravação prevista no item **5.8 do briefing**. Cobre os 
 
 ## 3:35 — 4:50 · Tópico 3 — Organização das tarefas
 
-> "Antes de escrever uma linha de código, eu separei o trabalho em **25 tasks** num quadro Kanban — `M1-T00` até `M1-T24` —, cada uma com seus critérios de aceitação e rastreabilidade para os 15 requisitos funcionais. Cada task só sai de *A Fazer* quando o código **funciona e foi testado**, não quando foi escrito.
+> "Antes de escrever uma linha de código, eu separei o trabalho em tasks num quadro Kanban — de `M1-T00` até `M1-T24` —, cada uma com critérios de aceitação e rastreabilidade para os 15 requisitos funcionais. Cada task só sai de *A Fazer* quando o código **funciona e foi testado**, não quando foi escrito.
 >
-> Hoje estão fechadas **19**. As seis que faltam são de entrega: teste integrado, README, consolidação do fluxo, este vídeo, links e um bônus de interface.
+> As pendências aparecem separadas no próprio quadro: consolidação final, gravação do vídeo e envio dos links. O README e os bônus implementados ficam registrados com a decisão técnica e a data de conclusão.
 >
 > A regra que usei pra não me perder: uma task só entra em *Em andamento* com timestamp e responsável na própria linha, e o checkbox é a única fonte de verdade do estado."
 
@@ -88,7 +90,7 @@ Documento de apoio à gravação prevista no item **5.8 do briefing**. Cobre os 
 
 **Números que sustentam o discurso:**
 
-> "São **111 commits** em `develop`, todos em Conventional Commits: **20** `feat:`, **11** `style:`, **38** `docs:`, além de `chore:` e `refactor:` e os merges. Arquivo por arquivo, com `git add <arquivo>` — nunca `git add .`"
+> "A branch de integração reúne commits em Conventional Commits, separados por funcionalidade e documentação, além dos merges. Os arquivos foram versionados explicitamente com `git add <arquivo>` — nunca `git add .`."
 
 **Tela:** `git branch -a`, depois `git log --oneline --graph --all | head -30`.
 
@@ -98,11 +100,11 @@ Documento de apoio à gravação prevista no item **5.8 do briefing**. Cobre os 
 
 > "Três coisas, sem maquiagem.
 >
-> **Primeiro:** o catálogo pega só a primeira página da TVMaze. Dá pra buscar `?page=1`, `?page=2` e ampliar bastante — está no backlog.
+> **Primeiro:** a busca está limitada às páginas 0, 1 e 2 da TVMaze. Dá para ampliar esse intervalo no futuro, mas mantive um limite explícito para não fazer uma quantidade indefinida de requisições.
 >
-> **Segundo:** quem está vendo os cards não consegue filtrar por gênero nem ordenar por avaliação sem preencher o formulário de novo. As funções de array já estão lá — o `sort` com `localeCompare` em português existe —, falta só a interface chamar.
+> **Segundo:** o bônus de interface já permite filtrar por gênero, ordenar por compatibilidade, avaliação ou título, alternar o tema escuro pelo tema sépia, pesquisar títulos e navegar entre telas exclusivas. A Geolocation API também é opcional: se autorizada, a latitude e a longitude são comparadas com uma lista local para personalizar a saudação com a cidade mais próxima.
 >
-> **Terceiro:** falta o teste integrado em celular de verdade. Eu validei o comportamento, mas o teste manual em dispositivo físico ainda é pendência minha."
+> **Terceiro:** ainda falta o teste integrado em celular de verdade. Eu validei o comportamento no navegador, mas o teste manual em dispositivo físico continua sendo uma melhoria."
 
 **Encerramento:**
 

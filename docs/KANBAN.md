@@ -14,7 +14,7 @@ Evolução do *CineMatch JS* (motor de recomendação que rodava no terminal Nod
 | **API utilizada** | TVMaze API — `https://api.tvmaze.com/shows?page=0` (API pública, sem chave) |
 | **Stack** | HTML5 + CSS3 (Flexbox, mobile-first) + JavaScript com módulos ES nativos — sem frameworks, sem build |
 | **Pacote de apoio** | `live-server` via npm (apenas servidor local de desenvolvimento) |
-| **Total de tarefas** | 25 tarefas (`M1-T00` a `M1-T24`) + 9 itens no Backlog (7 bônus das seções 8 e RF12 + 1 opcional da seção 5.4 + 1 bônus de interface fora do escopo do briefing) |
+| **Total de tarefas** | 25 tarefas (`M1-T00` a `M1-T24`) + 10 itens no Backlog (7 bônus das seções 8 e RF12 + 1 opcional da seção 5.4 + 1 bônus de interface fora do escopo do briefing + 1 melhoria de navegação) |
 
 ---
 
@@ -75,16 +75,17 @@ Regras do bloco:
 
 Ideias de bônus da seção 8 do briefing e melhorias possíveis. **Não contam para nota** — só entram na coluna *Concluído* depois que todos os RFs estiverem entregues.
 
-> Os itens do Backlog reproduzem as ideias de bônus da seção 8 do briefing (opcional, sem nota), o bônus opcional do RF12 (Geolocation), o item opcional da seção 5.4 (Bootstrap / Font Awesome via CDN) e a ideia de tela de login, que foi removida do código por estar fora do escopo. São **9 itens**, e nenhum deles conta para a nota.
+> Os itens do Backlog reproduzem as ideias de bônus da seção 8 do briefing (opcional, sem nota), o bônus opcional do RF12 (Geolocation), o item opcional da seção 5.4 (Bootstrap / Font Awesome via CDN), a melhoria de navegação e a ideia de tela de login, que foi removida do código por estar fora do escopo. São **10 itens**, e nenhum deles conta para a nota.
 
-- [ ] **Filtro por gênero** na tela de resultados, para refinar sem preencher o formulário de novo
-- [ ] **Ordenar os cards** por compatibilidade, nome ou avaliação (reaproveitando `sort`)
-- [ ] **Buscar mais de uma página** da TVMaze API (`?page=1`, `?page=2`...) para ampliar o catálogo disponível
-- [ ] **Publicar o projeto de verdade** — GitHub Pages, Netlify ou Vercel — para ter um link público no portfólio
-- [ ] **Modo escuro**, com um toggle simples de tema reforçando a manipulação de classes via `classList`
+- [x] **Filtro por gênero** na tela de resultados, para refinar sem preencher o formulário de novo — `select` acessível e filtro aplicado sem nova requisição. – Concluído em 04/10/2026:21:57 por Tiago 🟡
+- [x] **Ordenar os cards** por compatibilidade, nome ou avaliação (reaproveitando `sort`) — a ordenação atua sobre uma cópia e preserva a lista original. – Concluído em 04/10/2026:21:57 por Tiago 🟡
+- [x] **Buscar mais de uma página** da TVMaze API (`?page=1`, `?page=2`...) para ampliar o catálogo disponível — páginas 0, 1 e 2 buscadas em paralelo com validação individual. – Concluído em 04/10/2026:21:57 por Tiago 🟡
+- [x] **Publicar o projeto de verdade** — GitHub Pages, Netlify ou Vercel — para ter um link público no portfólio — publicação em GitHub Pages registrada no README. – Concluído em 04/10/2026:21:57 por Tiago 🟡
+- [x] **Modo escuro**, com um toggle simples de tema reforçando a manipulação de classes via `classList` — implementado como tema sépia/fantasia clara alternável e persistido. – Concluído em 04/10/2026:21:57 por Tiago 🟡
 - [ ] **Combinar com uma API de filmes**, voltando a ter "filmes e séries" como no mini-projeto original
-- [ ] **Geolocation API** para uma sugestão contextual (saudação ou recomendação diferente conforme a localização), como bônus do RF12
-- [ ] **Bootstrap / Font Awesome** via CDN (opcional do PDF, seção 5.4) — se usar, apenas via CDN e sem `npm install`
+- [x] **Geolocation API** para uma sugestão contextual (saudação ou recomendação diferente conforme a localização), como bônus do RF12 — autorização compara a posição com uma lista local de cidades, priorizando municípios de SC, e personaliza a saudação; coordenadas não são persistidas nem enviadas. – Concluído em 04/10/2026:21:57 por Tiago 🟡
+- [x] **Bootstrap / Font Awesome** via CDN (opcional do PDF, seção 5.4) — decisão documentada: não adicionar dependência; os ícones usam SVG nativo e o layout usa CSS próprio. – Concluído em 04/10/2026:21:57 por Tiago 🟡
+- [x] **Navegação por telas na navbar** — “Sobre”, “Minha Lista” e “Meu Perfil” exibem apenas sua própria seção; “Início” restaura o estado anterior e, com perfil salvo, prioriza as recomendações. O botão de perfil preenche os dados salvos sem apagar o registro; “Trocar perfil” continua sendo a ação explícita de remoção. – Concluído em 04/10/2026:22:37 por Tiago 🟡
 - [ ] **Tela de login** (e-mail, senha, "Entrar" e "Criar conta") — ideia de bônus descartada e removida do `index.html`, pois não faz parte do escopo do briefing. **Não conta nota**
 
 ---
@@ -99,14 +100,13 @@ Ideias de bônus da seção 8 do briefing e melhorias possíveis. **Não contam 
 
 ## Em Andamento
 
-- [ ] `M1-T21` **Entrega — Commits descritivos e fluxo de branches.** Fazer pelo menos 5 commits padronizados por funcionalidade (prefixos `feat:`, `style:`, `docs:`) seguindo o fluxo `feature/cinematch-web` (lógica), `feature/cinematch-web-interface` (interface/UI) → `develop` → `main`, garantindo que todo o código esteja na `main` ao final; em squad: 8 commits e as duas branches de feature da seção 5.6. Não é preciso criar uma branch para cada RF — o objetivo é mostrar que sabe separar trabalho numa branch de feature e trazer de volta para a `develop`, não multiplicar branches. *Depende de: M1-T20.* *Progresso: iniciada em 04/10/2026:20:32 para consolidar os commits locais e integrar as branches em `develop` e `main` sem push nesta etapa.* – Em andamento desde 04/10/2026:20:32 por Tiago 🟡
-
-*Nenhuma tarefa em andamento no momento.*
+_Nenhuma tarefa em andamento no momento._
 
 ---
 
 ## Concluído
 
+- [x] `M1-T21` **Entrega — Commits descritivos e fluxo de branches.** Fazer pelo menos 5 commits padronizados por funcionalidade (prefixos `feat:`, `style:`, `docs:`) seguindo o fluxo `feature/cinematch-web` (lógica), `feature/cinematch-web-interface` (interface/UI) → `develop` → `main`, garantindo que todo o código esteja na `main` ao final; em squad: 8 commits e as duas branches de feature da seção 5.6. Não é preciso criar uma branch para cada RF — o objetivo é mostrar que sabe separar trabalho numa branch de feature e trazer de volta para a `develop`, não multiplicar branches. *Depende de: M1-T20.* *Progresso: concluída com os commits finais e a integração local em `develop` e `main`, sem push nesta etapa.* – Concluído em 04/10/2026:22:48 por Tiago 🟡
 - [x] `M1-T00` **Planejar o quadro — Ler o briefing e mapear os 15 RFs e o passo a passo sugerido em tarefas.** Levantamento dos requisitos funcionais RF01–RF15 (seção 5.3), do passo a passo sugerido (seção 5.1), da organização de projeto (5.2), dos requisitos técnicos (5.4), do versionamento Git/GitHub (5.6), dos critérios de avaliação (seção 6), do checklist final de entrega (seção 7) e das ideias de bônus (seção 8), convertendo cada passo em uma tarefa rastreável deste quadro. – Concluído em 25/09/2026:20:28 por Lucas 🟡
 - [x] `M1-T01` **RF15 (parcial) — Bootstrap do projeto.** Criar a estrutura de arquivos do projeto dentro da pasta versionada no Git (`index.html`, `style.css`, `script.js`, `ui.js`, `modelo.js`) e o `package.json` com o script de `live-server`, deixando o repositório pronto para receber o código; aqui só são criados os arquivos em branco e o `package.json` — a instalação e a validação do `live-server` ficam em `M1-T18`. *Sem dependências.* – Concluído em 25/09/2026:22:51 por Lucas 🟡
 - [x] `M1-T03` **RF02 — Formulário de perfil.** Montar `<form id="form-perfil">` dentro da `<main>`: `<label for="nome">` com `<input type="text" id="nome" required>`, `<label for="idade">` com `<input type="number" id="idade" min="1" required>`, `<fieldset>` + `<legend>Gêneros favoritos</legend>` com checkboxes `name="genero"` (Drama, Comédia, Ação e outros) e `<button type="submit">Ver recomendações</button>`. *Depende de: M1-T02.* *Dependência registrada: a M1-T02 foi concluída posteriormente; o formulário foi implementado e validado na M1-T19.* – Concluído em 28/09/2026:20:48 por Lucas 🟡
@@ -158,7 +158,7 @@ Cada linha da tabela abaixo mapeia um requisito funcional do briefing (seção 5
 | Critério | Peso | Tarefa(s) | Coluna atual |
 | --- | --- | --- | --- |
 | 1 — Realizou a gravação de um vídeo? | **1,50** | `M1-T22` | A Fazer |
-| 2 — Versionamento com branches e commits | **1,00** | `M1-T21` | A Fazer |
+| 2 — Versionamento com branches e commits | **1,00** | `M1-T21` | Concluído |
 | 3 — Organização dos arquivos no repositório | **1,00** | `M1-T01`, `M1-T18`, `M1-T20` | Concluído / Concluído / Concluído |
 | 4 — Modelagem do perfil da pessoa usuária e catálogo de séries | **0,50** | `M1-T05` (objeto `usuario`), `M1-T08` (array de séries tratado) | Concluído |
 | Teste integrado do zero (item 18 do checklist) | **Sem peso** — não é critério notado, é boa prática | `M1-T19` | Concluído |
@@ -186,7 +186,7 @@ Cada linha da tabela abaixo mapeia um requisito funcional do briefing (seção 5
 | 10 | **Validação integrada do formulário** — a implementação de `#form-perfil` e os checkboxes `name="genero"` foi validada no navegador durante a `M1-T19`, incluindo o erro sem gênero, o envio válido e o perfil salvo em `localStorage` | Médio | Encerrado na `M1-T19`; manter a validação no teste manual antes da entrega final |
 | 11 | **Responsividade da `M1-T12`** — a grade de `.card-serie` e as media queries de `css/style.css` foram validadas na `M1-T19` em desktop e celular | Médio | Encerrado na `M1-T19`; repetir apenas se houver nova alteração visual |
 | 12 | **Conflito declarado com o briefing sobre `console.log`** — a seção 5.3 do briefing pede, no RF02, "confirmar com `console.log`" a captura do formulário, e no RF04, "registrar o resultado bruto no `console` antes de tratar". O professor afastou esse requisito do código entregue: **não há `console.log` em nenhum dos três módulos**, nem em código executável, nem em comentário. A evidência pedida foi substituída por outra, visível na tela e fora do código: (a) na `M1-T05`, o perfil recebido e a falha da validação são escritos em `#resultados-status`, que é o `role="status"` com `aria-live="polite"` do `index.html`; (b) na `M1-T06`, o sucesso da gravação e a falha de armazenamento também são escritos na tela, e o `try/catch` que a seção 7 exige está implementado; (c) na `M1-T07`, a resposta bruta da TVMaze será conferida na aba Network e no Console do DevTools durante a execução, e o erro de rede aparecerá em `exibirMensagemDeErro`; (d) o `docs/BRIEFING.md` **não** foi alterado — é transcrição do PDF e vale como registro do que o briefing pede, enquanto este quadro vale como registro do que foi entregue. Nesse ponto específico o `AGENTS.md` seção 2.1 e este quadro prevalecem sobre o texto do briefing, e o Critério 13 continua avaliado pelo `try/catch` + `response.ok` + os três estados, que é o que ele de fato mede | Médio — se a avaliação conferir literalmente a palavra `console.log` no código, o RF02 e o RF04 pareceriam incompletos | Manter o `try/catch` e o `response.ok` intactos; citar a troca de evidência no vídeo do Critério 1; e citar a checagem na aba Network e na aba Application como forma de comprovar o resultado bruto e o perfil gravado sem sujar o código. Conflito registrado, não silenciado |
-| 13 | **Parte de tela da `M1-T06` em `js/script.js`** — `mostrarResultados`, `mostrarFormulario` e parte das mensagens ainda ficam no módulo de fluxo, enquanto `ui.js` concentra os componentes e estados de catálogo | Baixo — a separação ideal de responsabilidades não está completa, mas o fluxo funciona e nenhum RF fica incompleto | Dívida arquitetural documentada; mover essas funções para `ui.js` somente em uma task futura com teste de regressão, sem alterar o comportamento validado na `M1-T19` |
+| 13 | **Parte de tela da `M1-T06` em `js/script.js`** — resolvido: `mostrarResultados` e `mostrarFormulario` agora ficam em `js/ui.js`, junto das demais funções que escrevem no DOM | Baixo — a separação ideal de responsabilidades foi concluída sem alterar o fluxo validado na `M1-T19` | Encerrado após mover as funções para `ui.js`, atualizar os `import`/chamadas em `script.js`, remover o template de card não utilizado do `index.html` e passar na validação de sintaxe e diagnósticos |
 | 14 | **Altura da `.midia-serie` no card dinâmico (RF09)** — a ausência de área para a mídia fazia o badge invadir o conteúdo | Médio — o card ficava sem área de imagem e a responsividade era prejudicada | Resolvido na `M1-T12` com `aspect-ratio: 2 / 3` em `.midia-serie`; a `M1-T19` confirmou os cards e imagens no navegador em desktop e celular |
 
 ---
@@ -215,7 +215,7 @@ Reprodução do "Checklist Final de Entrega" da seção 7 do briefing, para conf
 - [x] Testei em desktop e celular – Concluído em 04/10/2026:19:21 por Tiago 🟡
 - [x] Criei o README.md – Concluído em 04/10/2026:12:44 por Tiago 🟡
 - [x] Criei o quadro Kanban – Concluído em 25/09/2026:20:28 por Lucas 🟡
-- [ ] Fiz commits e usei ao menos uma branch de feature no GitHub — a consolidação final em `main` ainda pertence à `M1-T21`
+- [x] Fiz commits e usei ao menos uma branch de feature no GitHub — consolidação local concluída em `develop` e `main`, sem push nesta etapa – Concluído em 04/10/2026:22:48 por Tiago 🟡
 - [ ] Gravei o vídeo de até 7 minutos
 - [ ] Coloquei o vídeo com permissão correta para ver via link
 - [ ] Enviei os links no AVA

@@ -43,7 +43,7 @@ O fluxo completo é:
 | **Estilo** | CSS3 mobile-first com **Flexbox** (`flex-direction`, `flex-wrap`, `gap`), box model, media queries e variáveis CSS no `:root`. **Sem CSS Grid e sem `!important`** |
 | **Lógica** | JavaScript puro, sem nenhuma biblioteca de runtime: `async`/`await`, classes, funções de ordem superior e métodos de array |
 | **Módulos** | Módulos ES nativos: `import` / `export` entre `js/script.js`, `js/ui.js` e `js/modelo.js`, carregados por `<script type="module">` |
-| **Rede** | `fetch` com `async`/`await`, `try`/`catch` e validação de `response.ok` |
+| **Rede** | `fetch` com `async`/`await`, `try`/`catch`, validação de `response.ok` e consulta das páginas 0, 1 e 2 da TVMaze |
 | **Persistência** | `localStorage` (`setItem`, `getItem`, `removeItem`) em `try`/`catch`, com `JSON.stringify` e `JSON.parse` |
 | **POO** | `class`, `extends`, `super()` e `this` |
 | **Tempo** | `setTimeout` da Browser API, aplicado na **exibição** do resultado |
@@ -86,7 +86,7 @@ A TVMaze responde com `Access-Control-Allow-Origin: *`, então a chamada não é
 
 ```text
 CineMatch-Web/
-├── index.html            # Página única: HTML semântico, formulário, seção de resultados e <script type="module">
+├── index.html            # Página única: HTML semântico, navbar, perfil, resultados, lista e <script type="module">
 ├── package.json          # Identidade do projeto, "type": "module" e o script "start" do live-server
 ├── package-lock.json     # Versão exata do live-server resolvida pelo npm
 ├── README.md             # Este arquivo
@@ -260,8 +260,9 @@ Nenhuma regra do `css/style.css` usa `!important`, e o arquivo também não usa 
 
 - **Formulário de perfil validado** — nome, idade (`min="1"`) e dez opções de gênero; a validação roda no `submit` com `preventDefault()` e `FormData`, acumula os erros num array e os exibe como lista com `role="alert"` (RF02).
 - **Perfil persistido** — salvo em `localStorage` na chave **`cinematchPerfil`**, com `try`/`catch` em leitura e escrita; havendo perfil salvo, o formulário é pulado na próxima visita. O botão **"Trocar perfil"** apaga a chave com `removeItem` e reabre a coleta (RF03).
-- **Catálogo real da TVMaze** — `fetch` em `https://api.tvmaze.com/shows?page=0` com `try`/`catch`, validação de `response.ok` e guarda de formato, tratando os **três estados**: *carregando*, *vazio* ("Não encontramos recomendações agora") e *erro* com mensagem amigável (RF04).
-- **Tratamento com métodos de array** — cadeia `filter` (só títulos com gênero e nota) → `sort` (nota decrescente) → `slice(0, 8)` → `map` (forma normalizada `{ id, titulo, tipo, generos, duracaoMinutos, imagem }`), além dos `filter` que separam gêneros em comum e não explorados (RF05).
+- **Catálogo real da TVMaze** — `fetch` em `https://api.tvmaze.com/shows?page={0,1,2}` com `try`/`catch`, validação de `response.ok` e guarda de formato, tratando os **três estados**: *carregando*, *vazio* ("Não encontramos recomendações agora") e *erro* com mensagem amigável (RF04).
+- **Bônus de catálogo ampliado** — as páginas 0, 1 e 2 da TVMaze são buscadas em paralelo com `Promise.all`; uma falha em qualquer página mantém o estado de erro explícito, sem exibir catálogo parcial.
+- **Tratamento com métodos de array** — cadeia `filter` (só títulos com gênero e nota) → `sort` (nota decrescente) → `slice(0, 8)` → `map` (forma normalizada `{ id, titulo, tipo, generos, duracaoMinutos, imagem, avaliacao }`), além dos `filter` que separam gêneros em comum e não explorados (RF05).
 - **Classes `Conteudo` e `Serie`** — a base guarda título, tipo, gêneros e duração com `this`, e `Serie` herda por `extends` + `super()` acrescentando temporadas (RF06).
 - **Compatibilidade classificada** — fórmula `gêneros em comum ÷ total de gêneros do conteúdo × 100`, com faixas **Alta afinidade** (≥ 80), **Média afinidade** (≥ 50) e **Baixa afinidade**, listando os **gêneros em comum** e os **gêneros não explorados** (RF07).
 - **Renderização no DOM** — cada card é um `<article>` montado com `createElement` e escrito com `textContent` (nunca `innerHTML`), o que mantém o dado da API como texto e não como marcação (RF08).
@@ -270,6 +271,13 @@ Nenhuma regra do `css/style.css` usa `!important`, e o arquivo também não usa 
 - **`setTimeout` de exibição** — atraso proposital de 800 ms **na exibição**, nunca dentro do `fetch`, para que a frase de carregando seja percebida sem mascarar o estado de erro (RF12).
 - **Responsividade** — layout mobile-first com Flexbox, `flex-wrap` na grade de cards e as três media queries do `css/style.css`: `min-width: 769px` (desktop), `max-width: 768px` e `max-width: 560px` (RF09).
 - **SEO e acessibilidade** — `lang="pt-BR"`, `<title>` e `meta description` descritivos, og tags, skip link, landmarks, `aria-label`, `aria-live` e foco visível (RF01 e RF13).
+- **Bônus de exploração** — os resultados podem ser filtrados por gênero e ordenados por compatibilidade, avaliação da TVMaze ou título, sem alterar a lista original.
+- **Bônus de interface** — o botão da barra de navegação alterna entre o tema escuro padrão e o tema sépia/fantasia clara, com preferência salva em `localStorage`.
+- **Bônus de Geolocation** — quando a pessoa autoriza a localização, a aplicação compara latitude e longitude com uma lista local de cidades e personaliza a saudação com a cidade de referência mais próxima; a posição não é persistida nem enviada.
+- **Navegação e UX** — a navbar tem âncoras funcionais, estado ativo com `aria-current`, busca local por título, menu responsivo e ações rápidas para pesquisa, tema e perfil.
+- **Telas exclusivas** — “Sobre o CineMatch”, “Minha Lista” e “Meu Perfil” ocultam as demais seções enquanto estão abertas; “Início” restaura a tela anterior ou mostra as recomendações quando existe perfil salvo.
+- **Perfil editável** — o botão de perfil apenas abre o formulário preenchido com os dados salvos; a remoção do perfil fica restrita ao botão explícito “Trocar perfil”.
+- **Lista de favoritos** — cards podem ser adicionados ou removidos da lista, persistida em `localStorage` na chave `cinematchFavoritos`.
 
 ### Requisitos funcionais cobertos
 
@@ -286,16 +294,19 @@ Nenhuma regra do `css/style.css` usa `!important`, e o arquivo também não usa 
 
 ---
 
+## Decisões e limites dos bônus
+
+- **SVG nativo em vez de Font Awesome:** os ícones da navegação são pequenos, estáticos e já atendem ao uso previsto. SVG inline evita uma dependência externa, carregamento de CDN e configuração adicional, mantendo os ícones acessíveis com `aria-hidden="true"`.
+- **Bootstrap não utilizado:** o layout já atende ao briefing com CSS próprio, Flexbox, media queries e tokens de tema. Adicionar Bootstrap aumentaria a superfície de dependências sem resolver uma necessidade real e não mudaria a restrição de não usar CSS Grid.
+- **Geolocation opcional:** a recusa da permissão, a indisponibilidade da API ou uma publicação fora de contexto seguro não impedem a busca de recomendações. A cidade é escolhida por proximidade dentro da lista local, seguindo o exercício `ceu-aberto-cidade`; não há reverse geocoding externo.
+- **Navegação por telas:** a seção principal, a tela Sobre, a lista de favoritos e o perfil são seções da mesma página. O JavaScript alterna o atributo `hidden` e guarda o estado anterior para que a navegação seja reversível sem recarregar.
+
 ## Melhorias possíveis
 
 Itens registrados no [quadro Kanban](docs/KANBAN.md), na coluna *Backlog* — bônus sem nota, para evolução depois da entrega:
 
-- **Filtro por gênero** na tela de resultados, para refinar a lista sem preencher o formulário de novo.
-- **Ordenar os cards** por compatibilidade, nome ou avaliação, reaproveitando o mesmo `sort`.
-- **Buscar mais páginas da TVMaze** (`?page=1`, `?page=2`…) para ampliar o catálogo disponível além da página 0 consultada hoje.
-- **Modo escuro** com um toggle de tema, reforçando a manipulação de classes via `classList`.
 - **Combinar com uma API de filmes**, voltando a ter "filmes e séries" como no mini-projeto original.
-- **Tela de login** — foi uma ideia de bônus descartada e removida do `index.html`, porque autenticação e back-end estão fora do escopo do Módulo 01.
+- **Testes automatizados de interface** para cobrir os estados de rede, filtros, ordenação e persistência de tema.
 
 ---
 
@@ -309,3 +320,5 @@ Itens registrados no [quadro Kanban](docs/KANBAN.md), na coluna *Backlog* — b�
 | **Projeto online** | <https://tiagoeduardobr.github.io/CineMatch-Web/> |
 | **Quadro Kanban** | [`docs/KANBAN.md`](docs/KANBAN.md) |
 | **API de catálogo** | [TVMaze API](https://www.tvmaze.com/api) — pública, sem chave |
+| **Autor** | [Tiago](https://github.com/tiagoeduardobr) |
+| **Autor** | [Lucas](https://github.com/lucasgd123) |
