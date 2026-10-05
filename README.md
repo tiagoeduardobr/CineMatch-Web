@@ -21,6 +21,23 @@ Aplicação de recomendação de séries em tempo real, feita com **HTML5 semân
 
 ---
 
+## Resultados do Lighthouse
+
+Após a otimização da imagem principal para `assets/main.jpg`, uma nova auditoria do Lighthouse registrou:
+
+| Categoria | Resultado |
+| --- | ---: |
+| Performance | **99** |
+| Acessibilidade | **100** |
+| Boas práticas | **100** |
+| SEO | **100** |
+
+![Resultados do Lighthouse: Performance 99, Acessibilidade 100, Boas práticas 100 e SEO 100](assets/lighthouse-resultados.png)
+
+*Evidência da auditoria executada no navegador em 04/10/2026.*
+
+---
+
 ## O que é e qual problema resolve
 
 O CineMatch Web resolve um problema simples e cotidiano: **descobrir o que assistir sem perder horas navegando catálogos**. A pessoa informa nome, idade e gêneros que gosta; a aplicação busca um catálogo real de séries, compara cada título com o perfil e devolve uma lista curta de recomendações, cada uma com o **percentual de compatibilidade**, os **gêneros em comum**, os **gêneros que a pessoa ainda não explorou** e uma classificação de afinidade (**Alta**, **Média** ou **Baixa**).
@@ -99,6 +116,7 @@ CineMatch-Web/
 ├── assets/
 │   ├── main.png                          # Capa original preservada como fonte visual
 │   ├── main.jpg                          # Capa otimizada usada na página e como og:image
+│   ├── lighthouse-resultados.png         # Evidência dos resultados da auditoria Lighthouse
 │   └── Captura de tela 2026-09-28 *.png  # Capturas da interface
 ├── docs/
 │   ├── KANBAN.md        # Quadro Kanban do projeto: tarefas, rastreabilidade, riscos e checklist
@@ -277,6 +295,7 @@ Nenhuma regra do `css/style.css` usa `!important`, e o arquivo também não usa 
 - **Bônus de Geolocation** — quando a pessoa autoriza a localização, a aplicação compara latitude e longitude com uma lista local de cidades e personaliza a saudação com a cidade de referência mais próxima; a posição não é persistida nem enviada.
 - **Navegação e UX** — a navbar tem âncoras funcionais, estado ativo com `aria-current`, busca local por título, menu responsivo e ações rápidas para pesquisa, tema e perfil.
 - **Telas exclusivas** — “Sobre o CineMatch”, “Minha Lista” e “Meu Perfil” ocultam as demais seções enquanto estão abertas; “Início” restaura a tela anterior ou mostra as recomendações quando existe perfil salvo.
+- **Registros no Sobre** — a tela Sobre apresenta, em uma galeria horizontal, capturas das funcionalidades e a métrica da auditoria Lighthouse (Performance 99, Acessibilidade 100, Boas práticas 100 e SEO 100).
 - **Perfil editável** — o botão de perfil apenas abre o formulário preenchido com os dados salvos; a remoção do perfil fica restrita ao botão explícito “Trocar perfil”.
 - **Lista de favoritos** — cards podem ser adicionados ou removidos da lista, persistida em `localStorage` na chave `cinematchFavoritos`.
 
