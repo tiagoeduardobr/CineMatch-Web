@@ -9,6 +9,7 @@
 
 
 **Projeto online:** <https://tiagoeduardobr.github.io/CineMatch-Web/> — versão publicada do CineMatch Web, acessível direto pelo navegador, sem instalação.
+**Vídeo de apresentação do projeto online:** [https://tiagoeduardobr.github.io/CineMatch-Web/](https://drive.google.com/file/d/1xaInrlU-aX6Bsps12Ud1VAX_ndQ2fKqz/view?usp=sharing) — versão publicada do Vídeo CineMatch Web.
 
 Aplicação de recomendação de séries em tempo real, feita com **HTML5 semântico, CSS3 com Flexbox e JavaScript puro em módulos ES nativos** — sem framework, sem bundler e sem etapa de build.
 
