@@ -7,17 +7,10 @@
 [![live-server](https://img.shields.io/badge/live--server-8080-FF6C37?style=flat)](https://www.npmjs.com/package/live-server)
 [![online](https://img.shields.io/badge/online-tiagoeduardobr.github.io%2FCineMatch--Web-brightgreen?style=flat)](https://tiagoeduardobr.github.io/CineMatch-Web/)
 
+
 **Projeto online:** <https://tiagoeduardobr.github.io/CineMatch-Web/> — versão publicada do CineMatch Web, acessível direto pelo navegador, sem instalação.
 
 Aplicação de recomendação de séries em tempo real, feita com **HTML5 semântico, CSS3 com Flexbox e JavaScript puro em módulos ES nativos** — sem framework, sem bundler e sem etapa de build.
-
----
-
-## Captura de tela
-
-![Bloco da capa do CineMatch Web com o título "Descubra novas histórias" e a descrição "Recomendações personalizadas de acordo com seu perfil"](assets/Captura%20de%20tela%202026-09-28%20223830.png)
-
-*Detalhe da capa da aplicação — o mesmo texto aparece na página inicial servida pelo `live-server`.*
 
 ---
 
