@@ -501,7 +501,8 @@ function iniciarNavegacao() {
       estadoPrincipal === null ? Boolean(perfilSalvo) : estadoPrincipal.perfil;
     secaoResultados.hidden =
       estadoPrincipal === null ? !perfilSalvo : estadoPrincipal.resultados;
-    secaoLista.hidden = estadoPrincipal === null ? false : estadoPrincipal.lista;
+    secaoLista.hidden =
+      estadoPrincipal === null ? !perfilSalvo : estadoPrincipal.lista;
     estadoPrincipal = null;
   }
 
