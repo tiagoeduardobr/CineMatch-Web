@@ -34,24 +34,43 @@
       >Pular para o conteúdo principal</a
     >
     <header>
-      <nav class="barra-navegacao">
+      <nav class="barra-navegacao" aria-label="Navegação principal">
         <h1 class="marca">CineMatch</h1>
 
-        <ul class="links-navegacao">
-          <li><a href="#">Início</a></li>
-          <li><a href="#">Sobre nós</a></li>
-          <li><a href="#">Minha Lista</a></li>
-          <li><a href="#">Meu Perfil</a></li>
+        <button
+          id="botao-menu"
+          class="botao-menu"
+          type="button"
+          aria-label="Abrir menu de navegação"
+          aria-expanded="false"
+          aria-controls="menu-navegacao"
+        >
+          <span></span><span></span><span></span>
+        </button>
+
+        <ul id="menu-navegacao" class="links-navegacao">
+          <li><a href="#conteudo-principal" aria-current="page">Início</a></li>
+          <li><a href="#sobre">Sobre o CineMatch</a></li>
+          <li><a href="#minha-lista">Minha Lista</a></li>
+          <li><a href="#perfil-titulo">Meu Perfil</a></li>
         </ul>
 
         <div class="acoes-navegacao" role="group" aria-label="Ações rápidas">
-          <button class="botao-navegacao" type="button" aria-label="Pesquisar">
+          <button
+            id="botao-pesquisar"
+            class="botao-navegacao"
+            type="button"
+            aria-label="Abrir pesquisa de séries"
+            aria-expanded="false"
+            aria-controls="campo-pesquisa"
+          >
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <circle cx="11" cy="11" r="6.5"></circle>
               <path d="m16 16 4.5 4.5"></path>
             </svg>
           </button>
           <button
+            id="botao-tema"
             class="botao-navegacao"
             type="button"
             aria-label="Alternar tema"
@@ -63,15 +82,25 @@
             </svg>
           </button>
           <button
+            id="botao-perfil-nav"
             class="botao-navegacao botao-navegacao--perfil"
             type="button"
-            aria-label="Abrir perfil"
+            aria-label="Editar meu perfil"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <circle cx="12" cy="8" r="3.25"></circle>
               <path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path>
             </svg>
           </button>
+        </div>
+        <div id="painel-pesquisa" class="painel-pesquisa" hidden>
+          <label for="campo-pesquisa">Pesquisar nas recomendações</label>
+          <input
+            id="campo-pesquisa"
+            type="search"
+            placeholder="Digite o título de uma série"
+            autocomplete="off"
+          />
         </div>
       </nav>
     </header>
@@ -86,6 +115,54 @@
             width="2048"
             height="768"
           />
+        </div>
+      </section>
+
+      <section
+        id="sobre"
+        class="secao-sobre"
+        aria-labelledby="sobre-titulo"
+        hidden
+      >
+        <div class="conteudo-sobre">
+          <h2 id="sobre-titulo">Sobre o CineMatch</h2>
+          <p>
+            O CineMatch é uma aplicação de recomendação de séries criada para
+            transformar a escolha do que assistir em uma experiência simples,
+            personalizada e explicada. A pessoa informa seu perfil e seus
+            gêneros favoritos, e a aplicação compara essas preferências com um
+            catálogo real da TVMaze.
+          </p>
+          <p>
+            Cada recomendação mostra os gêneros em comum, os gêneros ainda não
+            explorados, a porcentagem de compatibilidade e a avaliação da série.
+            O projeto também oferece filtro, ordenação, tema alternativo,
+            geolocalização contextual e uma lista de favoritos salva no
+            navegador.
+          </p>
+          <div class="autores-projeto">
+            <h3>Autores</h3>
+            <ul>
+              <li>
+                <a
+                  href="https://github.com/tiagoeduardobr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Tiago
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/lucasgd123"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Lucas
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </section>
 
@@ -237,43 +314,47 @@
           </button>
         </div>
         <hr class="separador" />
-        <div id="resultados" class="resultados"></div>
-        <article
-          id="template-card-serie"
-          class="card-serie"
-          data-tipo="serie"
-          hidden
+        <div
+          class="controles-resultados"
+          role="group"
+          aria-label="Filtros das recomendações"
         >
-          <div class="midia-serie">
-            <img
-              class="cartaz-serie"
-              data-campo="poster"
-              alt="Pôster da série, aguardando catálogo"
-            />
-            <span class="badge badge-media">Média</span>
+          <div>
+            <label for="filtro-genero">Filtrar por gênero</label>
+            <select id="filtro-genero">
+              <option value="">Todos os gêneros</option>
+              <option value="Action">Ação</option>
+              <option value="Adventure">Aventura</option>
+              <option value="Comedy">Comédia</option>
+              <option value="Documentary">Documentário</option>
+              <option value="Drama">Drama</option>
+              <option value="Fantasy">Fantasia</option>
+              <option value="Horror">Terror</option>
+              <option value="Romance">Romance</option>
+              <option value="Science-Fiction">Ficção Científica</option>
+              <option value="Thriller">Suspense</option>
+            </select>
           </div>
-          <div class="conteudo-serie">
-            <h3 class="titulo-serie" data-campo="title">Título da série</h3>
-            <div class="metadados-serie">
-              <span class="nota-serie"
-                >★ <span data-campo="rating">Sem nota</span>/10</span
-              >
-              <span data-campo="releaseDate">Ano de lançamento</span>
-              <span data-campo="duration">Duração indisponível</span>
-            </div>
-            <div class="generos-serie" data-campo="genres">Gêneros</div>
-            <p class="sinopse-serie" data-campo="synopsis">
-              Sinopse da série em texto puro.
-            </p>
-            <p class="status-serie">
-              Status: <span data-campo="status">Indisponível</span>
-            </p>
-            <p class="plataforma-serie">
-              Onde assistir: <span data-campo="platform">Indisponível</span>
-            </p>
-            <a class="link-serie" href="#" data-campo="url">Ver detalhes</a>
+          <div>
+            <label for="ordenacao-resultados">Ordenar por</label>
+            <select id="ordenacao-resultados">
+              <option value="compatibilidade">Compatibilidade</option>
+              <option value="avaliacao">Avaliação</option>
+              <option value="titulo">Título</option>
+            </select>
           </div>
-        </article>
+        </div>
+        <div id="resultados" class="resultados"></div>
+      </section>
+
+      <section id="minha-lista" class="secao-lista" aria-labelledby="lista-titulo">
+        <div class="cabecalho-lista">
+          <h2 id="lista-titulo">Minha Lista</h2>
+          <p id="lista-status" role="status" aria-live="polite">
+            Suas séries favoritas aparecerão aqui.
+          </p>
+        </div>
+        <div id="lista-favoritos" class="resultados"></div>
       </section>
     </main>
     <footer>
