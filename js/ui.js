@@ -49,12 +49,14 @@ export function exibirErrosDeFormulario(erros) {
 export function mostrarResultados(usuario, aviso) {
   const secaoPerfil = document.querySelector(".secao-perfil");
   const secaoResultados = document.querySelector(".secao-resultados");
+  const secaoLista = document.querySelector("#minha-lista");
   const formPerfil = document.querySelector("#form-perfil");
   const statusResultados = document.querySelector("#resultados-status");
   const botaoTrocarPerfil = document.querySelector("#botao-trocar-perfil");
 
   secaoPerfil.hidden = true;
   secaoResultados.hidden = false;
+  secaoLista.hidden = false;
   formPerfil.hidden = true;
   botaoTrocarPerfil.hidden = false;
 
@@ -70,12 +72,14 @@ export function mostrarResultados(usuario, aviso) {
 export function mostrarFormulario(mensagem) {
   const secaoPerfil = document.querySelector(".secao-perfil");
   const secaoResultados = document.querySelector(".secao-resultados");
+  const secaoLista = document.querySelector("#minha-lista");
   const formPerfil = document.querySelector("#form-perfil");
   const formularioStatus = document.querySelector("#formulario-status");
   const botaoTrocarPerfil = document.querySelector("#botao-trocar-perfil");
 
   secaoPerfil.hidden = false;
   secaoResultados.hidden = true;
+  secaoLista.hidden = true;
   formPerfil.hidden = false;
   botaoTrocarPerfil.hidden = true;
   formularioStatus.classList.remove("mensagem-erro");
