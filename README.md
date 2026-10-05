@@ -7,7 +7,7 @@
 [![live-server](https://img.shields.io/badge/live--server-8080-FF6C37?style=flat)](https://www.npmjs.com/package/live-server)
 [![online](https://img.shields.io/badge/online-tiagoeduardobr.github.io%2FCineMatch--Web-brightgreen?style=flat)](https://tiagoeduardobr.github.io/CineMatch-Web/)
 
-![Resultados do Lighthouse: Performance 99, Acessibilidade 100, Boas práticas 100 e SEO 100](assets/assets/main.jpg)
+![CineMatch](assets/assets/main.jpg)
 
 **Projeto online:** <https://tiagoeduardobr.github.io/CineMatch-Web/> — versão publicada do CineMatch Web, acessível direto pelo navegador, sem instalação.
 
