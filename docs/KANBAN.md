@@ -100,7 +100,7 @@ Ideias de bônus da seção 8 do briefing e melhorias possíveis. **Não contam 
 
 ## Em Andamento
 
-_Nenhuma tarefa em andamento no momento._
+*Nenhuma tarefa em andamento no momento.*
 
 ---
 
