@@ -14,6 +14,7 @@
  */
 export function exibirMensagemDeErro(texto) {
   const statusResultados = document.querySelector("#resultados-status");
+  statusResultados.classList.add("mensagem-erro");
   statusResultados.textContent = texto;
 }
 
@@ -24,6 +25,7 @@ export function exibirMensagemDeErro(texto) {
  */
 export function exibirErrosDeFormulario(erros) {
   const formularioStatus = document.querySelector("#formulario-status");
+  formularioStatus.classList.add("mensagem-erro");
   formularioStatus.textContent = "";
 
   const mensagemErros = document.createElement("ul");
@@ -40,13 +42,68 @@ export function exibirErrosDeFormulario(erros) {
 }
 
 /**
+ * Troca a tela para o catálogo: esconde o formulário e mantém o aviso de
+ * persistência junto da mensagem inicial sem interpretar dados como HTML.
+ * O botão "Trocar perfil" fica na seção de resultados e permanece disponível.
+ */
+export function mostrarResultados(usuario, aviso) {
+  const secaoPerfil = document.querySelector(".secao-perfil");
+  const secaoResultados = document.querySelector(".secao-resultados");
+  const formPerfil = document.querySelector("#form-perfil");
+  const statusResultados = document.querySelector("#resultados-status");
+  const botaoTrocarPerfil = document.querySelector("#botao-trocar-perfil");
+
+  secaoPerfil.hidden = true;
+  secaoResultados.hidden = false;
+  formPerfil.hidden = true;
+  botaoTrocarPerfil.hidden = false;
+
+  statusResultados.classList.remove("mensagem-erro");
+  const saudacao = `Olá, ${usuario.nome}! Suas recomendações serão carregadas em seguida.`;
+  statusResultados.textContent = `${saudacao}${aviso}`;
+}
+
+/**
+ * Devolve a tela ao formulário e escreve a mensagem de orientação recebida.
+ * O chamador limpa os campos antes desta função para iniciar uma nova coleta.
+ */
+export function mostrarFormulario(mensagem) {
+  const secaoPerfil = document.querySelector(".secao-perfil");
+  const secaoResultados = document.querySelector(".secao-resultados");
+  const formPerfil = document.querySelector("#form-perfil");
+  const formularioStatus = document.querySelector("#formulario-status");
+  const botaoTrocarPerfil = document.querySelector("#botao-trocar-perfil");
+
+  secaoPerfil.hidden = false;
+  secaoResultados.hidden = true;
+  formPerfil.hidden = false;
+  botaoTrocarPerfil.hidden = true;
+  formularioStatus.classList.remove("mensagem-erro");
+  formularioStatus.textContent = mensagem;
+}
+
+/**
  * Escreve a frase do estado vazio em #resultados-status, com o aviso opcional
  * de falha de persistência anexado quando existe. É SUCESSO com zero resultado,
  * não falha — por isso é uma função própria, e não a de erro com texto trocado.
  */
 export function exibirMensagemDeCatalogoVazio(aviso) {
   const statusResultados = document.querySelector("#resultados-status");
+  statusResultados.classList.remove("mensagem-erro");
   statusResultados.textContent = `Não encontramos recomendações agora.${aviso}`;
+}
+
+/**
+ * Escreve o resumo do catálogo tratado no estado de sucesso da busca.
+ */
+export function exibirMensagemDeCatalogoCarregado(
+  totalBruto,
+  totalTratado,
+  aviso,
+) {
+  const statusResultados = document.querySelector("#resultados-status");
+  statusResultados.classList.remove("mensagem-erro");
+  statusResultados.textContent = `Catálogo carregado: ${totalBruto} séries disponíveis, ${totalTratado} depois do tratamento.${aviso}`;
 }
 
 /**
@@ -55,11 +112,86 @@ export function exibirMensagemDeCatalogoVazio(aviso) {
  * percentual e classificação. Não limpa a lista nem percorre-a — quem faz isso
  * é renderizarCards, em js/script.js.
  *
- * @param {{ titulo: string, imagem: string, generosEmComum: string[],
- *   generosNaoExplorados: string[], percentual: string, classificacao: string }}
+ * @param {{ id: number, titulo: string, imagem: string, generosEmComum: string[],
+ *   generosNaoExplorados: string[], percentual: string, avaliacao: number,
+ *   classificacao: string }}
  *   resultado objeto devolvido por calcularCompatibilidades.
  */
-export function renderizarCard(resultado) {
+const CHAVE_FAVORITOS = "cinematchFavoritos";
+
+function lerFavoritos() {
+  try {
+    const favoritosSalvos = localStorage.getItem(CHAVE_FAVORITOS);
+    return favoritosSalvos ? JSON.parse(favoritosSalvos) : [];
+  } catch (erro) {
+    return [];
+  }
+}
+
+function salvarFavoritos(favoritos) {
+  try {
+    localStorage.setItem(CHAVE_FAVORITOS, JSON.stringify(favoritos));
+  } catch (erro) {
+    return false;
+  }
+  return true;
+}
+
+function atualizarStatusDaLista(total) {
+  const status = document.querySelector("#lista-status");
+  status.textContent =
+    total === 0
+      ? "Suas séries favoritas aparecerão aqui."
+      : `${total} série(s) salva(s) na sua lista.`;
+}
+
+function renderizarListaFavoritos() {
+  const favoritos = lerFavoritos();
+  const container = document.querySelector("#lista-favoritos");
+  const anteriores = container.querySelectorAll(".card-serie");
+
+  for (let i = 0; i < anteriores.length; i++) {
+    anteriores[i].remove();
+  }
+
+  for (let i = 0; i < favoritos.length; i++) {
+    renderizarCard(favoritos[i], "#lista-favoritos");
+  }
+  atualizarStatusDaLista(favoritos.length);
+}
+
+function alternarFavorito(resultado) {
+  const favoritos = lerFavoritos();
+  const indice = favoritos.findIndex((item) => item.id === resultado.id);
+
+  if (indice === -1) {
+    favoritos.push(resultado);
+  } else {
+    favoritos.splice(indice, 1);
+  }
+
+  if (salvarFavoritos(favoritos)) {
+    renderizarListaFavoritos();
+    renderizarCardsAtualizados();
+  }
+}
+
+let redesenharCardsAtualizados = function () {};
+
+function renderizarCardsAtualizados() {
+  redesenharCardsAtualizados();
+}
+
+export function iniciarListaFavoritos(redesenharCards) {
+  redesenharCardsAtualizados = redesenharCards;
+  renderizarListaFavoritos();
+}
+
+function favoritoEstaSalvo(id) {
+  return lerFavoritos().some((item) => item.id === id);
+}
+
+export function renderizarCard(resultado, seletor = "#resultados") {
   const card = document.createElement("article");
   card.className = "card-serie";
 
@@ -101,6 +233,7 @@ export function renderizarCard(resultado) {
     `Gêneros em comum: ${emComum}`,
     `Gêneros não explorados: ${naoExplorados}`,
     `Compatibilidade: ${resultado.percentual}%`,
+    `Avaliação TVMaze: ${resultado.avaliacao}/10`,
   ];
   for (let i = 0; i < linhas.length; i++) {
     const paragrafo = document.createElement("p");
@@ -108,9 +241,99 @@ export function renderizarCard(resultado) {
     conteudo.appendChild(paragrafo);
   }
 
+  const favorito = document.createElement("button");
+  const estaSalvo = favoritoEstaSalvo(resultado.id);
+  favorito.className = "favorito-serie";
+  favorito.type = "button";
+  favorito.setAttribute("aria-pressed", String(estaSalvo));
+  favorito.textContent = estaSalvo
+    ? "Remover da minha lista"
+    : "Adicionar à minha lista";
+  favorito.addEventListener("click", function () {
+    alternarFavorito(resultado);
+  });
+  conteudo.appendChild(favorito);
+
   card.appendChild(midia);
   card.appendChild(conteudo);
-  document.querySelector("#resultados").appendChild(card);
+  document.querySelector(seletor).appendChild(card);
+}
+
+/**
+ * Limpa apenas os cards reais dentro de #resultados e desenha a lista recebida.
+ * O template antigo foi removido do HTML; cada card nasce em renderizarCard.
+ *
+ * @param {Array} lista - recomendações devolvidas pelo cálculo.
+ */
+export function renderizarCards(lista) {
+  const container = document.querySelector("#resultados");
+  const anteriores = container.querySelectorAll(".card-serie");
+
+  for (let i = 0; i < anteriores.length; i++) {
+    anteriores[i].remove();
+  }
+
+  for (let i = 0; i < lista.length; i++) {
+    renderizarCard(lista[i]);
+  }
+}
+
+/**
+ * Volta os controles para a configuração inicial ao começar uma nova busca.
+ */
+export function resetarControlesDeResultados() {
+  document.querySelector("#filtro-genero").value = "";
+  document.querySelector("#ordenacao-resultados").value = "compatibilidade";
+}
+
+const CHAVE_TEMA = "cinematchTema";
+
+/**
+ * Recupera a preferência visual sem interromper a aplicação se o storage
+ * estiver indisponível.
+ */
+function lerTemaSalvo() {
+  try {
+    return localStorage.getItem(CHAVE_TEMA);
+  } catch (erro) {
+    return null;
+  }
+}
+
+function salvarTema(tema) {
+  try {
+    localStorage.setItem(CHAVE_TEMA, tema);
+  } catch (erro) {
+    // A preferência é opcional; o tema continua ativo nesta sessão.
+  }
+}
+
+function atualizarBotaoDeTema(tema) {
+  const botaoTema = document.querySelector("#botao-tema");
+  const temaSepiaAtivo = tema === "sepia";
+  botaoTema.setAttribute(
+    "aria-label",
+    temaSepiaAtivo ? "Usar tema escuro" : "Usar tema sépia",
+  );
+  botaoTema.setAttribute("aria-pressed", String(temaSepiaAtivo));
+}
+
+export function iniciarTema() {
+  const temaInicial = lerTemaSalvo();
+  const tema = temaInicial === "sepia" ? "sepia" : "escuro";
+  const botaoTema = document.querySelector("#botao-tema");
+
+  document.body.classList.toggle("tema-sepia", tema === "sepia");
+  atualizarBotaoDeTema(tema);
+
+  botaoTema.addEventListener("click", function () {
+    const novoTema = document.body.classList.contains("tema-sepia")
+      ? "escuro"
+      : "sepia";
+    document.body.classList.toggle("tema-sepia", novoTema === "sepia");
+    atualizarBotaoDeTema(novoTema);
+    salvarTema(novoTema);
+  });
 }
 
 /**
@@ -119,11 +342,26 @@ export function renderizarCard(resultado) {
  * dispará-la é `concluirBusca`, em js/script.js.
  * @param {string} nome - nome já validado no formulário, ou o do perfil salvo.
  */
-export function exibirMensagemDeBoasVindas(nome) {
+export function exibirMensagemDeBoasVindas(nome, cidade = "") {
   const boasVindas = document.querySelector("#resultados-boas-vindas");
 
   // Alvo próprio: #resultados-status é sobrescrito por todos os estados da chamada.
-  boasVindas.textContent = `Olá, ${nome}! Boas-vindas ao CineMatch: as recomendações abaixo vêm dos gêneros que você escolheu no perfil.`;
+  boasVindas.textContent = "";
+
+  if (cidade === "") {
+    boasVindas.textContent = `Olá, ${nome}! Boas-vindas ao CineMatch: as recomendações abaixo vêm dos gêneros que você escolheu no perfil.`;
+    return;
+  }
+
+  boasVindas.appendChild(
+    document.createTextNode(`Olá ${nome}, como está em ${cidade} hoje?`),
+  );
+  boasVindas.appendChild(document.createElement("br"));
+  boasVindas.appendChild(
+    document.createTextNode(
+      "Boas-vindas ao CineMatch: as recomendações abaixo vêm dos gêneros que você escolheu no perfil.",
+    ),
+  );
 }
 
 /**
@@ -154,6 +392,7 @@ const ATRASO_DA_EXIBICAO_MS = 800;
  */
 export function exibirMensagemDeCarregando() {
   const statusResultados = document.querySelector("#resultados-status");
+  statusResultados.classList.remove("mensagem-erro");
   statusResultados.textContent = "Buscando as melhores séries pra você...";
 }
 
