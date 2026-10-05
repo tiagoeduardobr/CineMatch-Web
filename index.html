@@ -21,7 +21,13 @@
       property="og:url"
       content="https://tiagoeduardobr.github.io/CineMatch-Web/"
     />
-    <meta property="og:image" content="./assets/main.png" />
+    <meta property="og:image" content="./assets/main.jpg" />
+    <link
+      rel="preload"
+      as="image"
+      href="./assets/main.jpg"
+      fetchpriority="high"
+    />
     <link rel="stylesheet" href="./css/style.css" />
   </head>
 
@@ -110,10 +116,12 @@
         <div class="conteudo-capa">
           <img
             class="imagem-capa"
-            src="./assets/main.png"
+            src="./assets/main.jpg"
             alt="CineMatch em uma paisagem de montanhas, castelo e vulcão"
-            width="2048"
-            height="768"
+            width="1440"
+            height="540"
+            fetchpriority="high"
+            decoding="async"
           />
         </div>
       </section>
@@ -140,6 +148,40 @@
             geolocalização contextual e uma lista de favoritos salva no
             navegador.
           </p>
+          <div class="galeria-sobre galeria-sobre--funcionalidades">
+            <h3>Funcionalidades</h3>
+            <div class="galeria-sobre__imagens">
+              <img
+                src="./assets/Captura de tela 2026-09-28 223830.png"
+                alt="Capa do CineMatch Web com o título Descubra novas histórias"
+                width="422"
+                height="117"
+              />
+              <img
+                src="./assets/Captura de tela 2026-09-28 223843.png"
+                alt="Formulário de perfil do CineMatch Web"
+                width="423"
+                height="114"
+              />
+              <img
+                src="./assets/Captura de tela 2026-09-28 223908.png"
+                alt="Tela de recomendações do CineMatch Web"
+                width="424"
+                height="110"
+              />
+            </div>
+          </div>
+          <div class="galeria-sobre galeria-sobre--metricas">
+            <h3>Métricas</h3>
+            <div class="galeria-sobre__imagens">
+              <img
+                src="./assets/lighthouse-resultados.png"
+                alt="Resultados do Lighthouse: Performance 99, Acessibilidade 100, Boas práticas 100 e SEO 100"
+                width="422"
+                height="150"
+              />
+            </div>
+          </div>
           <div class="autores-projeto">
             <h3>Autores</h3>
             <ul>
