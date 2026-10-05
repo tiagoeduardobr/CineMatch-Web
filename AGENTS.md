@@ -102,7 +102,7 @@ Três módulos JavaScript, cada um com uma responsabilidade. O briefing diz que 
 | `js/ui.js` | Tudo que toca a **tela**: renderizar cards, mensagens de carregando, vazio e erro |
 | `js/modelo.js` | As **classes**: `Conteudo` e `Serie`, com herança e `this` |
 
-Mais `css/style.css` e `assets/main.png`, com o `index.html` na raiz do repositório. O carregamento é feito por `<script type="module" src="./js/script.js"></script>`.
+Mais `css/style.css` e a capa otimizada `assets/main.jpg` (com `assets/main.png` preservado como original), com o `index.html` na raiz do repositório. O carregamento é feito por `<script type="module" src="./js/script.js"></script>`.
 
 > **Onde cada coisa mora.** `css/` guarda a folha de estilo, `js/` guarda os módulos ES e `assets/` guarda as imagens. O `index.html` fica na raiz porque é o arquivo que o `live-server` serve em `/` — colocado em subpasta, a URL de entrada mudaria e o `npm start` deixaria de apontar para a página. Como os três módulos estão na mesma pasta, `script.js` importa `./ui.js` e `./modelo.js` com caminho relativo.
 
@@ -322,7 +322,7 @@ Prazo: **05/10/2026 até 22h**, contado pela última atualização no repositór
 | `docs/BRIEFING.md` | Transcrição pesquisável do briefing, extraída do PDF. Útil porque agentes não leem PDF. Substituída pelo PDF em qualquer divergência |
 | `docs/Projeto Avaliativo Final - Módulo 01 - Mobile React Native T1 - M1S13 (1).pdf` | O briefing original, 16 páginas. Fonte de verdade; `docs/BRIEFING.md` é a cópia pesquisável |
 | `.gitattributes` | Força LF em `md`, `js`, `css` e `html`, e CRLF em `bat`. Não remover |
-| `index.html`, `css/style.css`, `js/script.js`, `js/ui.js`, `js/modelo.js`, `assets/main.png`, `package.json` | A aplicação e o `package.json` do `live-server`. O estado da implementação vive no `docs/KANBAN.md`, não aqui |
+| `index.html`, `css/style.css`, `js/script.js`, `js/ui.js`, `js/modelo.js`, `assets/main.jpg`, `package.json` | A aplicação e o `package.json` do `live-server`; `assets/main.png` é a fonte visual original. O estado da implementação vive no `docs/KANBAN.md`, não aqui |
 | `run_opencode_web.bat` | Sobe o `opencode web` em `127.0.0.1:4096` e cria um Quick Tunnel temporário com `cloudflared`, sem `.env`. Conveniência local/remota |
 | cinematch_antigo/class.js, cinematch_antigo/cinematch.js, cinematch_antigo/catalogo.js | Entrega da semana 6 e base da lógica: classes, compatibilidade, closure, callback e setTimeout. Não editar; consultar conforme a seção 2.1 |
 | cspell.json | Dicionário de termos em pt-BR para o Code Spell Checker. Configuração de editor, não entra na aplicação |
