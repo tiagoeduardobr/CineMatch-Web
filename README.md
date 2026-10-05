@@ -97,7 +97,8 @@ CineMatch-Web/
 │   ├── ui.js             # Tela: estados da chamada, cards, saudação, contador e atraso de exibição
 │   └── modelo.js         # Classes Conteudo e Serie (herança, this) e a fórmula de compatibilidade
 ├── assets/
-│   ├── main.png                          # Capa usada como og:image
+│   ├── main.png                          # Capa original preservada como fonte visual
+│   ├── main.jpg                          # Capa otimizada usada na página e como og:image
 │   └── Captura de tela 2026-09-28 *.png  # Capturas da interface
 ├── docs/
 │   ├── KANBAN.md        # Quadro Kanban do projeto: tarefas, rastreabilidade, riscos e checklist

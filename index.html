@@ -21,7 +21,13 @@
       property="og:url"
       content="https://tiagoeduardobr.github.io/CineMatch-Web/"
     />
-    <meta property="og:image" content="./assets/main.png" />
+    <meta property="og:image" content="./assets/main.jpg" />
+    <link
+      rel="preload"
+      as="image"
+      href="./assets/main.jpg"
+      fetchpriority="high"
+    />
     <link rel="stylesheet" href="./css/style.css" />
   </head>
 
@@ -110,10 +116,12 @@
         <div class="conteudo-capa">
           <img
             class="imagem-capa"
-            src="./assets/main.png"
+            src="./assets/main.jpg"
             alt="CineMatch em uma paisagem de montanhas, castelo e vulcão"
-            width="2048"
-            height="768"
+            width="1440"
+            height="540"
+            fetchpriority="high"
+            decoding="async"
           />
         </div>
       </section>
