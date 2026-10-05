@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CineMatch — Recomendação de Séries em Tempo Real</title>
+    <meta
+      name="description"
+      content="CineMatch: receba recomendações de séries em tempo real a partir do seu perfil de gêneros favoritos, com catálogo real da TVMaze e compatibilidade calculada para você."
+    />
+    <meta
+      property="og:title"
+      content="CineMatch — Recomendação de Séries em Tempo Real"
+    />
+    <meta
+      property="og:description"
+      content="Recomendações de séries a partir do seu perfil de gêneros favoritos, com catálogo real da TVMaze."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://tiagoeduardobr.github.io/CineMatch-Web/"
+    />
+    <meta property="og:image" content="./assets/main.png" />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+
+  <body>
+    <!-- O skip link é o primeiro elemento focável da página: leitores de tela e
+       navegação por teclado pulam a navbar inteira e vão direto ao conteúdo
+       principal, cujo alvo é o id que a <main> recebe. Ele fica invisível e só
+       aparece quando recebe foco, pela regra .skip-link do css/style.css. -->
+    <a class="skip-link" href="#conteudo-principal"
+      >Pular para o conteúdo principal</a
+    >
+    <header>
+      <nav class="barra-navegacao" aria-label="Navegação principal">
+        <h1 class="marca">CineMatch</h1>
+
+        <button
+          id="botao-menu"
+          class="botao-menu"
+          type="button"
+          aria-label="Abrir menu de navegação"
+          aria-expanded="false"
+          aria-controls="menu-navegacao"
+        >
+          <span></span><span></span><span></span>
+        </button>
+
+        <ul id="menu-navegacao" class="links-navegacao">
+          <li><a href="#conteudo-principal" aria-current="page">Início</a></li>
+          <li><a href="#sobre">Sobre o CineMatch</a></li>
+          <li><a href="#minha-lista">Minha Lista</a></li>
+          <li><a href="#perfil-titulo">Meu Perfil</a></li>
+        </ul>
+
+        <div class="acoes-navegacao" role="group" aria-label="Ações rápidas">
+          <button
+            id="botao-pesquisar"
+            class="botao-navegacao"
+            type="button"
+            aria-label="Abrir pesquisa de séries"
+            aria-expanded="false"
+            aria-controls="campo-pesquisa"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="11" cy="11" r="6.5"></circle>
+              <path d="m16 16 4.5 4.5"></path>
+            </svg>
+          </button>
+          <button
+            id="botao-tema"
+            class="botao-navegacao"
+            type="button"
+            aria-label="Alternar tema"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"
+              ></path>
+            </svg>
+          </button>
+          <button
+            id="botao-perfil-nav"
+            class="botao-navegacao botao-navegacao--perfil"
+            type="button"
+            aria-label="Editar meu perfil"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="8" r="3.25"></circle>
+              <path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path>
+            </svg>
+          </button>
+        </div>
+        <div id="painel-pesquisa" class="painel-pesquisa" hidden>
+          <label for="campo-pesquisa">Pesquisar nas recomendações</label>
+          <input
+            id="campo-pesquisa"
+            type="search"
+            placeholder="Digite o título de uma série"
+            autocomplete="off"
+          />
+        </div>
+      </nav>
+    </header>
+
+    <main id="conteudo-principal">
+      <section class="capa" aria-label="Capa CineMatch">
+        <div class="conteudo-capa">
+          <img
+            class="imagem-capa"
+            src="./assets/main.png"
+            alt="CineMatch em uma paisagem de montanhas, castelo e vulcão"
+            width="2048"
+            height="768"
+          />
+        </div>
+      </section>
+
+      <section
+        id="sobre"
+        class="secao-sobre"
+        aria-labelledby="sobre-titulo"
+        hidden
+      >
+        <div class="conteudo-sobre">
+          <h2 id="sobre-titulo">Sobre o CineMatch</h2>
+          <p>
+            O CineMatch é uma aplicação de recomendação de séries criada para
+            transformar a escolha do que assistir em uma experiência simples,
+            personalizada e explicada. A pessoa informa seu perfil e seus
+            gêneros favoritos, e a aplicação compara essas preferências com um
+            catálogo real da TVMaze.
+          </p>
+          <p>
+            Cada recomendação mostra os gêneros em comum, os gêneros ainda não
+            explorados, a porcentagem de compatibilidade e a avaliação da série.
+            O projeto também oferece filtro, ordenação, tema alternativo,
+            geolocalização contextual e uma lista de favoritos salva no
+            navegador.
+          </p>
+          <div class="autores-projeto">
+            <h3>Autores</h3>
+            <ul>
+              <li>
+                <a
+                  href="https://github.com/tiagoeduardobr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Tiago
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/lucasgd123"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Lucas
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="secao-perfil" aria-labelledby="perfil-titulo">
+        <div class="cartao-perfil">
+          <h2 id="perfil-titulo">Crie seu perfil</h2>
+          <hr class="separador" />
+
+          <div id="formulario-status" role="status" aria-live="polite">
+            Preencha seu perfil para receber recomendações.
+          </div>
+
+          <form id="form-perfil">
+            <div>
+              <label for="nome">Nome</label>
+              <input
+                type="text"
+                id="nome"
+                name="nome"
+                autocomplete="name"
+                required
+              />
+            </div>
+            <div>
+              <label for="idade">Idade</label>
+              <input type="number" id="idade" name="idade" min="1" required />
+            </div>
+
+            <fieldset class="generos">
+              <legend>Gêneros favoritos</legend>
+              <div class="lista-generos">
+                <label class="genero" for="genero-drama">
+                  <input
+                    type="checkbox"
+                    id="genero-drama"
+                    name="genero"
+                    value="Drama"
+                  />
+                  Drama
+                </label>
+                <label class="genero" for="genero-comedia">
+                  <input
+                    type="checkbox"
+                    id="genero-comedia"
+                    name="genero"
+                    value="Comedy"
+                  />
+                  Comédia
+                </label>
+                <label class="genero" for="genero-acao">
+                  <input
+                    type="checkbox"
+                    id="genero-acao"
+                    name="genero"
+                    value="Action"
+                  />
+                  Ação
+                </label>
+                <label class="genero" for="genero-ficcao-cientifica">
+                  <input
+                    type="checkbox"
+                    id="genero-ficcao-cientifica"
+                    name="genero"
+                    value="Science-Fiction"
+                  />
+                  Ficção Científica
+                </label>
+                <label class="genero" for="genero-terror">
+                  <input
+                    type="checkbox"
+                    id="genero-terror"
+                    name="genero"
+                    value="Horror"
+                  />
+                  Terror
+                </label>
+                <label class="genero" for="genero-romance">
+                  <input
+                    type="checkbox"
+                    id="genero-romance"
+                    name="genero"
+                    value="Romance"
+                  />
+                  Romance
+                </label>
+                <label class="genero" for="genero-fantasia">
+                  <input
+                    type="checkbox"
+                    id="genero-fantasia"
+                    name="genero"
+                    value="Fantasy"
+                  />
+                  Fantasia
+                </label>
+                <label class="genero" for="genero-aventura">
+                  <input
+                    type="checkbox"
+                    id="genero-aventura"
+                    name="genero"
+                    value="Adventure"
+                  />
+                  Aventura
+                </label>
+                <label class="genero" for="genero-suspense">
+                  <input
+                    type="checkbox"
+                    id="genero-suspense"
+                    name="genero"
+                    value="Thriller"
+                  />
+                  Suspense
+                </label>
+                <label class="genero" for="genero-documentario">
+                  <input
+                    type="checkbox"
+                    id="genero-documentario"
+                    name="genero"
+                    value="Documentary"
+                  />
+                  Documentário
+                </label>
+              </div>
+            </fieldset>
+
+            <button type="submit">Ver recomendações</button>
+          </form>
+        </div>
+      </section>
+
+      <section
+        class="secao-resultados"
+        aria-labelledby="resultados-titulo"
+        hidden
+      >
+        <div class="cabecalho-resultados">
+          <div class="introducao-resultados">
+            <h2 id="resultados-titulo">Recomendações para você</h2>
+            <p id="resultados-boas-vindas"></p>
+            <p id="resultados-status" role="status" aria-live="polite">
+              As recomendações serão exibidas aqui.
+            </p>
+            <!-- Alvo do contador por closure do RF11 (M1-T14), escrito por
+              exibirContadorDeRecalculos em js/ui.js. Ele permanece separado
+              do status porque os estados da busca reescrevem o status. -->
+            <p id="resultados-contador"></p>
+          </div>
+          <button id="botao-trocar-perfil" type="button" hidden>
+            Trocar perfil
+          </button>
+        </div>
+        <hr class="separador" />
+        <div
+          class="controles-resultados"
+          role="group"
+          aria-label="Filtros das recomendações"
+        >
+          <div>
+            <label for="filtro-genero">Filtrar por gênero</label>
+            <select id="filtro-genero">
+              <option value="">Todos os gêneros</option>
+              <option value="Action">Ação</option>
+              <option value="Adventure">Aventura</option>
+              <option value="Comedy">Comédia</option>
+              <option value="Documentary">Documentário</option>
+              <option value="Drama">Drama</option>
+              <option value="Fantasy">Fantasia</option>
+              <option value="Horror">Terror</option>
+              <option value="Romance">Romance</option>
+              <option value="Science-Fiction">Ficção Científica</option>
+              <option value="Thriller">Suspense</option>
+            </select>
+          </div>
+          <div>
+            <label for="ordenacao-resultados">Ordenar por</label>
+            <select id="ordenacao-resultados">
+              <option value="compatibilidade">Compatibilidade</option>
+              <option value="avaliacao">Avaliação</option>
+              <option value="titulo">Título</option>
+            </select>
+          </div>
+        </div>
+        <div id="resultados" class="resultados"></div>
+      </section>
+
+      <section id="minha-lista" class="secao-lista" aria-labelledby="lista-titulo">
+        <div class="cabecalho-lista">
+          <h2 id="lista-titulo">Minha Lista</h2>
+          <p id="lista-status" role="status" aria-live="polite">
+            Suas séries favoritas aparecerão aqui.
+          </p>
+        </div>
+        <div id="lista-favoritos" class="resultados"></div>
+      </section>
+    </main>
+    <footer>
+      <p>CineMatch — Te acompanha em todas as aventuras.</p>
+    </footer>
+
+    <script type="module" src="./js/script.js"></script>
+  </body>
+</html>

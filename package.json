@@ -1,0 +1,13 @@
+{
+  "name": "cinematch-web",
+  "version": "0.1.0",
+  "description": "CineMatch Web: recomendação de séries em tempo real, com HTML5, CSS3 (Flexbox) e JavaScript de módulos ES nativos.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "live-server"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
