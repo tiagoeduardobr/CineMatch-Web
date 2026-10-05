@@ -1,5 +1,6 @@
 # Dependências do npm (entram na M1-T18, com `npm install`)
 node_modules/
+.opencode
 
 # Logs
 npm-debug.log*
